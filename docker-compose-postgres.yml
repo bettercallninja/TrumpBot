@@ -1,0 +1,13 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: trump
+      POSTGRES_PASSWORD: trump
+      POSTGRES_DB: trumpbot
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata: {}
