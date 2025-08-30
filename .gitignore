@@ -6,5 +6,48 @@ dist/
 wheels/
 *.egg-info
 .idea/
+
 # Virtual environments
 .venv
+venv/
+env/
+
+# Environment variables and secrets
+.env
+.env.local
+.env.production
+.env.staging
+*.env
+
+# Configuration files with secrets
+config/bot_config.json
+config/secrets.json
+
+# Logs
+logs/
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+backups/
+*.backup
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE files
+.vscode/settings.json
+.idea/
+*.iml
+
+# Temporary files
+temp/
+tmp/
+*.tmp
