@@ -668,25 +668,25 @@ def register_handlers(bot: AsyncTeleBot, db_manager: DBManager):
             elif action == "inventory":
                 # Import and use inventory manager
                 from .inventory import InventoryManager
-                inventory_manager = InventoryManager(db_manager)
+                inventory_manager = InventoryManager(db_manager, bot)
                 await inventory_manager.show_inventory_overview(bot, call.message)
             
             elif action == "stats":
                 # Import and use general manager for stats
                 from .general import GeneralManager
-                general_manager = GeneralManager(db_manager)
+                general_manager = GeneralManager(db_manager, bot)
                 await general_manager.show_user_profile(bot, call.message)
             
             elif action == "leaderboard":
                 # Import and use general manager for leaderboard
                 from .general import GeneralManager
-                general_manager = GeneralManager(db_manager)
+                general_manager = GeneralManager(db_manager, bot)
                 await general_manager.show_leaderboard(bot, call.message)
             
             elif action == "menu":
                 # Import and use general manager for main menu
                 from .general import GeneralManager
-                general_manager = GeneralManager(db_manager)
+                general_manager = GeneralManager(db_manager, bot)
                 await general_manager.show_main_menu(bot, call.message)
             
             await bot.answer_callback_query(call.id)

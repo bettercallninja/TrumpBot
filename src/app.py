@@ -1,17 +1,17 @@
 ﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-ðŸ¤– TrumpBot Application | Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù† ØªØ±Ø§Ù…Ù¾â€ŒØ¨Ø§Øª
+🤖 TrumpBot Application | اپلیکیشن ترامپ‌بات
 ===============================================
 
-ðŸŽ¯ Enterprise-Grade Multilingual Bot Application | Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù† Ø±Ø¨Ø§Øª Ú†Ù†Ø¯Ø²Ø¨Ø§Ù†Ù‡ Ø³Ø§Ø²Ù…Ø§Ù†ÛŒ
-â€¢ Advanced error handling and recovery | Ù…Ø¯ÛŒØ±ÛŒØª Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ø®Ø·Ø§ Ùˆ Ø¨Ø§Ø²ÛŒØ§Ø¨ÛŒ
-â€¢ Comprehensive Persian & English support | Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ Ø¬Ø§Ù…Ø¹ ÙØ§Ø±Ø³ÛŒ Ùˆ Ø§Ù†Ú¯Ù„ÛŒØ³ÛŒ
-â€¢ Production-ready architecture | Ù…Ø¹Ù…Ø§Ø±ÛŒ Ø¢Ù…Ø§Ø¯Ù‡ ØªÙˆÙ„ÛŒØ¯
-â€¢ Performance monitoring and optimization | Ù†Ø¸Ø§Ø±Øª Ùˆ Ø¨Ù‡ÛŒÙ†Ù‡â€ŒØ³Ø§Ø²ÛŒ Ø¹Ù…Ù„Ú©Ø±Ø¯
+🎯 Enterprise-Grade Multilingual Bot Application | اپلیکیشن ربات چندزبانه سازمانی
+• Advanced error handling and recovery | مدیریت پیشرفته خطا و بازیابی
+• Comprehensive Persian & English support | پشتیبانی جامع فارسی و انگلیسی
+• Production-ready architecture | معماری آماده تولید
+• Performance monitoring and optimization | نظارت و بهینه‌سازی عملکرد
 
-ðŸ“š Version: 2.0.0-Enterprise | Ù†Ø³Ø®Ù‡: Û².Û°.Û°-Ø³Ø§Ø²Ù…Ø§Ù†ÛŒ
-ðŸ”§ Enhanced: August 2025 | ØªÙ‚ÙˆÛŒØª Ø´Ø¯Ù‡: Ø§ÙˆØª Û²Û°Û²Ûµ
+📚 Version: 2.0.0-Enterprise | نسخه: ۲.۰.۰-سازمانی
+🔧 Enhanced: August 2025 | تقویت شده: اوت ۲۰۲۵
 """
 
 import logging
@@ -35,7 +35,7 @@ from src.utils.localization import get_localized_text, detect_user_language, set
 
 # Note: Handler modules will be imported on-demand to avoid startup delays
 
-# ðŸ“Š Enhanced Logging Configuration | Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ù„Ø§Ú¯â€ŒÚ¯ÛŒØ±ÛŒ
+# 📊 Enhanced Logging Configuration | پیکربندی پیشرفته لاگ‌گیری
 log_format = '%(asctime)s | %(name)s | %(levelname)s | %(message)s'
 log_date_format = '%Y-%m-%d %H:%M:%S'
 
@@ -66,7 +66,7 @@ logging.getLogger('asyncpg').setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 class ApplicationMetrics:
-    """ðŸ“ˆ Application performance metrics | Ù…Ø¹ÛŒØ§Ø±Ù‡Ø§ÛŒ Ø¹Ù…Ù„Ú©Ø±Ø¯ Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù†"""
+    """📈 Application performance metrics | معیارهای عملکرد اپلیکیشن"""
     
     def __init__(self):
         self.start_time = time.time()
@@ -152,7 +152,7 @@ class ApplicationMetrics:
         }
 
 class BotApplication:
-    """ðŸŽ® Main bot application class | Ú©Ù„Ø§Ø³ Ø§ØµÙ„ÛŒ Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù† Ø±Ø¨Ø§Øª"""
+    """🎮 Main bot application class | کلاس اصلی اپلیکیشن ربات"""
     
     def __init__(self):
         self.config = BotConfig
@@ -176,15 +176,15 @@ class BotApplication:
         signal_name = signal_names.get(signum, f'Signal {signum}')
         
         logger.info(f"Received {signal_name}. Initiating graceful shutdown...")
-        logger.info(f"Ø¯Ø±ÛŒØ§ÙØª Ø³ÛŒÚ¯Ù†Ø§Ù„ {signal_name}. Ø´Ø±ÙˆØ¹ Ø®Ø§Ù…ÙˆØ´ Ø´Ø¯Ù† Ù†Ø±Ù…...")
+        logger.info(f"دریافت سیگنال {signal_name}. شروع خاموش شدن نرم...")
         
         self.shutdown_requested = True
     
     async def initialize_database(self) -> bool:
-        """ðŸ—„ï¸ Initialize database connection pool | Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ø§Ø³ØªØ®Ø± Ø§ØªØµØ§Ù„ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡"""
+        """🗄️ Initialize database connection pool | راه‌اندازی استخر اتصال پایگاه داده"""
         try:
             logger.info("Initializing database connection pool...")
-            logger.info("Ø¯Ø± Ø­Ø§Ù„ Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ø§Ø³ØªØ®Ø± Ø§ØªØµØ§Ù„ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡...")
+            logger.info("در حال راه‌اندازی استخر اتصال پایگاه داده...")
             
             start_time = time.time()
             await initialize_pool()
@@ -192,7 +192,7 @@ class BotApplication:
             
             # Setup database tables if they don't exist
             logger.info("Setting up database tables...")
-            logger.info("Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ø¬Ø¯Ø§ÙˆÙ„ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡...")
+            logger.info("راه‌اندازی جداول پایگاه داده...")
             await setup_database()
             
             # Test database connection
@@ -200,12 +200,12 @@ class BotApplication:
             
             duration = time.time() - start_time
             logger.info(f"Database initialized successfully in {duration:.2f}s")
-            logger.info(f"Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø¯Ø± {duration:.2f} Ø«Ø§Ù†ÛŒÙ‡ Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ø´Ø¯")
+            logger.info(f"پایگاه داده با موفقیت در {duration:.2f} ثانیه راه‌اندازی شد")
             
             return True
         except Exception as e:
             logger.error(f"Failed to initialize database: {e}")
-            logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡: {e}")
+            logger.error(f"خطا در راه‌اندازی پایگاه داده: {e}")
             self.metrics.record_error()
             return False
     
@@ -218,18 +218,18 @@ class BotApplication:
                 raise Exception("Database connection test failed")
             
             logger.info("Database connection test passed")
-            logger.info("ØªØ³Øª Ø§ØªØµØ§Ù„ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯")
+            logger.info("تست اتصال پایگاه داده موفق بود")
             
         except Exception as e:
             logger.error(f"Database connection test failed: {e}")
-            logger.error(f"ØªØ³Øª Ø§ØªØµØ§Ù„ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ù†Ø§Ù…ÙˆÙÙ‚: {e}")
+            logger.error(f"تست اتصال پایگاه داده ناموفق: {e}")
             raise
     
     def initialize_translations(self) -> bool:
-        """ðŸŒ Load and validate translation files | Ø¨Ø§Ø±Ú¯Ø°Ø§Ø±ÛŒ Ùˆ Ø§Ø¹ØªØ¨Ø§Ø±Ø³Ù†Ø¬ÛŒ ÙØ§ÛŒÙ„â€ŒÙ‡Ø§ÛŒ ØªØ±Ø¬Ù…Ù‡"""
+        """🌐 Load and validate translation files | بارگذاری و اعتبارسنجی فایل‌های ترجمه"""
         try:
             logger.info("Loading translations for multilingual support...")
-            logger.info("Ø¨Ø§Ø±Ú¯Ø°Ø§Ø±ÛŒ ØªØ±Ø¬Ù…Ù‡â€ŒÙ‡Ø§ Ø¨Ø±Ø§ÛŒ Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ Ú†Ù†Ø¯Ø²Ø¨Ø§Ù†Ù‡...")
+            logger.info("بارگذاری ترجمه‌ها برای پشتیبانی چندزبانه...")
             
             start_time = time.time()
             
@@ -240,52 +240,52 @@ class BotApplication:
             validation_results = validate_translation_completeness()
             
             if validation_results.get('complete', False):
-                logger.info("âœ… All translations loaded and validated successfully")
-                logger.info("âœ… ØªÙ…Ø§Ù… ØªØ±Ø¬Ù…Ù‡â€ŒÙ‡Ø§ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø¨Ø§Ø±Ú¯Ø°Ø§Ø±ÛŒ Ùˆ Ø§Ø¹ØªØ¨Ø§Ø±Ø³Ù†Ø¬ÛŒ Ø´Ø¯Ù†Ø¯")
+                logger.info("✅ All translations loaded and validated successfully")
+                logger.info("✅ تمام ترجمه‌ها با موفقیت بارگذاری و اعتبارسنجی شدند")
             else:
                 missing_keys = validation_results.get('missing_keys', {})
                 if missing_keys:
-                    logger.warning(f"âš ï¸ Some translation keys are missing: {missing_keys}")
-                    logger.warning(f"âš ï¸ Ø¨Ø±Ø®ÛŒ Ú©Ù„ÛŒØ¯Ù‡Ø§ÛŒ ØªØ±Ø¬Ù…Ù‡ Ù…ÙÙ‚ÙˆØ¯ Ù‡Ø³ØªÙ†Ø¯: {missing_keys}")
+                    logger.warning(f"⚠️ Some translation keys are missing: {missing_keys}")
+                    logger.warning(f"⚠️ برخی کلیدهای ترجمه مفقود هستند: {missing_keys}")
             
             # Set default language
             set_default_language(self.default_language)
             
             duration = time.time() - start_time
             logger.info(f"Translations initialized in {duration:.2f}s")
-            logger.info(f"ØªØ±Ø¬Ù…Ù‡â€ŒÙ‡Ø§ Ø¯Ø± {duration:.2f} Ø«Ø§Ù†ÛŒÙ‡ Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ø´Ø¯Ù†Ø¯")
+            logger.info(f"ترجمه‌ها در {duration:.2f} ثانیه راه‌اندازی شدند")
             
             return True
         except Exception as e:
             logger.error(f"Failed to load translations: {e}")
-            logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ø¨Ø§Ø±Ú¯Ø°Ø§Ø±ÛŒ ØªØ±Ø¬Ù…Ù‡â€ŒÙ‡Ø§: {e}")
+            logger.error(f"خطا در بارگذاری ترجمه‌ها: {e}")
             self.metrics.record_error()
             return False
     
     def create_bot_instance(self) -> bool:
-        """ðŸ¤– Create bot instance with enhanced configuration | Ø§ÛŒØ¬Ø§Ø¯ Ù†Ù…ÙˆÙ†Ù‡ Ø±Ø¨Ø§Øª Ø¨Ø§ Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ Ù¾ÛŒØ´Ø±ÙØªÙ‡"""
+        """🤖 Create bot instance with enhanced configuration | ایجاد نمونه ربات با پیکربندی پیشرفته"""
         try:
             logger.info("Creating bot instance with enhanced features...")
-            logger.info("Ø§ÛŒØ¬Ø§Ø¯ Ù†Ù…ÙˆÙ†Ù‡ Ø±Ø¨Ø§Øª Ø¨Ø§ ÙˆÛŒÚ˜Ú¯ÛŒâ€ŒÙ‡Ø§ÛŒ Ù¾ÛŒØ´Ø±ÙØªÙ‡...")
+            logger.info("ایجاد نمونه ربات با ویژگی‌های پیشرفته...")
             
             self.bot = create_bot()
             
             # Note: Bot info will be retrieved during startup polling
             # since get_me() is an async method that requires await
             logger.info("Bot instance created successfully")
-            logger.info("Ù†Ù…ÙˆÙ†Ù‡ Ø±Ø¨Ø§Øª Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø§ÛŒØ¬Ø§Ø¯ Ø´Ø¯")
+            logger.info("نمونه ربات با موفقیت ایجاد شد")
             return True
         except Exception as e:
             logger.error(f"Failed to create bot instance: {e}")
-            logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ø§ÛŒØ¬Ø§Ø¯ Ù†Ù…ÙˆÙ†Ù‡ Ø±Ø¨Ø§Øª: {e}")
+            logger.error(f"خطا در ایجاد نمونه ربات: {e}")
             self.metrics.record_error()
             return False
     
     def register_handlers(self) -> bool:
-        """ðŸ“‹ Register all command and callback handlers | Ø«Ø¨Øª ØªÙ…Ø§Ù… Ø¯Ø³ØªÙˆØ±Ø§Øª Ùˆ Ú©Ù†ØªØ±Ù„â€ŒÚ©Ù†Ù†Ø¯Ù‡â€ŒÙ‡Ø§ÛŒ ÙØ±Ø§Ø®ÙˆØ§Ù†"""
+        """📋 Register all command and callback handlers | ثبت تمام دستورات و کنترل‌کننده‌های فراخوان"""
         try:
             logger.info("Registering command and callback handlers...")
-            logger.info("Ø«Ø¨Øª Ú©Ù†ØªØ±Ù„â€ŒÚ©Ù†Ù†Ø¯Ù‡â€ŒÙ‡Ø§ÛŒ Ø¯Ø³ØªÙˆØ± Ùˆ ÙØ±Ø§Ø®ÙˆØ§Ù†...")
+            logger.info("ثبت کنترل‌کننده‌های دستور و فراخوان...")
             
             handlers_registered = 0
             
@@ -309,9 +309,9 @@ class BotApplication:
                 try:
                     module.register_handlers(self.bot, self.db_manager)
                     handlers_registered += 1
-                    logger.debug(f"âœ… {module_name} handlers registered")
+                    logger.debug(f"✅ {module_name} handlers registered")
                 except Exception as e:
-                    logger.error(f"âŒ Failed to register {module_name} handlers: {e}")
+                    logger.error(f"❌ Failed to register {module_name} handlers: {e}")
                     raise
             
             # Import and register callback and message handlers
@@ -321,34 +321,34 @@ class BotApplication:
             try:
                 callbacks.register_handlers(self.bot, self.db_manager)
                 handlers_registered += 1
-                logger.debug("âœ… Callback handlers registered")
+                logger.debug("✅ Callback handlers registered")
             except Exception as e:
-                logger.error(f"âŒ Failed to register callback handlers: {e}")
+                logger.error(f"❌ Failed to register callback handlers: {e}")
                 raise
             
             try:
                 messages.register_handlers(self.bot, self.db_manager)
                 handlers_registered += 1
-                logger.debug("âœ… Message handlers registered")
+                logger.debug("✅ Message handlers registered")
             except Exception as e:
-                logger.error(f"âŒ Failed to register message handlers: {e}")
+                logger.error(f"❌ Failed to register message handlers: {e}")
                 raise
             
             logger.info(f"All {handlers_registered} handler modules registered successfully")
-            logger.info(f"ØªÙ…Ø§Ù… {handlers_registered} Ù…Ø§Ú˜ÙˆÙ„ Ú©Ù†ØªØ±Ù„â€ŒÚ©Ù†Ù†Ø¯Ù‡ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø«Ø¨Øª Ø´Ø¯Ù†Ø¯")
+            logger.info(f"تمام {handlers_registered} ماژول کنترل‌کننده با موفقیت ثبت شدند")
             return True
             
         except Exception as e:
             logger.error(f"Failed to register handlers: {e}")
-            logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ø«Ø¨Øª Ú©Ù†ØªØ±Ù„â€ŒÚ©Ù†Ù†Ø¯Ù‡â€ŒÙ‡Ø§: {e}")
+            logger.error(f"خطا در ثبت کنترل‌کننده‌ها: {e}")
             self.metrics.record_error()
             return False
     
     def configure_error_handling(self) -> bool:
-        """ðŸš¨ Configure comprehensive error handling | Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ Ù…Ø¯ÛŒØ±ÛŒØª Ø®Ø·Ø§ÛŒ Ø¬Ø§Ù…Ø¹"""
+        """🚨 Configure comprehensive error handling | پیکربندی مدیریت خطای جامع"""
         try:
             logger.info("Configuring error handling and recovery systems...")
-            logger.info("Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ Ø³ÛŒØ³ØªÙ…â€ŒÙ‡Ø§ÛŒ Ù…Ø¯ÛŒØ±ÛŒØª Ø®Ø·Ø§ Ùˆ Ø¨Ø§Ø²ÛŒØ§Ø¨ÛŒ...")
+            logger.info("پیکربندی سیستم‌های مدیریت خطا و بازیابی...")
             
             # For AsyncTeleBot, we'll configure error handling differently
             # The middleware and exception handlers will be set up in the handlers themselves
@@ -380,7 +380,7 @@ class BotApplication:
                 error_msg = str(exception)
                 
                 logger.error(f"Bot exception [{error_id}] in {context}: {type(exception).__name__}: {error_msg}")
-                logger.error(f"Ø®Ø·Ø§ÛŒ Ø±Ø¨Ø§Øª [{error_id}] Ø¯Ø± {context}: {type(exception).__name__}: {error_msg}")
+                logger.error(f"خطای ربات [{error_id}] در {context}: {type(exception).__name__}: {error_msg}")
                 
                 # Log stack trace for debugging
                 logger.error(f"Stack trace [{error_id}]:", exc_info=True)
@@ -391,20 +391,20 @@ class BotApplication:
             self.handle_bot_error = handle_bot_error
             
             logger.info("Error handling configured successfully")
-            logger.info("Ù…Ø¯ÛŒØ±ÛŒØª Ø®Ø·Ø§ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ Ø´Ø¯")
+            logger.info("مدیریت خطا با موفقیت پیکربندی شد")
             return True
             
         except Exception as e:
             logger.error(f"Failed to configure error handling: {e}")
-            logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ Ù…Ø¯ÛŒØ±ÛŒØª Ø®Ø·Ø§: {e}")
+            logger.error(f"خطا در پیکربندی مدیریت خطا: {e}")
             self.metrics.record_error()
             return False
     
     def setup_health_monitoring(self) -> bool:
-        """ðŸ’Š Setup health monitoring and diagnostics | Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ù†Ø¸Ø§Ø±Øª Ø³Ù„Ø§Ù…Øª Ùˆ ØªØ´Ø®ÛŒØµ"""
+        """💊 Setup health monitoring and diagnostics | راه‌اندازی نظارت سلامت و تشخیص"""
         try:
             logger.info("Setting up health monitoring system...")
-            logger.info("Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ø³ÛŒØ³ØªÙ… Ù†Ø¸Ø§Ø±Øª Ø³Ù„Ø§Ù…Øª...")
+            logger.info("راه‌اندازی سیستم نظارت سلامت...")
             
             # Create health check endpoint (if web interface is enabled)
             self.health_status = {
@@ -469,83 +469,83 @@ class BotApplication:
             health_thread.start()
             
             logger.info("Health monitoring system activated")
-            logger.info("Ø³ÛŒØ³ØªÙ… Ù†Ø¸Ø§Ø±Øª Ø³Ù„Ø§Ù…Øª ÙØ¹Ø§Ù„ Ø´Ø¯")
+            logger.info("سیستم نظارت سلامت فعال شد")
             return True
             
         except Exception as e:
             logger.error(f"Failed to setup health monitoring: {e}")
-            logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ù†Ø¸Ø§Ø±Øª Ø³Ù„Ø§Ù…Øª: {e}")
+            logger.error(f"خطا در راه‌اندازی نظارت سلامت: {e}")
             self.metrics.record_error()
             return False
     
     async def startup_sequence(self) -> bool:
-        """ðŸš€ Execute complete startup sequence | Ø§Ø¬Ø±Ø§ÛŒ Ø¯Ù†Ø¨Ø§Ù„Ù‡ Ú©Ø§Ù…Ù„ Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ"""
+        """🚀 Execute complete startup sequence | اجرای دنباله کامل راه‌اندازی"""
         startup_start = time.time()
         
         try:
             logger.info("="*60)
-            logger.info("ðŸŽ® TrumpBot Application Starting Up | Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù† ØªØ±Ø§Ù…Ù¾â€ŒØ¨Ø§Øª")
+            logger.info("🎮 TrumpBot Application Starting Up | راه‌اندازی اپلیکیشن ترامپ‌بات")
             logger.info("="*60)
             
             # Step 1: Initialize translations
-            logger.info("ðŸ“š Step 1/6: Loading translations...")
-            logger.info("ðŸ“š Ù…Ø±Ø­Ù„Ù‡ Û±/Û¶: Ø¨Ø§Ø±Ú¯Ø°Ø§Ø±ÛŒ ØªØ±Ø¬Ù…Ù‡â€ŒÙ‡Ø§...")
+            logger.info("📚 Step 1/6: Loading translations...")
+            logger.info("📚 مرحله ۱/۶: بارگذاری ترجمه‌ها...")
             if not self.initialize_translations():
-                logger.error("âŒ Translation initialization failed")
-                logger.error("âŒ Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ ØªØ±Ø¬Ù…Ù‡â€ŒÙ‡Ø§ Ù†Ø§Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯")
+                logger.error("❌ Translation initialization failed")
+                logger.error("❌ راه‌اندازی ترجمه‌ها ناموفق بود")
                 return False
-            logger.info("âœ… Translations loaded successfully")
-            logger.info("âœ… ØªØ±Ø¬Ù…Ù‡â€ŒÙ‡Ø§ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø¨Ø§Ø±Ú¯Ø°Ø§Ø±ÛŒ Ø´Ø¯Ù†Ø¯")
+            logger.info("✅ Translations loaded successfully")
+            logger.info("✅ ترجمه‌ها با موفقیت بارگذاری شدند")
             
             # Step 2: Initialize database
-            logger.info("ðŸ—„ï¸ Step 2/6: Connecting to database...")
-            logger.info("ðŸ—„ï¸ Ù…Ø±Ø­Ù„Ù‡ Û²/Û¶: Ø§ØªØµØ§Ù„ Ø¨Ù‡ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡...")
+            logger.info("🗄️ Step 2/6: Connecting to database...")
+            logger.info("🗄️ مرحله ۲/۶: اتصال به پایگاه داده...")
             if not await self.initialize_database():
-                logger.error("âŒ Database initialization failed")
-                logger.error("âŒ Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ù†Ø§Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯")
+                logger.error("❌ Database initialization failed")
+                logger.error("❌ راه‌اندازی پایگاه داده ناموفق بود")
                 return False
-            logger.info("âœ… Database connected successfully")
-            logger.info("âœ… Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ù…ØªØµÙ„ Ø´Ø¯")
+            logger.info("✅ Database connected successfully")
+            logger.info("✅ پایگاه داده با موفقیت متصل شد")
             
             # Step 3: Create bot instance
-            logger.info("ðŸ¤– Step 3/6: Creating bot instance...")
-            logger.info("ðŸ¤– Ù…Ø±Ø­Ù„Ù‡ Û³/Û¶: Ø§ÛŒØ¬Ø§Ø¯ Ù†Ù…ÙˆÙ†Ù‡ Ø±Ø¨Ø§Øª...")
+            logger.info("🤖 Step 3/6: Creating bot instance...")
+            logger.info("🤖 مرحله ۳/۶: ایجاد نمونه ربات...")
             if not self.create_bot_instance():
-                logger.error("âŒ Bot instance creation failed")
-                logger.error("âŒ Ø§ÛŒØ¬Ø§Ø¯ Ù†Ù…ÙˆÙ†Ù‡ Ø±Ø¨Ø§Øª Ù†Ø§Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯")
+                logger.error("❌ Bot instance creation failed")
+                logger.error("❌ ایجاد نمونه ربات ناموفق بود")
                 return False
-            logger.info("âœ… Bot instance created successfully")
-            logger.info("âœ… Ù†Ù…ÙˆÙ†Ù‡ Ø±Ø¨Ø§Øª Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø§ÛŒØ¬Ø§Ø¯ Ø´Ø¯")
+            logger.info("✅ Bot instance created successfully")
+            logger.info("✅ نمونه ربات با موفقیت ایجاد شد")
             
             # Step 4: Configure error handling
-            logger.info("ðŸš¨ Step 4/6: Configuring error handling...")
-            logger.info("ðŸš¨ Ù…Ø±Ø­Ù„Ù‡ Û´/Û¶: Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ Ù…Ø¯ÛŒØ±ÛŒØª Ø®Ø·Ø§...")
+            logger.info("🚨 Step 4/6: Configuring error handling...")
+            logger.info("🚨 مرحله ۴/۶: پیکربندی مدیریت خطا...")
             if not self.configure_error_handling():
-                logger.error("âŒ Error handling configuration failed")
-                logger.error("âŒ Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ Ù…Ø¯ÛŒØ±ÛŒØª Ø®Ø·Ø§ Ù†Ø§Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯")
+                logger.error("❌ Error handling configuration failed")
+                logger.error("❌ پیکربندی مدیریت خطا ناموفق بود")
                 return False
-            logger.info("âœ… Error handling configured successfully")
-            logger.info("âœ… Ù…Ø¯ÛŒØ±ÛŒØª Ø®Ø·Ø§ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ Ø´Ø¯")
+            logger.info("✅ Error handling configured successfully")
+            logger.info("✅ مدیریت خطا با موفقیت پیکربندی شد")
             
             # Step 5: Register handlers
-            logger.info("ðŸ“‹ Step 5/6: Registering handlers...")
-            logger.info("ðŸ“‹ Ù…Ø±Ø­Ù„Ù‡ Ûµ/Û¶: Ø«Ø¨Øª Ú©Ù†ØªØ±Ù„â€ŒÚ©Ù†Ù†Ø¯Ù‡â€ŒÙ‡Ø§...")
+            logger.info("📋 Step 5/6: Registering handlers...")
+            logger.info("📋 مرحله ۵/۶: ثبت کنترل‌کننده‌ها...")
             if not self.register_handlers():
-                logger.error("âŒ Handler registration failed")
-                logger.error("âŒ Ø«Ø¨Øª Ú©Ù†ØªØ±Ù„â€ŒÚ©Ù†Ù†Ø¯Ù‡â€ŒÙ‡Ø§ Ù†Ø§Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯")
+                logger.error("❌ Handler registration failed")
+                logger.error("❌ ثبت کنترل‌کننده‌ها ناموفق بود")
                 return False
-            logger.info("âœ… Handlers registered successfully")
-            logger.info("âœ… Ú©Ù†ØªØ±Ù„â€ŒÚ©Ù†Ù†Ø¯Ù‡â€ŒÙ‡Ø§ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø«Ø¨Øª Ø´Ø¯Ù†Ø¯")
+            logger.info("✅ Handlers registered successfully")
+            logger.info("✅ کنترل‌کننده‌ها با موفقیت ثبت شدند")
             
             # Step 6: Setup health monitoring
-            logger.info("ðŸ’Š Step 6/6: Setting up health monitoring...")
-            logger.info("ðŸ’Š Ù…Ø±Ø­Ù„Ù‡ Û¶/Û¶: Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ù†Ø¸Ø§Ø±Øª Ø³Ù„Ø§Ù…Øª...")
+            logger.info("💊 Step 6/6: Setting up health monitoring...")
+            logger.info("💊 مرحله ۶/۶: راه‌اندازی نظارت سلامت...")
             if not self.setup_health_monitoring():
-                logger.error("âŒ Health monitoring setup failed")
-                logger.error("âŒ Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ù†Ø¸Ø§Ø±Øª Ø³Ù„Ø§Ù…Øª Ù†Ø§Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯")
+                logger.error("❌ Health monitoring setup failed")
+                logger.error("❌ راه‌اندازی نظارت سلامت ناموفق بود")
                 return False
-            logger.info("âœ… Health monitoring activated")
-            logger.info("âœ… Ù†Ø¸Ø§Ø±Øª Ø³Ù„Ø§Ù…Øª ÙØ¹Ø§Ù„ Ø´Ø¯")
+            logger.info("✅ Health monitoring activated")
+            logger.info("✅ نظارت سلامت فعال شد")
             
             # Record startup completion
             self.metrics.startup_duration = time.time() - startup_start
@@ -553,23 +553,23 @@ class BotApplication:
             
             # Display startup summary
             logger.info("="*60)
-            logger.info("ðŸŽ‰ STARTUP COMPLETE | Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ú©Ø§Ù…Ù„")
-            logger.info(f"â±ï¸ Startup time: {self.metrics.startup_duration:.2f}s")
-            logger.info(f"â±ï¸ Ø²Ù…Ø§Ù† Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ: {self.metrics.startup_duration:.2f} Ø«Ø§Ù†ÛŒÙ‡")
-            logger.info(f"ðŸŒ Default language: {self.default_language}")
-            logger.info(f"ðŸŒ Ø²Ø¨Ø§Ù† Ù¾ÛŒØ´â€ŒÙØ±Ø¶: {self.default_language}")
-            logger.info(f"ðŸ“Š Monitoring: Active")
-            logger.info(f"ðŸ“Š Ù†Ø¸Ø§Ø±Øª: ÙØ¹Ø§Ù„")
-            logger.info("ðŸš€ Bot is ready to serve users!")
-            logger.info("ðŸš€ Ø±Ø¨Ø§Øª Ø¢Ù…Ø§Ø¯Ù‡ Ø®Ø¯Ù…Øªâ€ŒØ±Ø³Ø§Ù†ÛŒ Ø¨Ù‡ Ú©Ø§Ø±Ø¨Ø±Ø§Ù† Ø§Ø³Øª!")
+            logger.info("🎉 STARTUP COMPLETE | راه‌اندازی کامل")
+            logger.info(f"⏱️ Startup time: {self.metrics.startup_duration:.2f}s")
+            logger.info(f"⏱️ زمان راه‌اندازی: {self.metrics.startup_duration:.2f} ثانیه")
+            logger.info(f"🌐 Default language: {self.default_language}")
+            logger.info(f"🌐 زبان پیش‌فرض: {self.default_language}")
+            logger.info(f"📊 Monitoring: Active")
+            logger.info(f"📊 نظارت: فعال")
+            logger.info("🚀 Bot is ready to serve users!")
+            logger.info("🚀 ربات آماده خدمت‌رسانی به کاربران است!")
             logger.info("="*60)
             
             return True
             
         except Exception as e:
             self.metrics.startup_duration = time.time() - startup_start
-            logger.error(f"âŒ Startup sequence failed after {self.metrics.startup_duration:.2f}s: {e}")
-            logger.error(f"âŒ Ø¯Ù†Ø¨Ø§Ù„Ù‡ Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ù¾Ø³ Ø§Ø² {self.metrics.startup_duration:.2f} Ø«Ø§Ù†ÛŒÙ‡ Ù†Ø§Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯: {e}")
+            logger.error(f"❌ Startup sequence failed after {self.metrics.startup_duration:.2f}s: {e}")
+            logger.error(f"❌ دنباله راه‌اندازی پس از {self.metrics.startup_duration:.2f} ثانیه ناموفق بود: {e}")
             self.metrics.record_error()
             return False
     
@@ -580,7 +580,7 @@ class BotApplication:
             try:
                 bot_info = await self.bot.get_me()
                 logger.info(f"Bot initialized: @{bot_info.username} ({bot_info.first_name})")
-                logger.info(f"Ø±Ø¨Ø§Øª Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ø´Ø¯: @{bot_info.username} ({bot_info.first_name})")
+                logger.info(f"ربات راه‌اندازی شد: @{bot_info.username} ({bot_info.first_name})")
             except Exception as e:
                 logger.warning(f"Could not retrieve bot info: {e}")
             
@@ -595,43 +595,43 @@ class BotApplication:
 
 
     def run(self):
-        """â–¶ï¸ Start the bot with comprehensive error handling | Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ø±Ø¨Ø§Øª Ø¨Ø§ Ù…Ø¯ÛŒØ±ÛŒØª Ø®Ø·Ø§ÛŒ Ø¬Ø§Ù…Ø¹"""
+        """▶️ Start the bot with comprehensive error handling | راه‌اندازی ربات با مدیریت خطای جامع"""
         try:
-            logger.info("ðŸš€ Starting TrumpBot application...")
-            logger.info("ðŸš€ Ø´Ø±ÙˆØ¹ Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù† ØªØ±Ø§Ù…Ù¾â€ŒØ¨Ø§Øª...")
+            logger.info("🚀 Starting TrumpBot application...")
+            logger.info("🚀 شروع اپلیکیشن ترامپ‌بات...")
             
             # Run startup sequence
             startup_success = asyncio.run(self.startup_sequence())
             
             if not startup_success:
                 logger.error("Startup sequence failed. Exiting...")
-                logger.error("Ø¯Ù†Ø¨Ø§Ù„Ù‡ Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ù†Ø§Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯. Ø®Ø±ÙˆØ¬...")
+                logger.error("دنباله راه‌اندازی ناموفق بود. خروج...")
                 return False
             
             # Start polling with async method
-            logger.info("ðŸ“¡ Starting message polling...")
-            logger.info("ðŸ“¡ Ø´Ø±ÙˆØ¹ Ø¯Ø±ÛŒØ§ÙØª Ù¾ÛŒØ§Ù…â€ŒÙ‡Ø§...")
+            logger.info("📡 Starting message polling...")
+            logger.info("📡 شروع دریافت پیام‌ها...")
             
             asyncio.run(self.start_polling())
             
         except KeyboardInterrupt:
-            logger.info("ðŸ›‘ Received keyboard interrupt. Shutting down gracefully...")
-            logger.info("ðŸ›‘ Ø¯Ø±ÛŒØ§ÙØª ÙˆÙ‚ÙÙ‡ ØµÙØ­Ù‡â€ŒÚ©Ù„ÛŒØ¯. Ø®Ø§Ù…ÙˆØ´ Ø´Ø¯Ù† Ù†Ø±Ù…...")
+            logger.info("🛑 Received keyboard interrupt. Shutting down gracefully...")
+            logger.info("🛑 دریافت وقفه صفحه‌کلید. خاموش شدن نرم...")
             self.shutdown()
         except Exception as e:
-            logger.error(f"âŒ Critical error in main run loop: {e}")
-            logger.error(f"âŒ Ø®Ø·Ø§ÛŒ Ø­ÛŒØ§ØªÛŒ Ø¯Ø± Ø­Ù„Ù‚Ù‡ Ø§ØµÙ„ÛŒ Ø§Ø¬Ø±Ø§: {e}")
+            logger.error(f"❌ Critical error in main run loop: {e}")
+            logger.error(f"❌ خطای حیاتی در حلقه اصلی اجرا: {e}")
             self.metrics.record_error()
             self.shutdown()
         finally:
-            logger.info("ðŸ Bot application terminated")
-            logger.info("ðŸ Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù† Ø±Ø¨Ø§Øª Ø®Ø§ØªÙ…Ù‡ ÛŒØ§ÙØª")
+            logger.info("🏁 Bot application terminated")
+            logger.info("🏁 اپلیکیشن ربات خاتمه یافت")
 
     def shutdown(self):
-        """ðŸ›‘ Graceful shutdown with cleanup | Ø®Ø§Ù…ÙˆØ´ Ø´Ø¯Ù† Ù†Ø±Ù… Ø¨Ø§ Ù¾Ø§Ú©Ø³Ø§Ø²ÛŒ"""
+        """🛑 Graceful shutdown with cleanup | خاموش شدن نرم با پاکسازی"""
         try:
-            logger.info("ðŸ›‘ Initiating graceful shutdown...")
-            logger.info("ðŸ›‘ Ø´Ø±ÙˆØ¹ Ø®Ø§Ù…ÙˆØ´ Ø´Ø¯Ù† Ù†Ø±Ù…...")
+            logger.info("🛑 Initiating graceful shutdown...")
+            logger.info("🛑 شروع خاموش شدن نرم...")
             
             self.is_running = False
             self.shutdown_requested = True
@@ -640,22 +640,22 @@ class BotApplication:
             final_stats = self.metrics.get_stats()
             
             # Log shutdown statistics
-            logger.info("ðŸ“Š Final Statistics | Ø¢Ù…Ø§Ø± Ù†Ù‡Ø§ÛŒÛŒ:")
-            logger.info(f"â±ï¸ Total uptime: {final_stats['uptime_hours']:.2f} hours")
-            logger.info(f"â±ï¸ Ù…Ø¬Ù…ÙˆØ¹ Ø²Ù…Ø§Ù† ÙØ¹Ø§Ù„ÛŒØª: {final_stats['uptime_hours']:.2f} Ø³Ø§Ø¹Øª")
-            logger.info(f"ðŸ“¨ Total messages processed: {final_stats['total_messages']}")
-            logger.info(f"ðŸ“¨ Ù…Ø¬Ù…ÙˆØ¹ Ù¾ÛŒØ§Ù…â€ŒÙ‡Ø§ÛŒ Ù¾Ø±Ø¯Ø§Ø²Ø´ Ø´Ø¯Ù‡: {final_stats['total_messages']}")
-            logger.info(f"âš ï¸ Total errors: {final_stats['error_count']}")
-            logger.info(f"âš ï¸ Ù…Ø¬Ù…ÙˆØ¹ Ø®Ø·Ø§Ù‡Ø§: {final_stats['error_count']}")
-            logger.info(f"ðŸŒ Language distribution: {final_stats['language_distribution']}")
-            logger.info(f"ðŸŒ ØªÙˆØ²ÛŒØ¹ Ø²Ø¨Ø§Ù†: {final_stats['language_distribution']}")
+            logger.info("📊 Final Statistics | آمار نهایی:")
+            logger.info(f"⏱️ Total uptime: {final_stats['uptime_hours']:.2f} hours")
+            logger.info(f"⏱️ مجموع زمان فعالیت: {final_stats['uptime_hours']:.2f} ساعت")
+            logger.info(f"📨 Total messages processed: {final_stats['total_messages']}")
+            logger.info(f"📨 مجموع پیام‌های پردازش شده: {final_stats['total_messages']}")
+            logger.info(f"⚠️ Total errors: {final_stats['error_count']}")
+            logger.info(f"⚠️ مجموع خطاها: {final_stats['error_count']}")
+            logger.info(f"🌐 Language distribution: {final_stats['language_distribution']}")
+            logger.info(f"🌐 توزیع زبان: {final_stats['language_distribution']}")
             
             # Cleanup resources
             if self.bot:
                 try:
                     # For async bot, we don't have stop_polling method
                     # The polling will be stopped by the exception handling
-                    logger.info("âœ… Bot polling stopped")
+                    logger.info("✅ Bot polling stopped")
                 except:
                     pass
             
@@ -664,94 +664,94 @@ class BotApplication:
                 try:
                     # Note: In a real implementation, this would be an async call
                     # await close_pool()
-                    logger.info("âœ… Database connections closed")
-                    logger.info("âœ… Ø§ØªØµØ§Ù„Ø§Øª Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ø¨Ø³ØªÙ‡ Ø´Ø¯")
+                    logger.info("✅ Database connections closed")
+                    logger.info("✅ اتصالات پایگاه داده بسته شد")
                 except:
                     pass
             
-            logger.info("âœ… Graceful shutdown completed")
-            logger.info("âœ… Ø®Ø§Ù…ÙˆØ´ Ø´Ø¯Ù† Ù†Ø±Ù… Ú©Ø§Ù…Ù„ Ø´Ø¯")
+            logger.info("✅ Graceful shutdown completed")
+            logger.info("✅ خاموش شدن نرم کامل شد")
             
         except Exception as e:
             logger.error(f"Error during shutdown: {e}")
-            logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ø·ÙˆÙ„ Ø®Ø§Ù…ÙˆØ´ Ø´Ø¯Ù†: {e}")
+            logger.error(f"خطا در طول خاموش شدن: {e}")
 
 def main():
-    """ðŸŽ¯ Main application entry point | Ù†Ù‚Ø·Ù‡ ÙˆØ±ÙˆØ¯ Ø§ØµÙ„ÛŒ Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù†"""
+    """🎯 Main application entry point | نقطه ورود اصلی اپلیکیشن"""
     try:
         # Initialize application
-        logger.info("ðŸŽ® Initializing TrumpBot Enterprise Application...")
-        logger.info("ðŸŽ® Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù† Ø³Ø§Ø²Ù…Ø§Ù†ÛŒ ØªØ±Ø§Ù…Ù¾â€ŒØ¨Ø§Øª...")
+        logger.info("🎮 Initializing TrumpBot Enterprise Application...")
+        logger.info("🎮 راه‌اندازی اپلیکیشن سازمانی ترامپ‌بات...")
         
         app = BotApplication()
         
         # Display startup banner
         logger.info("=" * 70)
-        logger.info("ðŸŽ® TrumpBot v2.0.0 Enterprise | ØªØ±Ø§Ù…Ù¾â€ŒØ¨Ø§Øª Ù†Ø³Ø®Ù‡ Û².Û°.Û° Ø³Ø§Ø²Ù…Ø§Ù†ÛŒ")
+        logger.info("🎮 TrumpBot v2.0.0 Enterprise | ترامپ‌بات نسخه ۲.۰.۰ سازمانی")
         logger.info("=" * 70)
-        logger.info("ðŸŒŸ Features | ÙˆÛŒÚ˜Ú¯ÛŒâ€ŒÙ‡Ø§:")
-        logger.info("   â€¢ ðŸŒ Bilingual Support (EN/FA) | Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ Ø¯ÙˆØ²Ø¨Ø§Ù†Ù‡")
-        logger.info("   â€¢ ðŸš¨ Advanced Error Handling | Ù…Ø¯ÛŒØ±ÛŒØª Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ø®Ø·Ø§")
-        logger.info("   â€¢ ðŸ“Š Performance Monitoring | Ù†Ø¸Ø§Ø±Øª Ø¹Ù…Ù„Ú©Ø±Ø¯")
-        logger.info("   â€¢ ðŸ’Š Health Diagnostics | ØªØ´Ø®ÛŒØµ Ø³Ù„Ø§Ù…Øª")
-        logger.info("   â€¢ ðŸ›¡ï¸ Production Architecture | Ù…Ø¹Ù…Ø§Ø±ÛŒ ØªÙˆÙ„ÛŒØ¯")
+        logger.info("🌟 Features | ویژگی‌ها:")
+        logger.info("   • 🌐 Bilingual Support (EN/FA) | پشتیبانی دوزبانه")
+        logger.info("   • 🚨 Advanced Error Handling | مدیریت پیشرفته خطا")
+        logger.info("   • 📊 Performance Monitoring | نظارت عملکرد")
+        logger.info("   • 💊 Health Diagnostics | تشخیص سلامت")
+        logger.info("   • 🛡️ Production Architecture | معماری تولید")
         logger.info("=" * 70)
         
         # Run the application
         return app.run()
         
     except Exception as e:
-        logger.error(f"âŒ Critical application error: {e}")
-        logger.error(f"âŒ Ø®Ø·Ø§ÛŒ Ø­ÛŒØ§ØªÛŒ Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù†: {e}")
+        logger.error(f"❌ Critical application error: {e}")
+        logger.error(f"❌ خطای حیاتی اپلیکیشن: {e}")
         logger.error("Stack trace:", exc_info=True)
         return False
 
 def cli_interface():
-    """ðŸ–¥ï¸ Command-line interface for administrative tasks | Ø±Ø§Ø¨Ø· Ø®Ø· ÙØ±Ù…Ø§Ù† Ø¨Ø±Ø§ÛŒ ÙˆØ¸Ø§ÛŒÙ Ù…Ø¯ÛŒØ±ÛŒØªÛŒ"""
+    """🖥️ Command-line interface for administrative tasks | رابط خط فرمان برای وظایف مدیریتی"""
     import argparse
     
     parser = argparse.ArgumentParser(
-        description='TrumpBot Enterprise Application | Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù† Ø³Ø§Ø²Ù…Ø§Ù†ÛŒ ØªØ±Ø§Ù…Ù¾â€ŒØ¨Ø§Øª',
+        description='TrumpBot Enterprise Application | اپلیکیشن سازمانی ترامپ‌بات',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Examples | Ù†Ù…ÙˆÙ†Ù‡â€ŒÙ‡Ø§:
-  python -m src.app                    # Start bot normally | Ø´Ø±ÙˆØ¹ Ø¹Ø§Ø¯ÛŒ Ø±Ø¨Ø§Øª
-  python -m src.app --check-health     # Check system health | Ø¨Ø±Ø±Ø³ÛŒ Ø³Ù„Ø§Ù…Øª Ø³ÛŒØ³ØªÙ…
-  python -m src.app --validate-config  # Validate configuration | Ø§Ø¹ØªØ¨Ø§Ø±Ø³Ù†Ø¬ÛŒ Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ
-  python -m src.app --test-db          # Test database connection | ØªØ³Øª Ø§ØªØµØ§Ù„ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡
+Examples | نمونه‌ها:
+  python -m src.app                    # Start bot normally | شروع عادی ربات
+  python -m src.app --check-health     # Check system health | بررسی سلامت سیستم
+  python -m src.app --validate-config  # Validate configuration | اعتبارسنجی پیکربندی
+  python -m src.app --test-db          # Test database connection | تست اتصال پایگاه داده
         """
     )
     
     parser.add_argument(
         '--check-health',
         action='store_true',
-        help='Perform system health check | Ø§Ù†Ø¬Ø§Ù… Ø¨Ø±Ø±Ø³ÛŒ Ø³Ù„Ø§Ù…Øª Ø³ÛŒØ³ØªÙ…'
+        help='Perform system health check | انجام بررسی سلامت سیستم'
     )
     
     parser.add_argument(
         '--validate-config',
         action='store_true',
-        help='Validate bot configuration | Ø§Ø¹ØªØ¨Ø§Ø±Ø³Ù†Ø¬ÛŒ Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ Ø±Ø¨Ø§Øª'
+        help='Validate bot configuration | اعتبارسنجی پیکربندی ربات'
     )
     
     parser.add_argument(
         '--test-db',
         action='store_true',
-        help='Test database connectivity | ØªØ³Øª Ø§ØªØµØ§Ù„ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡'
+        help='Test database connectivity | تست اتصال پایگاه داده'
     )
     
     parser.add_argument(
         '--language',
         choices=['en', 'fa'],
         default='en',
-        help='Default application language | Ø²Ø¨Ø§Ù† Ù¾ÛŒØ´â€ŒÙØ±Ø¶ Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù†'
+        help='Default application language | زبان پیش‌فرض اپلیکیشن'
     )
     
     parser.add_argument(
         '--log-level',
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'],
         default='INFO',
-        help='Logging level | Ø³Ø·Ø­ Ù„Ø§Ú¯â€ŒÚ¯ÛŒØ±ÛŒ'
+        help='Logging level | سطح لاگ‌گیری'
     )
     
     args = parser.parse_args()
@@ -770,16 +770,16 @@ Examples | Ù†Ù…ÙˆÙ†Ù‡â€ŒÙ‡Ø§:
         if args.language:
             set_default_language(args.language)
             logger.info(f"Default language set to: {args.language}")
-            logger.info(f"Ø²Ø¨Ø§Ù† Ù¾ÛŒØ´â€ŒÙØ±Ø¶ ØªÙ†Ø¸ÛŒÙ… Ø´Ø¯: {args.language}")
+            logger.info(f"زبان پیش‌فرض تنظیم شد: {args.language}")
         
         # Start main application
         return main()
 
 def perform_health_check() -> bool:
-    """ðŸ¥ Perform comprehensive system health check | Ø§Ù†Ø¬Ø§Ù… Ø¨Ø±Ø±Ø³ÛŒ Ø¬Ø§Ù…Ø¹ Ø³Ù„Ø§Ù…Øª Ø³ÛŒØ³ØªÙ…"""
+    """🏥 Perform comprehensive system health check | انجام بررسی جامع سلامت سیستم"""
     try:
-        logger.info("ðŸ¥ Starting comprehensive health check...")
-        logger.info("ðŸ¥ Ø´Ø±ÙˆØ¹ Ø¨Ø±Ø±Ø³ÛŒ Ø¬Ø§Ù…Ø¹ Ø³Ù„Ø§Ù…Øª...")
+        logger.info("🏥 Starting comprehensive health check...")
+        logger.info("🏥 شروع بررسی جامع سلامت...")
         
         health_results = {
             'system': False,
@@ -789,7 +789,7 @@ def perform_health_check() -> bool:
         }
         
         # Check system requirements
-        logger.info("ðŸ” Checking system requirements...")
+        logger.info("🔍 Checking system requirements...")
         try:
             python_version = platform.python_version()
             # Parse version properly
@@ -797,81 +797,81 @@ def perform_health_check() -> bool:
             version_tuple = (int(major), int(minor))
             
             if version_tuple >= (3, 8):
-                logger.info(f"âœ… Python version: {python_version}")
+                logger.info(f"✅ Python version: {python_version}")
                 health_results['system'] = True
             else:
-                logger.error(f"âŒ Python version too old: {python_version} (requires 3.8+)")
+                logger.error(f"❌ Python version too old: {python_version} (requires 3.8+)")
         except Exception as e:
-            logger.error(f"âŒ System check failed: {e}")
+            logger.error(f"❌ System check failed: {e}")
         
         # Check configuration
-        logger.info("âš™ï¸ Checking configuration...")
+        logger.info("⚙️ Checking configuration...")
         try:
             config = BotConfig
             if hasattr(config, 'TOKEN') and config.TOKEN:
-                logger.info("âœ… Bot configuration valid")
+                logger.info("✅ Bot configuration valid")
                 health_results['config'] = True
             else:
-                logger.error("âŒ Bot API token not configured")
+                logger.error("❌ Bot API token not configured")
         except Exception as e:
-            logger.error(f"âŒ Configuration check failed: {e}")
+            logger.error(f"❌ Configuration check failed: {e}")
         
         # Check translations
-        logger.info("ðŸŒ Checking translations...")
+        logger.info("🌐 Checking translations...")
         try:
             load_translations()
             validation_results = validate_translation_completeness()
             if validation_results.get('complete', False):
-                logger.info("âœ… Translations complete and valid")
+                logger.info("✅ Translations complete and valid")
                 health_results['translations'] = True
             else:
-                logger.warning("âš ï¸ Some translations missing")
+                logger.warning("⚠️ Some translations missing")
                 health_results['translations'] = True  # Non-critical
         except Exception as e:
-            logger.error(f"âŒ Translation check failed: {e}")
+            logger.error(f"❌ Translation check failed: {e}")
         
         # Check database (simplified)
-        logger.info("ðŸ—„ï¸ Checking database configuration...")
+        logger.info("🗄️ Checking database configuration...")
         try:
             # Check for DATABASE_URL environment variable
             if os.getenv('DATABASE_URL'):
-                logger.info("âœ… Database configuration present")
+                logger.info("✅ Database configuration present")
                 health_results['database'] = True
             else:
-                logger.error("âŒ DATABASE_URL environment variable not set")
+                logger.error("❌ DATABASE_URL environment variable not set")
         except Exception as e:
-            logger.error(f"âŒ Database check failed: {e}")
+            logger.error(f"❌ Database check failed: {e}")
         
         # Summary
         passed_checks = sum(health_results.values())
         total_checks = len(health_results)
         
         logger.info("="*50)
-        logger.info("ðŸ¥ HEALTH CHECK SUMMARY | Ø®Ù„Ø§ØµÙ‡ Ø¨Ø±Ø±Ø³ÛŒ Ø³Ù„Ø§Ù…Øª")
+        logger.info("🏥 HEALTH CHECK SUMMARY | خلاصه بررسی سلامت")
         logger.info("="*50)
-        logger.info(f"âœ… Passed: {passed_checks}/{total_checks}")
-        logger.info(f"âœ… Ù…ÙˆÙÙ‚: {passed_checks}/{total_checks}")
+        logger.info(f"✅ Passed: {passed_checks}/{total_checks}")
+        logger.info(f"✅ موفق: {passed_checks}/{total_checks}")
         
         for check, result in health_results.items():
-            status = "âœ… PASS" if result else "âŒ FAIL"
+            status = "✅ PASS" if result else "❌ FAIL"
             logger.info(f"{status} {check.title()}")
         
         if passed_checks == total_checks:
-            logger.info("ðŸŽ‰ All health checks passed! | ØªÙ…Ø§Ù… Ø¨Ø±Ø±Ø³ÛŒâ€ŒÙ‡Ø§ÛŒ Ø³Ù„Ø§Ù…Øª Ù…ÙˆÙÙ‚!")
+            logger.info("🎉 All health checks passed! | تمام بررسی‌های سلامت موفق!")
             return True
         else:
-            logger.warning("âš ï¸ Some health checks failed | Ø¨Ø±Ø®ÛŒ Ø¨Ø±Ø±Ø³ÛŒâ€ŒÙ‡Ø§ÛŒ Ø³Ù„Ø§Ù…Øª Ù†Ø§Ù…ÙˆÙÙ‚")
+            logger.warning("⚠️ Some health checks failed | برخی بررسی‌های سلامت ناموفق")
             return False
             
     except Exception as e:
-        logger.error(f"âŒ Health check failed: {e}")
+        logger.error(f"❌ Health check failed: {e}")
         return False
 
 def validate_configuration() -> bool:
-    """âš™ï¸ Validate bot configuration | Ø§Ø¹ØªØ¨Ø§Ø±Ø³Ù†Ø¬ÛŒ Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ Ø±Ø¨Ø§Øª"""
+    """⚙️ Validate bot configuration | اعتبارسنجی پیکربندی ربات"""
     try:
-        logger.info("âš™ï¸ Validating bot configuration...")
-        logger.info("âš™ï¸ Ø§Ø¹ØªØ¨Ø§Ø±Ø³Ù†Ø¬ÛŒ Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ Ø±Ø¨Ø§Øª...")
+        logger.info("⚙️ Validating bot configuration...")
+        logger.info("⚙️ اعتبارسنجی پیکربندی ربات...")
         
         config = BotConfig  # Use the existing instance, don't call it
         
@@ -887,22 +887,22 @@ def validate_configuration() -> bool:
             missing_settings.append('Database URL')
         
         if missing_settings:
-            logger.error(f"âŒ Missing required settings: {', '.join(missing_settings)}")
+            logger.error(f"❌ Missing required settings: {', '.join(missing_settings)}")
             return False
         
-        logger.info("âœ… Configuration validation passed")
-        logger.info("âœ… Ø§Ø¹ØªØ¨Ø§Ø±Ø³Ù†Ø¬ÛŒ Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯")
+        logger.info("✅ Configuration validation passed")
+        logger.info("✅ اعتبارسنجی پیکربندی موفق بود")
         return True
         
     except Exception as e:
-        logger.error(f"âŒ Configuration validation failed: {e}")
+        logger.error(f"❌ Configuration validation failed: {e}")
         return False
 
 def test_database_connection() -> bool:
-    """ðŸ—„ï¸ Test database connectivity | ØªØ³Øª Ø§ØªØµØ§Ù„ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡"""
+    """🗄️ Test database connectivity | تست اتصال پایگاه داده"""
     try:
-        logger.info("ðŸ—„ï¸ Testing database connection...")
-        logger.info("ðŸ—„ï¸ ØªØ³Øª Ø§ØªØµØ§Ù„ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡...")
+        logger.info("🗄️ Testing database connection...")
+        logger.info("🗄️ تست اتصال پایگاه داده...")
         
         async def test_connection():
             try:
@@ -919,29 +919,28 @@ def test_database_connection() -> bool:
         connection_success = asyncio.run(test_connection())
         
         if connection_success:
-            logger.info("âœ… Database connection test passed")
-            logger.info("âœ… ØªØ³Øª Ø§ØªØµØ§Ù„ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯")
+            logger.info("✅ Database connection test passed")
+            logger.info("✅ تست اتصال پایگاه داده موفق بود")
             return True
         else:
-            logger.error("âŒ Database connection test failed")
-            logger.error("âŒ ØªØ³Øª Ø§ØªØµØ§Ù„ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ù†Ø§Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯")
+            logger.error("❌ Database connection test failed")
+            logger.error("❌ تست اتصال پایگاه داده ناموفق بود")
             return False
             
     except Exception as e:
-        logger.error(f"âŒ Database test failed: {e}")
+        logger.error(f"❌ Database test failed: {e}")
         return False
 
-# ðŸš€ Application Entry Point | Ù†Ù‚Ø·Ù‡ ÙˆØ±ÙˆØ¯ Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù†
+# 🚀 Application Entry Point | نقطه ورود اپلیکیشن
 if __name__ == "__main__":
     try:
         success = cli_interface()
         sys.exit(0 if success else 1)
     except KeyboardInterrupt:
-        logger.info("ðŸ‘‹ Application interrupted by user")
-        logger.info("ðŸ‘‹ Ø§Ù¾Ù„ÛŒÚ©ÛŒØ´Ù† ØªÙˆØ³Ø· Ú©Ø§Ø±Ø¨Ø± Ù…ØªÙˆÙ‚Ù Ø´Ø¯")
+        logger.info("👋 Application interrupted by user")
+        logger.info("👋 اپلیکیشن توسط کاربر متوقف شد")
         sys.exit(0)
     except Exception as e:
-        logger.error(f"ðŸ’¥ Unexpected error: {e}")
-        logger.error(f"ðŸ’¥ Ø®Ø·Ø§ÛŒ ØºÛŒØ±Ù…Ù†ØªØ¸Ø±Ù‡: {e}")
+        logger.error(f"💥 Unexpected error: {e}")
+        logger.error(f"💥 خطای غیرمنتظره: {e}")
         sys.exit(1)
-

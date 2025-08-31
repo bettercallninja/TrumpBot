@@ -562,7 +562,7 @@ def register_handlers(bot: AsyncTeleBot, db_manager=None):
         from ..database.db_manager import DBManager
         db_manager = DBManager()
     
-    inventory_manager = InventoryManager(db_manager)
+    inventory_manager = InventoryManager(db_manager, bot)
     
     @bot.message_handler(commands=['inventory', 'inv'])
     async def handle_inventory_command(message):
