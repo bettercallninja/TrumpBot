@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-پردازش‌کننده‌های پیشرفته کالبک با پشتیبانی کامل از زبان فارسی
+Ù¾Ø±Ø¯Ø§Ø²Ø´â€ŒÚ©Ù†Ù†Ø¯Ù‡â€ŒÙ‡Ø§ÛŒ Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ú©Ø§Ù„Ø¨Ú© Ø¨Ø§ Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ Ú©Ø§Ù…Ù„ Ø§Ø² Ø²Ø¨Ø§Ù† ÙØ§Ø±Ø³ÛŒ
 Enhanced Callback Query Handlers with Comprehensive Persian Language Support
 """
 
@@ -20,34 +20,34 @@ from src.database.db_manager import DBManager
 from src.utils.helpers import ensure_player, get_lang, set_lang
 from src.utils.translations import T
 from src.commands import help, shop, stats, status, inventory, attack, general
-from src.commands.stars import handle_stars_amount_selection, handle_stars_payment_processing, handle_tg_stars_received
+from src.commands.stars import handle_stars_callback
 
 # Set up logging
 logger = logging.getLogger(__name__)
 
 class CallbackAction(Enum):
-    """انواع عملیات کالبک - Callback Action Types"""
-    NAVIGATION = "go"          # ناوبری - Navigation
-    ACTION = "do"              # عمل - Action
-    PURCHASE = "buy"           # خرید - Purchase
-    CONFIRM = "confirm"        # تایید - Confirmation
-    CANCEL = "cancel"          # لغو - Cancel
-    PAGINATION = "page"        # صفحه‌بندی - Pagination
-    LANGUAGE = "lang"          # زبان - Language
-    FILTER = "filter"          # فیلتر - Filter
-    SORT = "sort"              # مرتب‌سازی - Sort
-    HELP = "help"              # راهنما - Help
-    SETTINGS = "settings"      # تنظیمات - Settings
-    ADMIN = "admin"            # مدیریت - Admin
-    STARS = "stars"            # ستاره‌ها - Stars
-    ATTACK = "attack"          # حمله - Attack
-    DEFEND = "defend"          # دفاع - Defense
-    INVENTORY = "inv"          # موجودی - Inventory
-    LEADERBOARD = "lead"       # لیدربورد - Leaderboard
+    """Ø§Ù†ÙˆØ§Ø¹ Ø¹Ù…Ù„ÛŒØ§Øª Ú©Ø§Ù„Ø¨Ú© - Callback Action Types"""
+    NAVIGATION = "go"          # Ù†Ø§ÙˆØ¨Ø±ÛŒ - Navigation
+    ACTION = "do"              # Ø¹Ù…Ù„ - Action
+    PURCHASE = "buy"           # Ø®Ø±ÛŒØ¯ - Purchase
+    CONFIRM = "confirm"        # ØªØ§ÛŒÛŒØ¯ - Confirmation
+    CANCEL = "cancel"          # Ù„ØºÙˆ - Cancel
+    PAGINATION = "page"        # ØµÙØ­Ù‡â€ŒØ¨Ù†Ø¯ÛŒ - Pagination
+    LANGUAGE = "lang"          # Ø²Ø¨Ø§Ù† - Language
+    FILTER = "filter"          # ÙÛŒÙ„ØªØ± - Filter
+    SORT = "sort"              # Ù…Ø±ØªØ¨â€ŒØ³Ø§Ø²ÛŒ - Sort
+    HELP = "help"              # Ø±Ø§Ù‡Ù†Ù…Ø§ - Help
+    SETTINGS = "settings"      # ØªÙ†Ø¸ÛŒÙ…Ø§Øª - Settings
+    ADMIN = "admin"            # Ù…Ø¯ÛŒØ±ÛŒØª - Admin
+    STARS = "stars"            # Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ - Stars
+    ATTACK = "attack"          # Ø­Ù…Ù„Ù‡ - Attack
+    DEFEND = "defend"          # Ø¯ÙØ§Ø¹ - Defense
+    INVENTORY = "inv"          # Ù…ÙˆØ¬ÙˆØ¯ÛŒ - Inventory
+    LEADERBOARD = "lead"       # Ù„ÛŒØ¯Ø±Ø¨ÙˆØ±Ø¯ - Leaderboard
 
 @dataclass
 class CallbackContext:
-    """بافت کالبک - Callback Context"""
+    """Ø¨Ø§ÙØª Ú©Ø§Ù„Ø¨Ú© - Callback Context"""
     call: types.CallbackQuery
     bot: AsyncTeleBot
     db_manager: DBManager
@@ -60,7 +60,7 @@ class CallbackContext:
     timestamp: float
 
 class CallbackSecurity:
-    """امنیت کالبک - Callback Security Manager"""
+    """Ø§Ù…Ù†ÛŒØª Ú©Ø§Ù„Ø¨Ú© - Callback Security Manager"""
     
     def __init__(self):
         self.rate_limits: Dict[int, List[float]] = {}
@@ -69,7 +69,7 @@ class CallbackSecurity:
         self.block_duration = 300  # 5 minutes
     
     def is_rate_limited(self, user_id: int) -> bool:
-        """بررسی محدودیت نرخ - Check rate limiting"""
+        """Ø¨Ø±Ø±Ø³ÛŒ Ù…Ø­Ø¯ÙˆØ¯ÛŒØª Ù†Ø±Ø® - Check rate limiting"""
         current_time = time.time()
         
         # Clean old requests
@@ -91,7 +91,7 @@ class CallbackSecurity:
         if len(user_requests) >= self.max_requests_per_minute:
             self.blocked_users[user_id] = current_time
             logger.warning(f"User {user_id} blocked for rate limiting")
-            logger.warning(f"کاربر {user_id} به دلیل محدودیت نرخ مسدود شد")
+            logger.warning(f"Ú©Ø§Ø±Ø¨Ø± {user_id} Ø¨Ù‡ Ø¯Ù„ÛŒÙ„ Ù…Ø­Ø¯ÙˆØ¯ÛŒØª Ù†Ø±Ø® Ù…Ø³Ø¯ÙˆØ¯ Ø´Ø¯")
             return True
         
         # Add current request
@@ -102,7 +102,7 @@ class CallbackSecurity:
         return False
     
     def validate_callback_data(self, data: str) -> bool:
-        """اعتبارسنجی داده کالبک - Validate callback data"""
+        """Ø§Ø¹ØªØ¨Ø§Ø±Ø³Ù†Ø¬ÛŒ Ø¯Ø§Ø¯Ù‡ Ú©Ø§Ù„Ø¨Ú© - Validate callback data"""
         if not data or len(data) > 64:  # Telegram limit
             return False
         
@@ -115,7 +115,7 @@ callback_security = CallbackSecurity()
 
 def owner_only(func):
     """
-    دکوریتر برای اطمینان از اینکه فقط صاحب پیام می‌تواند از کالبک استفاده کند
+    Ø¯Ú©ÙˆØ±ÛŒØªØ± Ø¨Ø±Ø§ÛŒ Ø§Ø·Ù…ÛŒÙ†Ø§Ù† Ø§Ø² Ø§ÛŒÙ†Ú©Ù‡ ÙÙ‚Ø· ØµØ§Ø­Ø¨ Ù¾ÛŒØ§Ù… Ù…ÛŒâ€ŒØªÙˆØ§Ù†Ø¯ Ø§Ø² Ú©Ø§Ù„Ø¨Ú© Ø§Ø³ØªÙØ§Ø¯Ù‡ Ú©Ù†Ø¯
     Decorator to ensure only the message owner can use the callback
     """
     @wraps(func)
@@ -127,13 +127,13 @@ def owner_only(func):
             if lang == "fa":
                 await bot.answer_callback_query(
                     call.id, 
-                    "⚠️ این دکمه‌ها فقط برای کاربری است که پیام را ارسال کرده!", 
+                    "âš ï¸ Ø§ÛŒÙ† Ø¯Ú©Ù…Ù‡â€ŒÙ‡Ø§ ÙÙ‚Ø· Ø¨Ø±Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø±ÛŒ Ø§Ø³Øª Ú©Ù‡ Ù¾ÛŒØ§Ù… Ø±Ø§ Ø§Ø±Ø³Ø§Ù„ Ú©Ø±Ø¯Ù‡!", 
                     show_alert=True
                 )
             else:
                 await bot.answer_callback_query(
                     call.id, 
-                    "⚠️ These buttons are only for the user who sent the message!", 
+                    "âš ï¸ These buttons are only for the user who sent the message!", 
                     show_alert=True
                 )
             return
@@ -143,7 +143,7 @@ def owner_only(func):
 
 def rate_limit(func):
     """
-    دکوریتر محدودیت نرخ برای جلوگیری از سوءاستفاده
+    Ø¯Ú©ÙˆØ±ÛŒØªØ± Ù…Ø­Ø¯ÙˆØ¯ÛŒØª Ù†Ø±Ø® Ø¨Ø±Ø§ÛŒ Ø¬Ù„ÙˆÚ¯ÛŒØ±ÛŒ Ø§Ø² Ø³ÙˆØ¡Ø§Ø³ØªÙØ§Ø¯Ù‡
     Rate limiting decorator to prevent abuse
     """
     @wraps(func)
@@ -152,13 +152,13 @@ def rate_limit(func):
             if lang == "fa":
                 await bot.answer_callback_query(
                     call.id,
-                    "⚠️ شما خیلی سریع درخواست می‌دهید! لطفاً کمی صبر کنید.",
+                    "âš ï¸ Ø´Ù…Ø§ Ø®ÛŒÙ„ÛŒ Ø³Ø±ÛŒØ¹ Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ù…ÛŒâ€ŒØ¯Ù‡ÛŒØ¯! Ù„Ø·ÙØ§Ù‹ Ú©Ù…ÛŒ ØµØ¨Ø± Ú©Ù†ÛŒØ¯.",
                     show_alert=True
                 )
             else:
                 await bot.answer_callback_query(
                     call.id,
-                    "⚠️ You're making requests too quickly! Please wait a moment.",
+                    "âš ï¸ You're making requests too quickly! Please wait a moment.",
                     show_alert=True
                 )
             return
@@ -168,19 +168,19 @@ def rate_limit(func):
 
 def validate_data(func):
     """
-    دکوریتر اعتبارسنجی داده‌های کالبک
+    Ø¯Ú©ÙˆØ±ÛŒØªØ± Ø§Ø¹ØªØ¨Ø§Ø±Ø³Ù†Ø¬ÛŒ Ø¯Ø§Ø¯Ù‡â€ŒÙ‡Ø§ÛŒ Ú©Ø§Ù„Ø¨Ú©
     Callback data validation decorator
     """
     @wraps(func)
     async def wrapper(call, bot, data, lang, db_manager):
         if not callback_security.validate_callback_data(data):
             logger.warning(f"Invalid callback data from user {call.from_user.id}: {data}")
-            logger.warning(f"داده کالبک نامعتبر از کاربر {call.from_user.id}: {data}")
+            logger.warning(f"Ø¯Ø§Ø¯Ù‡ Ú©Ø§Ù„Ø¨Ú© Ù†Ø§Ù…Ø¹ØªØ¨Ø± Ø§Ø² Ú©Ø§Ø±Ø¨Ø± {call.from_user.id}: {data}")
             
             if lang == "fa":
-                await bot.answer_callback_query(call.id, "⚠️ داده نامعتبر!", show_alert=True)
+                await bot.answer_callback_query(call.id, "âš ï¸ Ø¯Ø§Ø¯Ù‡ Ù†Ø§Ù…Ø¹ØªØ¨Ø±!", show_alert=True)
             else:
-                await bot.answer_callback_query(call.id, "⚠️ Invalid data!", show_alert=True)
+                await bot.answer_callback_query(call.id, "âš ï¸ Invalid data!", show_alert=True)
             return
         
         return await func(call, bot, data, lang, db_manager)
@@ -188,7 +188,7 @@ def validate_data(func):
 
 async def handle_language_callback(call: types.CallbackQuery, bot: AsyncTeleBot, data: str, db_manager: DBManager):
     """
-    مدیریت انتخاب زبان از کیبورد درون‌خطی
+    Ù…Ø¯ÛŒØ±ÛŒØª Ø§Ù†ØªØ®Ø§Ø¨ Ø²Ø¨Ø§Ù† Ø§Ø² Ú©ÛŒØ¨ÙˆØ±Ø¯ Ø¯Ø±ÙˆÙ†â€ŒØ®Ø·ÛŒ
     Handles language selection from inline keyboard
     """
     try:
@@ -200,11 +200,11 @@ async def handle_language_callback(call: types.CallbackQuery, bot: AsyncTeleBot,
         
         # Get localized response
         if new_lang == "fa":
-            response = "✅ زبان به فارسی تغییر یافت"
-            success_text = f"🌐 **انتخاب زبان**\n\n✅ زبان شما با موفقیت به **فارسی** تغییر یافت!\n\nاکنون تمام پیام‌ها و منوها به زبان فارسی نمایش داده خواهند شد."
+            response = "âœ… Ø²Ø¨Ø§Ù† Ø¨Ù‡ ÙØ§Ø±Ø³ÛŒ ØªØºÛŒÛŒØ± ÛŒØ§ÙØª"
+            success_text = f"ðŸŒ **Ø§Ù†ØªØ®Ø§Ø¨ Ø²Ø¨Ø§Ù†**\n\nâœ… Ø²Ø¨Ø§Ù† Ø´Ù…Ø§ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø¨Ù‡ **ÙØ§Ø±Ø³ÛŒ** ØªØºÛŒÛŒØ± ÛŒØ§ÙØª!\n\nØ§Ú©Ù†ÙˆÙ† ØªÙ…Ø§Ù… Ù¾ÛŒØ§Ù…â€ŒÙ‡Ø§ Ùˆ Ù…Ù†ÙˆÙ‡Ø§ Ø¨Ù‡ Ø²Ø¨Ø§Ù† ÙØ§Ø±Ø³ÛŒ Ù†Ù…Ø§ÛŒØ´ Ø¯Ø§Ø¯Ù‡ Ø®ÙˆØ§Ù‡Ù†Ø¯ Ø´Ø¯."
         else:
-            response = "✅ Language changed to English"
-            success_text = f"🌐 **Language Selection**\n\n✅ Your language has been successfully changed to **English**!\n\nAll messages and menus will now be displayed in English."
+            response = "âœ… Language changed to English"
+            success_text = f"ðŸŒ **Language Selection**\n\nâœ… Your language has been successfully changed to **English**!\n\nAll messages and menus will now be displayed in English."
         
         await bot.answer_callback_query(call.id, text=response)
         
@@ -213,13 +213,13 @@ async def handle_language_callback(call: types.CallbackQuery, bot: AsyncTeleBot,
         
         # Language options with flags and native names
         languages = [
-            ("🇺🇸 English", "en"),
-            ("🇮🇷 فارسی", "fa")
+            ("ðŸ‡ºðŸ‡¸ English", "en"),
+            ("ðŸ‡®ðŸ‡· ÙØ§Ø±Ø³ÛŒ", "fa")
         ]
         
         for lang_display, lang_code in languages:
             if lang_code == new_lang:
-                lang_display = f"✅ {lang_display}"
+                lang_display = f"âœ… {lang_display}"
             
             keyboard.add(types.InlineKeyboardButton(
                 lang_display,
@@ -228,9 +228,9 @@ async def handle_language_callback(call: types.CallbackQuery, bot: AsyncTeleBot,
         
         # Add close button
         if new_lang == "fa":
-            keyboard.add(types.InlineKeyboardButton("❌ بستن", callback_data="do:delete_message"))
+            keyboard.add(types.InlineKeyboardButton("âŒ Ø¨Ø³ØªÙ†", callback_data="do:delete_message"))
         else:
-            keyboard.add(types.InlineKeyboardButton("❌ Close", callback_data="do:delete_message"))
+            keyboard.add(types.InlineKeyboardButton("âŒ Close", callback_data="do:delete_message"))
         
         # Update message
         await bot.edit_message_text(
@@ -242,17 +242,17 @@ async def handle_language_callback(call: types.CallbackQuery, bot: AsyncTeleBot,
         )
         
         logger.info(f"Language changed for user {call.from_user.id}: {old_lang} -> {new_lang}")
-        logger.info(f"زبان کاربر {call.from_user.id} تغییر یافت: {old_lang} -> {new_lang}")
+        logger.info(f"Ø²Ø¨Ø§Ù† Ú©Ø§Ø±Ø¨Ø± {call.from_user.id} ØªØºÛŒÛŒØ± ÛŒØ§ÙØª: {old_lang} -> {new_lang}")
         
     except Exception as e:
         logger.error(f"Error handling language callback: {e}")
-        logger.error(f"خطا در مدیریت کالبک زبان: {e}")
+        logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ù…Ø¯ÛŒØ±ÛŒØª Ú©Ø§Ù„Ø¨Ú© Ø²Ø¨Ø§Ù†: {e}")
         
-        error_msg = "خطا در تغییر زبان!" if call.data == "fa" else "Error changing language!"
+        error_msg = "Ø®Ø·Ø§ Ø¯Ø± ØªØºÛŒÛŒØ± Ø²Ø¨Ø§Ù†!" if call.data == "fa" else "Error changing language!"
         await bot.answer_callback_query(call.id, error_msg, show_alert=True)
 async def handle_callback_query(call, bot, db_manager: DBManager):
     """
-    مدیر اصلی کالبک‌های کوئری با قابلیت‌های پیشرفته
+    Ù…Ø¯ÛŒØ± Ø§ØµÙ„ÛŒ Ú©Ø§Ù„Ø¨Ú©â€ŒÙ‡Ø§ÛŒ Ú©ÙˆØ¦Ø±ÛŒ Ø¨Ø§ Ù‚Ø§Ø¨Ù„ÛŒØªâ€ŒÙ‡Ø§ÛŒ Ù¾ÛŒØ´Ø±ÙØªÙ‡
     Main callback query handler with enhanced functionality
     
     Args:
@@ -265,13 +265,13 @@ async def handle_callback_query(call, bot, db_manager: DBManager):
         return
         
     logger.info(f"Callback query: {call.data} from {call.from_user.id} in {call.message.chat.id}")
-    logger.info(f"کالبک کوئری: {call.data} از {call.from_user.id} در {call.message.chat.id}")
+    logger.info(f"Ú©Ø§Ù„Ø¨Ú© Ú©ÙˆØ¦Ø±ÛŒ: {call.data} Ø§Ø² {call.from_user.id} Ø¯Ø± {call.message.chat.id}")
     
     try:
         # Validate callback data format
         if ":" not in call.data:
             logger.warning(f"Invalid callback data format: {call.data}")
-            await bot.answer_callback_query(call.id, "⚠️ Invalid format!")
+            await bot.answer_callback_query(call.id, "âš ï¸ Invalid format!")
             return
             
         action, data = call.data.split(":", 1)
@@ -296,29 +296,27 @@ async def handle_callback_query(call, bot, db_manager: DBManager):
         
         # Enhanced routing system with comprehensive handlers
         handlers = {
-            "go": handle_navigation_action,           # ناوبری
-            "do": handle_action_callback,             # عمل
-            "buy": handle_purchase_callback,          # خرید
-            "confirm": handle_confirmation_callback,   # تایید
-            "cancel": handle_cancel_action,           # لغو
-            "page": handle_pagination_callback,       # صفحه‌بندی
-            "lang": handle_language_callback,         # زبان
-            "filter": handle_filter_callback,         # فیلتر
-            "sort": handle_sort_callback,             # مرتب‌سازی
-            "help": handle_help_callback,             # راهنما
-            "settings": handle_settings_callback,     # تنظیمات
-            "admin": handle_admin_callback,           # مدیریت
-            "stars_amount": handle_stars_amount_selection,
-            "stars_payment": handle_stars_payment_processing,
-            "tg_stars_received": handle_tg_stars_received,
-            "attack": handle_attack_callback,         # حمله
-            "defend": handle_defense_callback,        # دفاع
-            "inv": handle_inventory_callback,         # موجودی
-            "lead": handle_leaderboard_callback,      # لیدربورد
-            "profile": handle_profile_callback,       # پروفایل
-            "weapon": handle_weapon_callback,         # سلاح
-            "item": handle_item_callback,             # آیتم
-            "quick": handle_quick_action,             # اقدام سریع
+            "go": handle_navigation_action,           # Ù†Ø§ÙˆØ¨Ø±ÛŒ
+            "do": handle_action_callback,             # Ø¹Ù…Ù„
+            "buy": handle_purchase_callback,          # Ø®Ø±ÛŒØ¯
+            "confirm": handle_confirmation_callback,   # ØªØ§ÛŒÛŒØ¯
+            "cancel": handle_cancel_action,           # Ù„ØºÙˆ
+            "page": handle_pagination_callback,       # ØµÙØ­Ù‡â€ŒØ¨Ù†Ø¯ÛŒ
+            "lang": handle_language_callback,         # Ø²Ø¨Ø§Ù†
+            "filter": handle_filter_callback,         # ÙÛŒÙ„ØªØ±
+            "sort": handle_sort_callback,             # Ù…Ø±ØªØ¨â€ŒØ³Ø§Ø²ÛŒ
+            "help": handle_help_callback,             # Ø±Ø§Ù‡Ù†Ù…Ø§
+            "settings": handle_settings_callback,     # ØªÙ†Ø¸ÛŒÙ…Ø§Øª
+            "admin": handle_admin_callback,           # Ù…Ø¯ÛŒØ±ÛŒØª
+            "stars": handle_stars_callback,           # TG Stars system
+            "attack": handle_attack_callback,         # Ø­Ù…Ù„Ù‡
+            "defend": handle_defense_callback,        # Ø¯ÙØ§Ø¹
+            "inv": handle_inventory_callback,         # Ù…ÙˆØ¬ÙˆØ¯ÛŒ
+            "lead": handle_leaderboard_callback,      # Ù„ÛŒØ¯Ø±Ø¨ÙˆØ±Ø¯
+            "profile": handle_profile_callback,       # Ù¾Ø±ÙˆÙØ§ÛŒÙ„
+            "weapon": handle_weapon_callback,         # Ø³Ù„Ø§Ø­
+            "item": handle_item_callback,             # Ø¢ÛŒØªÙ…
+            "quick": handle_quick_action,             # Ø§Ù‚Ø¯Ø§Ù… Ø³Ø±ÛŒØ¹
         }
         
         handler = handlers.get(action)
@@ -330,32 +328,32 @@ async def handle_callback_query(call, bot, db_manager: DBManager):
                 await handler(call, bot, data, lang, db_manager)
         else:
             logger.warning(f"Unknown callback action: {action}")
-            logger.warning(f"عملیات کالبک ناشناخته: {action}")
+            logger.warning(f"Ø¹Ù…Ù„ÛŒØ§Øª Ú©Ø§Ù„Ø¨Ú© Ù†Ø§Ø´Ù†Ø§Ø®ØªÙ‡: {action}")
             
             if lang == "fa":
-                await bot.answer_callback_query(call.id, "⚠️ عملیات ناشناخته!", show_alert=True)
+                await bot.answer_callback_query(call.id, "âš ï¸ Ø¹Ù…Ù„ÛŒØ§Øª Ù†Ø§Ø´Ù†Ø§Ø®ØªÙ‡!", show_alert=True)
             else:
-                await bot.answer_callback_query(call.id, "⚠️ Unknown action!", show_alert=True)
+                await bot.answer_callback_query(call.id, "âš ï¸ Unknown action!", show_alert=True)
                 
     except Exception as e:
         logger.error(f"Error handling callback query: {e}")
-        logger.error(f"خطا در مدیریت کالبک کوئری: {e}")
+        logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ù…Ø¯ÛŒØ±ÛŒØª Ú©Ø§Ù„Ø¨Ú© Ú©ÙˆØ¦Ø±ÛŒ: {e}")
         
         try:
             lang = await get_lang(call.message.chat.id, call.from_user.id, db_manager)
             if lang == "fa":
-                await bot.answer_callback_query(call.id, "❌ خطا در پردازش درخواست!", show_alert=True)
+                await bot.answer_callback_query(call.id, "âŒ Ø®Ø·Ø§ Ø¯Ø± Ù¾Ø±Ø¯Ø§Ø²Ø´ Ø¯Ø±Ø®ÙˆØ§Ø³Øª!", show_alert=True)
             else:
-                await bot.answer_callback_query(call.id, "❌ Error processing request!", show_alert=True)
+                await bot.answer_callback_query(call.id, "âŒ Error processing request!", show_alert=True)
         except:
-            await bot.answer_callback_query(call.id, "❌ Internal error!")
+            await bot.answer_callback_query(call.id, "âŒ Internal error!")
 
 @owner_only
 @rate_limit
 @validate_data
 async def handle_navigation_action(call, bot, data, lang, db_manager: DBManager):
     """
-    مدیریت اقدامات ناوبری پیشرفته
+    Ù…Ø¯ÛŒØ±ÛŒØª Ø§Ù‚Ø¯Ø§Ù…Ø§Øª Ù†Ø§ÙˆØ¨Ø±ÛŒ Ù¾ÛŒØ´Ø±ÙØªÙ‡
     Handle enhanced navigation actions (go:xxx)
     """
     await bot.answer_callback_query(call.id)
@@ -363,22 +361,22 @@ async def handle_navigation_action(call, bot, data, lang, db_manager: DBManager)
     try:
         # Enhanced navigation mapping with module paths
         nav_actions = {
-            "shop": ("src.commands.shop", "shop_cmd"),
-            "inventory": ("src.commands.inventory", "inventory_cmd"),
-            "inv": ("src.commands.inventory", "inventory_cmd"),
-            "status": ("src.commands.status", "status_cmd"),
-            "stars": ("src.commands.stars", "stars_cmd"),
-            "stats": ("src.commands.stats", "stats_cmd"),
-            "help": ("src.commands.help", "help_cmd"),
-            "start": ("src.commands.general", "start_cmd"),
-            "attack": ("src.commands.attack", "attack_cmd"),
-            "profile": ("src.commands.general", "profile_cmd"),
-            "leaderboard": ("src.commands.general", "leaderboard_cmd"),
-            "settings": ("src.commands.general", "settings_cmd"),
-            "weapons": ("src.commands.attack", "weapons_cmd"),
-            "battle_stats": ("src.commands.attack", "battle_stats_cmd"),
-            "main": ("src.commands.general", "start_cmd"),
-            "menu": ("src.commands.general", "start_cmd"),
+            "shop": ("src.commands.shop", "shop_command"),
+            "inventory": ("src.commands.inventory", "inventory_command"),
+            "inv": ("src.commands.inventory", "inventory_command"),
+            "status": ("src.commands.status", "status_command"),
+            "stars": ("src.commands.stars", "stars_command"),
+            "stats": ("src.commands.stats", "stats_command"),
+            "help": ("src.commands.help", "help_command"),
+            "start": ("src.commands.general", "start_command"),
+            "attack": ("src.commands.attack", "attack_command"),
+            "profile": ("src.commands.general", "profile_command"),
+            "leaderboard": ("src.commands.general", "leaderboard_command"),
+            "settings": ("src.commands.general", "settings_command"),
+            "weapons": ("src.commands.attack", "weapons_command"),
+            "battle_stats": ("src.commands.attack", "battle_stats_command"),
+            "main": ("src.commands.general", "start_command"),
+            "menu": ("src.commands.general", "start_command"),
         }
         
         if data in nav_actions:
@@ -397,40 +395,40 @@ async def handle_navigation_action(call, bot, data, lang, db_manager: DBManager)
                     await command_func(call.message, bot, db_manager)
                     
                 logger.info(f"Navigation to {data} completed for user {call.from_user.id}")
-                logger.info(f"ناوبری به {data} برای کاربر {call.from_user.id} کامل شد")
+                logger.info(f"Ù†Ø§ÙˆØ¨Ø±ÛŒ Ø¨Ù‡ {data} Ø¨Ø±Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø± {call.from_user.id} Ú©Ø§Ù…Ù„ Ø´Ø¯")
                 
             except ImportError as e:
                 logger.error(f"Failed to import module {module_path}: {e}")
                 if lang == "fa":
-                    await bot.answer_callback_query(call.id, "❌ ماژول در دسترس نیست!", show_alert=True)
+                    await bot.answer_callback_query(call.id, "âŒ Ù…Ø§Ú˜ÙˆÙ„ Ø¯Ø± Ø¯Ø³ØªØ±Ø³ Ù†ÛŒØ³Øª!", show_alert=True)
                 else:
-                    await bot.answer_callback_query(call.id, "❌ Module not available!", show_alert=True)
+                    await bot.answer_callback_query(call.id, "âŒ Module not available!", show_alert=True)
                     
             except AttributeError as e:
                 logger.error(f"Function {func_name} not found in {module_path}: {e}")
                 if lang == "fa":
-                    await bot.answer_callback_query(call.id, "❌ تابع در دسترس نیست!", show_alert=True)
+                    await bot.answer_callback_query(call.id, "âŒ ØªØ§Ø¨Ø¹ Ø¯Ø± Ø¯Ø³ØªØ±Ø³ Ù†ÛŒØ³Øª!", show_alert=True)
                 else:
-                    await bot.answer_callback_query(call.id, "❌ Function not available!", show_alert=True)
+                    await bot.answer_callback_query(call.id, "âŒ Function not available!", show_alert=True)
         else:
             logger.warning(f"Unknown navigation destination: {data}")
-            logger.warning(f"مقصد ناوبری ناشناخته: {data}")
+            logger.warning(f"Ù…Ù‚ØµØ¯ Ù†Ø§ÙˆØ¨Ø±ÛŒ Ù†Ø§Ø´Ù†Ø§Ø®ØªÙ‡: {data}")
             
             if lang == "fa":
-                await bot.answer_callback_query(call.id, "⚠️ مقصد ناشناخته!", show_alert=True)
+                await bot.answer_callback_query(call.id, "âš ï¸ Ù…Ù‚ØµØ¯ Ù†Ø§Ø´Ù†Ø§Ø®ØªÙ‡!", show_alert=True)
             else:
-                await bot.answer_callback_query(call.id, "⚠️ Unknown destination!", show_alert=True)
+                await bot.answer_callback_query(call.id, "âš ï¸ Unknown destination!", show_alert=True)
                 
     except Exception as e:
         logger.error(f"Error in navigation action: {e}")
-        logger.error(f"خطا در اقدام ناوبری: {e}")
+        logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ø§Ù‚Ø¯Ø§Ù… Ù†Ø§ÙˆØ¨Ø±ÛŒ: {e}")
 
 @owner_only
 @rate_limit 
 @validate_data
 async def handle_action_callback(call, bot, data, lang, db_manager: DBManager):
     """
-    مدیریت کالبک‌های اقدام پیشرفته
+    Ù…Ø¯ÛŒØ±ÛŒØª Ú©Ø§Ù„Ø¨Ú©â€ŒÙ‡Ø§ÛŒ Ø§Ù‚Ø¯Ø§Ù… Ù¾ÛŒØ´Ø±ÙØªÙ‡
     Handle enhanced action callbacks (do:xxx)
     """
     await bot.answer_callback_query(call.id)
@@ -471,30 +469,30 @@ async def handle_action_callback(call, bot, data, lang, db_manager: DBManager):
                     await command_func(call.message, bot, db_manager)
                     
                 logger.info(f"Action {data} executed for user {call.from_user.id}")
-                logger.info(f"اقدام {data} برای کاربر {call.from_user.id} اجرا شد")
+                logger.info(f"Ø§Ù‚Ø¯Ø§Ù… {data} Ø¨Ø±Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø± {call.from_user.id} Ø§Ø¬Ø±Ø§ Ø´Ø¯")
                 
             except Exception as e:
                 logger.error(f"Error executing action {data}: {e}")
                 if lang == "fa":
-                    await bot.answer_callback_query(call.id, "❌ خطا در اجرای عملیات!", show_alert=True)
+                    await bot.answer_callback_query(call.id, "âŒ Ø®Ø·Ø§ Ø¯Ø± Ø§Ø¬Ø±Ø§ÛŒ Ø¹Ù…Ù„ÛŒØ§Øª!", show_alert=True)
                 else:
-                    await bot.answer_callback_query(call.id, "❌ Error executing action!", show_alert=True)
+                    await bot.answer_callback_query(call.id, "âŒ Error executing action!", show_alert=True)
                     
         elif data == "delete_message":
             try:
                 await bot.delete_message(call.message.chat.id, call.message.message_id)
                 logger.info(f"Message deleted by user {call.from_user.id}")
-                logger.info(f"پیام توسط کاربر {call.from_user.id} حذف شد")
+                logger.info(f"Ù¾ÛŒØ§Ù… ØªÙˆØ³Ø· Ú©Ø§Ø±Ø¨Ø± {call.from_user.id} Ø­Ø°Ù Ø´Ø¯")
             except Exception as e:
                 logger.error(f"Error deleting message: {e}")
-                logger.error(f"خطا در حذف پیام: {e}")
+                logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ø­Ø°Ù Ù¾ÛŒØ§Ù…: {e}")
                 
         elif data == "close_menu":
             try:
                 if lang == "fa":
-                    close_text = "❌ منو بسته شد"
+                    close_text = "âŒ Ù…Ù†Ùˆ Ø¨Ø³ØªÙ‡ Ø´Ø¯"
                 else:
-                    close_text = "❌ Menu closed"
+                    close_text = "âŒ Menu closed"
                     
                 await bot.edit_message_text(
                     close_text,
@@ -510,22 +508,22 @@ async def handle_action_callback(call, bot, data, lang, db_manager: DBManager):
             
         else:
             logger.warning(f"Unknown action: {data}")
-            logger.warning(f"اقدام ناشناخته: {data}")
+            logger.warning(f"Ø§Ù‚Ø¯Ø§Ù… Ù†Ø§Ø´Ù†Ø§Ø®ØªÙ‡: {data}")
             
             if lang == "fa":
-                await bot.answer_callback_query(call.id, "⚠️ اقدام ناشناخته!", show_alert=True)
+                await bot.answer_callback_query(call.id, "âš ï¸ Ø§Ù‚Ø¯Ø§Ù… Ù†Ø§Ø´Ù†Ø§Ø®ØªÙ‡!", show_alert=True)
             else:
-                await bot.answer_callback_query(call.id, "⚠️ Unknown action!", show_alert=True)
+                await bot.answer_callback_query(call.id, "âš ï¸ Unknown action!", show_alert=True)
                 
     except Exception as e:
         logger.error(f"Error in action callback: {e}")
-        logger.error(f"خطا در کالبک اقدام: {e}")
+        logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ú©Ø§Ù„Ø¨Ú© Ø§Ù‚Ø¯Ø§Ù…: {e}")
 
 @rate_limit
 @validate_data
 async def handle_purchase_callback(call, bot, data, lang, db_manager: DBManager):
     """
-    مدیریت کالبک‌های خرید پیشرفته
+    Ù…Ø¯ÛŒØ±ÛŒØª Ú©Ø§Ù„Ø¨Ú©â€ŒÙ‡Ø§ÛŒ Ø®Ø±ÛŒØ¯ Ù¾ÛŒØ´Ø±ÙØªÙ‡
     Handle enhanced purchase callbacks (buy:xxx)
     """
     try:
@@ -533,23 +531,23 @@ async def handle_purchase_callback(call, bot, data, lang, db_manager: DBManager)
         await process_purchase(call, bot, data, lang, db_manager)
         
         logger.info(f"Purchase callback handled for user {call.from_user.id}: {data}")
-        logger.info(f"کالبک خرید برای کاربر {call.from_user.id} مدیریت شد: {data}")
+        logger.info(f"Ú©Ø§Ù„Ø¨Ú© Ø®Ø±ÛŒØ¯ Ø¨Ø±Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø± {call.from_user.id} Ù…Ø¯ÛŒØ±ÛŒØª Ø´Ø¯: {data}")
         
     except Exception as e:
         logger.error(f"Error in purchase callback: {e}")
-        logger.error(f"خطا در کالبک خرید: {e}")
+        logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ú©Ø§Ù„Ø¨Ú© Ø®Ø±ÛŒØ¯: {e}")
         
         if lang == "fa":
-            await bot.answer_callback_query(call.id, "❌ خطا در پردازش خرید!", show_alert=True)
+            await bot.answer_callback_query(call.id, "âŒ Ø®Ø·Ø§ Ø¯Ø± Ù¾Ø±Ø¯Ø§Ø²Ø´ Ø®Ø±ÛŒØ¯!", show_alert=True)
         else:
-            await bot.answer_callback_query(call.id, "❌ Error processing purchase!", show_alert=True)
+            await bot.answer_callback_query(call.id, "âŒ Error processing purchase!", show_alert=True)
 
 @owner_only
 @rate_limit
 @validate_data
 async def handle_confirmation_callback(call, bot, data, lang, db_manager: DBManager):
     """
-    مدیریت کالبک‌های تایید پیشرفته
+    Ù…Ø¯ÛŒØ±ÛŒØª Ú©Ø§Ù„Ø¨Ú©â€ŒÙ‡Ø§ÛŒ ØªØ§ÛŒÛŒØ¯ Ù¾ÛŒØ´Ø±ÙØªÙ‡
     Handle enhanced confirmation callbacks (confirm:xxx)
     """
     if ":" in data:
@@ -577,42 +575,42 @@ async def handle_confirmation_callback(call, bot, data, lang, db_manager: DBMana
                 
             else:
                 logger.warning(f"Unknown confirmation action: {action}")
-                logger.warning(f"اقدام تایید ناشناخته: {action}")
+                logger.warning(f"Ø§Ù‚Ø¯Ø§Ù… ØªØ§ÛŒÛŒØ¯ Ù†Ø§Ø´Ù†Ø§Ø®ØªÙ‡: {action}")
                 
                 if lang == "fa":
-                    await bot.answer_callback_query(call.id, "⚠️ اقدام تایید ناشناخته!", show_alert=True)
+                    await bot.answer_callback_query(call.id, "âš ï¸ Ø§Ù‚Ø¯Ø§Ù… ØªØ§ÛŒÛŒØ¯ Ù†Ø§Ø´Ù†Ø§Ø®ØªÙ‡!", show_alert=True)
                 else:
-                    await bot.answer_callback_query(call.id, "⚠️ Unknown confirmation action!", show_alert=True)
+                    await bot.answer_callback_query(call.id, "âš ï¸ Unknown confirmation action!", show_alert=True)
                     
         except Exception as e:
             logger.error(f"Error in confirmation action {action}: {e}")
-            logger.error(f"خطا در اقدام تایید {action}: {e}")
+            logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ø§Ù‚Ø¯Ø§Ù… ØªØ§ÛŒÛŒØ¯ {action}: {e}")
             
             if lang == "fa":
-                await bot.answer_callback_query(call.id, "❌ خطا در تایید عملیات!", show_alert=True)
+                await bot.answer_callback_query(call.id, "âŒ Ø®Ø·Ø§ Ø¯Ø± ØªØ§ÛŒÛŒØ¯ Ø¹Ù…Ù„ÛŒØ§Øª!", show_alert=True)
             else:
-                await bot.answer_callback_query(call.id, "❌ Error confirming operation!", show_alert=True)
+                await bot.answer_callback_query(call.id, "âŒ Error confirming operation!", show_alert=True)
     else:
         logger.warning(f"Invalid confirmation data format: {data}")
-        logger.warning(f"فرمت داده تایید نامعتبر: {data}")
+        logger.warning(f"ÙØ±Ù…Øª Ø¯Ø§Ø¯Ù‡ ØªØ§ÛŒÛŒØ¯ Ù†Ø§Ù…Ø¹ØªØ¨Ø±: {data}")
         
         if lang == "fa":
-            await bot.answer_callback_query(call.id, "⚠️ فرمت داده نامعتبر!", show_alert=True)
+            await bot.answer_callback_query(call.id, "âš ï¸ ÙØ±Ù…Øª Ø¯Ø§Ø¯Ù‡ Ù†Ø§Ù…Ø¹ØªØ¨Ø±!", show_alert=True)
         else:
-            await bot.answer_callback_query(call.id, "⚠️ Invalid data format!", show_alert=True)
+            await bot.answer_callback_query(call.id, "âš ï¸ Invalid data format!", show_alert=True)
 
 @owner_only
 @rate_limit
 @validate_data
 async def handle_cancel_action(call, bot, data, lang, db_manager: DBManager):
     """
-    مدیریت اقدامات لغو پیشرفته
+    Ù…Ø¯ÛŒØ±ÛŒØª Ø§Ù‚Ø¯Ø§Ù…Ø§Øª Ù„ØºÙˆ Ù¾ÛŒØ´Ø±ÙØªÙ‡
     Handle enhanced cancel actions (cancel:xxx)
     """
     if lang == "fa":
-        await bot.answer_callback_query(call.id, "❌ عملیات لغو شد")
+        await bot.answer_callback_query(call.id, "âŒ Ø¹Ù…Ù„ÛŒØ§Øª Ù„ØºÙˆ Ø´Ø¯")
     else:
-        await bot.answer_callback_query(call.id, "❌ Operation cancelled")
+        await bot.answer_callback_query(call.id, "âŒ Operation cancelled")
     
     try:
         if data == "purchase":
@@ -636,35 +634,35 @@ async def handle_cancel_action(call, bot, data, lang, db_manager: DBManager):
             await settings_cmd(call.message, bot, db_manager)
             
         else:
-            text = "❌ عملیات لغو شد." if lang == "fa" else "❌ Operation cancelled."
+            text = "âŒ Ø¹Ù…Ù„ÛŒØ§Øª Ù„ØºÙˆ Ø´Ø¯." if lang == "fa" else "âŒ Operation cancelled."
             try:
                 await bot.edit_message_text(text, call.message.chat.id, call.message.message_id)
             except Exception as e:
                 logger.error(f"Error editing message: {e}")
                 
         logger.info(f"Cancel action {data} handled for user {call.from_user.id}")
-        logger.info(f"اقدام لغو {data} برای کاربر {call.from_user.id} مدیریت شد")
+        logger.info(f"Ø§Ù‚Ø¯Ø§Ù… Ù„ØºÙˆ {data} Ø¨Ø±Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø± {call.from_user.id} Ù…Ø¯ÛŒØ±ÛŒØª Ø´Ø¯")
         
     except Exception as e:
         logger.error(f"Error in cancel action: {e}")
-        logger.error(f"خطا در اقدام لغو: {e}")
+        logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ø§Ù‚Ø¯Ø§Ù… Ù„ØºÙˆ: {e}")
 
 @rate_limit
 @validate_data
 async def handle_pagination_callback(call, bot, data, lang, db_manager: DBManager):
     """
-    مدیریت کالبک‌های صفحه‌بندی پیشرفته
+    Ù…Ø¯ÛŒØ±ÛŒØª Ú©Ø§Ù„Ø¨Ú©â€ŒÙ‡Ø§ÛŒ ØµÙØ­Ù‡â€ŒØ¨Ù†Ø¯ÛŒ Ù¾ÛŒØ´Ø±ÙØªÙ‡
     Handle enhanced pagination callbacks (page:xxx)
     """
     parts = data.split(":")
     if len(parts) != 2:
         logger.warning(f"Invalid pagination data format: {data}")
-        logger.warning(f"فرمت داده صفحه‌بندی نامعتبر: {data}")
+        logger.warning(f"ÙØ±Ù…Øª Ø¯Ø§Ø¯Ù‡ ØµÙØ­Ù‡â€ŒØ¨Ù†Ø¯ÛŒ Ù†Ø§Ù…Ø¹ØªØ¨Ø±: {data}")
         
         if lang == "fa":
-            await bot.answer_callback_query(call.id, "⚠️ فرمت صفحه‌بندی نامعتبر!", show_alert=True)
+            await bot.answer_callback_query(call.id, "âš ï¸ ÙØ±Ù…Øª ØµÙØ­Ù‡â€ŒØ¨Ù†Ø¯ÛŒ Ù†Ø§Ù…Ø¹ØªØ¨Ø±!", show_alert=True)
         else:
-            await bot.answer_callback_query(call.id, "⚠️ Invalid pagination format!", show_alert=True)
+            await bot.answer_callback_query(call.id, "âš ï¸ Invalid pagination format!", show_alert=True)
         return
     
     section, page_num_str = parts
@@ -672,12 +670,12 @@ async def handle_pagination_callback(call, bot, data, lang, db_manager: DBManage
         page_num = int(page_num_str)
     except ValueError:
         logger.warning(f"Invalid page number: {page_num_str}")
-        logger.warning(f"شماره صفحه نامعتبر: {page_num_str}")
+        logger.warning(f"Ø´Ù…Ø§Ø±Ù‡ ØµÙØ­Ù‡ Ù†Ø§Ù…Ø¹ØªØ¨Ø±: {page_num_str}")
         
         if lang == "fa":
-            await bot.answer_callback_query(call.id, "⚠️ شماره صفحه نامعتبر!", show_alert=True)
+            await bot.answer_callback_query(call.id, "âš ï¸ Ø´Ù…Ø§Ø±Ù‡ ØµÙØ­Ù‡ Ù†Ø§Ù…Ø¹ØªØ¨Ø±!", show_alert=True)
         else:
-            await bot.answer_callback_query(call.id, "⚠️ Invalid page number!", show_alert=True)
+            await bot.answer_callback_query(call.id, "âš ï¸ Invalid page number!", show_alert=True)
         return
     
     await bot.answer_callback_query(call.id)
@@ -705,20 +703,20 @@ async def handle_pagination_callback(call, bot, data, lang, db_manager: DBManage
             
         else:
             logger.warning(f"Unknown pagination section: {section}")
-            logger.warning(f"بخش صفحه‌بندی ناشناخته: {section}")
+            logger.warning(f"Ø¨Ø®Ø´ ØµÙØ­Ù‡â€ŒØ¨Ù†Ø¯ÛŒ Ù†Ø§Ø´Ù†Ø§Ø®ØªÙ‡: {section}")
             
     except Exception as e:
         logger.error(f"Error in pagination callback: {e}")
-        logger.error(f"خطا در کالبک صفحه‌بندی: {e}")
+        logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ú©Ø§Ù„Ø¨Ú© ØµÙØ­Ù‡â€ŒØ¨Ù†Ø¯ÛŒ: {e}")
 
 # =============================================================================
-# مدیریت‌کننده‌های کالبک اضافی - Additional Callback Handlers
+# Ù…Ø¯ÛŒØ±ÛŒØªâ€ŒÚ©Ù†Ù†Ø¯Ù‡â€ŒÙ‡Ø§ÛŒ Ú©Ø§Ù„Ø¨Ú© Ø§Ø¶Ø§ÙÛŒ - Additional Callback Handlers
 # =============================================================================
 
 @rate_limit
 @validate_data
 async def handle_filter_callback(call, bot, data, lang, db_manager: DBManager):
-    """مدیریت فیلترها - Handle filters"""
+    """Ù…Ø¯ÛŒØ±ÛŒØª ÙÛŒÙ„ØªØ±Ù‡Ø§ - Handle filters"""
     await bot.answer_callback_query(call.id)
     
     try:
@@ -738,7 +736,7 @@ async def handle_filter_callback(call, bot, data, lang, db_manager: DBManager):
 @rate_limit
 @validate_data
 async def handle_sort_callback(call, bot, data, lang, db_manager: DBManager):
-    """مدیریت مرتب‌سازی - Handle sorting"""
+    """Ù…Ø¯ÛŒØ±ÛŒØª Ù…Ø±ØªØ¨â€ŒØ³Ø§Ø²ÛŒ - Handle sorting"""
     await bot.answer_callback_query(call.id)
     
     try:
@@ -753,7 +751,7 @@ async def handle_sort_callback(call, bot, data, lang, db_manager: DBManager):
 @rate_limit
 @validate_data
 async def handle_help_callback(call, bot, data, lang, db_manager: DBManager):
-    """مدیریت راهنما - Handle help"""
+    """Ù…Ø¯ÛŒØ±ÛŒØª Ø±Ø§Ù‡Ù†Ù…Ø§ - Handle help"""
     await bot.answer_callback_query(call.id)
     
     try:
@@ -766,7 +764,7 @@ async def handle_help_callback(call, bot, data, lang, db_manager: DBManager):
 @rate_limit
 @validate_data
 async def handle_settings_callback(call, bot, data, lang, db_manager: DBManager):
-    """مدیریت تنظیمات - Handle settings"""
+    """Ù…Ø¯ÛŒØ±ÛŒØª ØªÙ†Ø¸ÛŒÙ…Ø§Øª - Handle settings"""
     await bot.answer_callback_query(call.id)
     
     try:
@@ -778,13 +776,13 @@ async def handle_settings_callback(call, bot, data, lang, db_manager: DBManager)
 @rate_limit
 @validate_data
 async def handle_admin_callback(call, bot, data, lang, db_manager: DBManager):
-    """مدیریت ادمین - Handle admin actions"""
+    """Ù…Ø¯ÛŒØ±ÛŒØª Ø§Ø¯Ù…ÛŒÙ† - Handle admin actions"""
     # Check if user is admin
     if not await is_user_admin(call.from_user.id, call.message.chat.id, db_manager):
         if lang == "fa":
-            await bot.answer_callback_query(call.id, "⚠️ شما مجاز به این عملیات نیستید!", show_alert=True)
+            await bot.answer_callback_query(call.id, "âš ï¸ Ø´Ù…Ø§ Ù…Ø¬Ø§Ø² Ø¨Ù‡ Ø§ÛŒÙ† Ø¹Ù…Ù„ÛŒØ§Øª Ù†ÛŒØ³ØªÛŒØ¯!", show_alert=True)
         else:
-            await bot.answer_callback_query(call.id, "⚠️ You're not authorized for this action!", show_alert=True)
+            await bot.answer_callback_query(call.id, "âš ï¸ You're not authorized for this action!", show_alert=True)
         return
     
     await bot.answer_callback_query(call.id)
@@ -792,9 +790,9 @@ async def handle_admin_callback(call, bot, data, lang, db_manager: DBManager):
     try:
         # Admin functionality placeholder - implement when admin module is available
         if lang == "fa":
-            await bot.send_message(call.message.chat.id, "⚙️ عملکرد ادمین در حال توسعه است...")
+            await bot.send_message(call.message.chat.id, "âš™ï¸ Ø¹Ù…Ù„Ú©Ø±Ø¯ Ø§Ø¯Ù…ÛŒÙ† Ø¯Ø± Ø­Ø§Ù„ ØªÙˆØ³Ø¹Ù‡ Ø§Ø³Øª...")
         else:
-            await bot.send_message(call.message.chat.id, "⚙️ Admin functionality under development...")
+            await bot.send_message(call.message.chat.id, "âš™ï¸ Admin functionality under development...")
     except Exception as e:
         logger.error(f"Error in admin callback: {e}")
 
@@ -802,7 +800,7 @@ async def handle_admin_callback(call, bot, data, lang, db_manager: DBManager):
 @rate_limit
 @validate_data
 async def handle_attack_callback(call, bot, data, lang, db_manager: DBManager):
-    """مدیریت حمله - Handle attack actions"""
+    """Ù…Ø¯ÛŒØ±ÛŒØª Ø­Ù…Ù„Ù‡ - Handle attack actions"""
     await bot.answer_callback_query(call.id)
     
     try:
@@ -815,7 +813,7 @@ async def handle_attack_callback(call, bot, data, lang, db_manager: DBManager):
 @rate_limit
 @validate_data
 async def handle_defense_callback(call, bot, data, lang, db_manager: DBManager):
-    """مدیریت دفاع - Handle defense actions"""
+    """Ù…Ø¯ÛŒØ±ÛŒØª Ø¯ÙØ§Ø¹ - Handle defense actions"""
     await bot.answer_callback_query(call.id)
     
     try:
@@ -828,7 +826,7 @@ async def handle_defense_callback(call, bot, data, lang, db_manager: DBManager):
 @rate_limit
 @validate_data
 async def handle_inventory_callback(call, bot, data, lang, db_manager: DBManager):
-    """مدیریت موجودی - Handle inventory actions"""
+    """Ù…Ø¯ÛŒØ±ÛŒØª Ù…ÙˆØ¬ÙˆØ¯ÛŒ - Handle inventory actions"""
     await bot.answer_callback_query(call.id)
     
     try:
@@ -840,7 +838,7 @@ async def handle_inventory_callback(call, bot, data, lang, db_manager: DBManager
 @rate_limit
 @validate_data
 async def handle_leaderboard_callback(call, bot, data, lang, db_manager: DBManager):
-    """مدیریت لیدربورد - Handle leaderboard actions"""
+    """Ù…Ø¯ÛŒØ±ÛŒØª Ù„ÛŒØ¯Ø±Ø¨ÙˆØ±Ø¯ - Handle leaderboard actions"""
     await bot.answer_callback_query(call.id)
     
     try:
@@ -853,7 +851,7 @@ async def handle_leaderboard_callback(call, bot, data, lang, db_manager: DBManag
 @rate_limit
 @validate_data
 async def handle_profile_callback(call, bot, data, lang, db_manager: DBManager):
-    """مدیریت پروفایل - Handle profile actions"""
+    """Ù…Ø¯ÛŒØ±ÛŒØª Ù¾Ø±ÙˆÙØ§ÛŒÙ„ - Handle profile actions"""
     await bot.answer_callback_query(call.id)
     
     try:
@@ -865,7 +863,7 @@ async def handle_profile_callback(call, bot, data, lang, db_manager: DBManager):
 @rate_limit
 @validate_data
 async def handle_weapon_callback(call, bot, data, lang, db_manager: DBManager):
-    """مدیریت سلاح - Handle weapon actions"""
+    """Ù…Ø¯ÛŒØ±ÛŒØª Ø³Ù„Ø§Ø­ - Handle weapon actions"""
     await bot.answer_callback_query(call.id)
     
     try:
@@ -877,7 +875,7 @@ async def handle_weapon_callback(call, bot, data, lang, db_manager: DBManager):
 @rate_limit
 @validate_data
 async def handle_item_callback(call, bot, data, lang, db_manager: DBManager):
-    """مدیریت آیتم - Handle item actions"""
+    """Ù…Ø¯ÛŒØ±ÛŒØª Ø¢ÛŒØªÙ… - Handle item actions"""
     await bot.answer_callback_query(call.id)
     
     try:
@@ -890,7 +888,7 @@ async def handle_item_callback(call, bot, data, lang, db_manager: DBManager):
 @rate_limit
 @validate_data
 async def handle_quick_action(call, bot, data, lang, db_manager: DBManager):
-    """مدیریت اقدامات سریع - Handle quick actions"""
+    """Ù…Ø¯ÛŒØ±ÛŒØª Ø§Ù‚Ø¯Ø§Ù…Ø§Øª Ø³Ø±ÛŒØ¹ - Handle quick actions"""
     await bot.answer_callback_query(call.id)
     
     try:
@@ -917,7 +915,7 @@ async def handle_quick_action(call, bot, data, lang, db_manager: DBManager):
         logger.error(f"Error in quick action: {e}")
 
 async def handle_delete_account_confirmation(call, bot, lang, db_manager: DBManager):
-    """مدیریت تایید حذف حساب - Handle account deletion confirmation"""
+    """Ù…Ø¯ÛŒØ±ÛŒØª ØªØ§ÛŒÛŒØ¯ Ø­Ø°Ù Ø­Ø³Ø§Ø¨ - Handle account deletion confirmation"""
     try:
         # Delete user data
         await db_manager.db(
@@ -926,9 +924,9 @@ async def handle_delete_account_confirmation(call, bot, lang, db_manager: DBMana
         )
         
         if lang == "fa":
-            success_text = "✅ حساب شما با موفقیت حذف شد!"
+            success_text = "âœ… Ø­Ø³Ø§Ø¨ Ø´Ù…Ø§ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø­Ø°Ù Ø´Ø¯!"
         else:
-            success_text = "✅ Your account has been successfully deleted!"
+            success_text = "âœ… Your account has been successfully deleted!"
             
         await bot.edit_message_text(
             success_text,
@@ -937,18 +935,18 @@ async def handle_delete_account_confirmation(call, bot, lang, db_manager: DBMana
         )
         
         logger.info(f"Account deleted for user {call.from_user.id}")
-        logger.info(f"حساب کاربر {call.from_user.id} حذف شد")
+        logger.info(f"Ø­Ø³Ø§Ø¨ Ú©Ø§Ø±Ø¨Ø± {call.from_user.id} Ø­Ø°Ù Ø´Ø¯")
         
     except Exception as e:
         logger.error(f"Error deleting account: {e}")
-        logger.error(f"خطا در حذف حساب: {e}")
+        logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ø­Ø°Ù Ø­Ø³Ø§Ø¨: {e}")
 
 # =============================================================================
-# توابع کمکی - Helper Functions
+# ØªÙˆØ§Ø¨Ø¹ Ú©Ù…Ú©ÛŒ - Helper Functions
 # =============================================================================
 
 async def is_user_admin(user_id: int, chat_id: int, db_manager: DBManager) -> bool:
-    """بررسی ادمین بودن کاربر - Check if user is admin"""
+    """Ø¨Ø±Ø±Ø³ÛŒ Ø§Ø¯Ù…ÛŒÙ† Ø¨ÙˆØ¯Ù† Ú©Ø§Ø±Ø¨Ø± - Check if user is admin"""
     try:
         # Check if user is bot admin (you can customize this)
         admin_ids = [123456789]  # Add your admin IDs here
@@ -958,7 +956,7 @@ async def is_user_admin(user_id: int, chat_id: int, db_manager: DBManager) -> bo
         return False
 
 async def log_callback_usage(call: types.CallbackQuery, action: str, data: str):
-    """ثبت استفاده از کالبک - Log callback usage"""
+    """Ø«Ø¨Øª Ø§Ø³ØªÙØ§Ø¯Ù‡ Ø§Ø² Ú©Ø§Ù„Ø¨Ú© - Log callback usage"""
     try:
         usage_data = {
             'user_id': call.from_user.id,
@@ -970,33 +968,33 @@ async def log_callback_usage(call: types.CallbackQuery, action: str, data: str):
         
         # You can save this to database or file for analytics
         logger.info(f"Callback usage: {usage_data}")
-        logger.info(f"استفاده از کالبک: {usage_data}")
+        logger.info(f"Ø§Ø³ØªÙØ§Ø¯Ù‡ Ø§Ø² Ú©Ø§Ù„Ø¨Ú©: {usage_data}")
         
     except Exception as e:
         logger.error(f"Error logging callback usage: {e}")
 
 async def create_error_keyboard(lang: str) -> types.InlineKeyboardMarkup:
-    """ایجاد کیبورد خطا - Create error keyboard"""
+    """Ø§ÛŒØ¬Ø§Ø¯ Ú©ÛŒØ¨ÙˆØ±Ø¯ Ø®Ø·Ø§ - Create error keyboard"""
     keyboard = types.InlineKeyboardMarkup()
     
     if lang == "fa":
         keyboard.add(
-            types.InlineKeyboardButton("🔄 تلاش مجدد", callback_data="do:retry"),
-            types.InlineKeyboardButton("🏠 منوی اصلی", callback_data="go:main")
+            types.InlineKeyboardButton("ðŸ”„ ØªÙ„Ø§Ø´ Ù…Ø¬Ø¯Ø¯", callback_data="do:retry"),
+            types.InlineKeyboardButton("ðŸ  Ù…Ù†ÙˆÛŒ Ø§ØµÙ„ÛŒ", callback_data="go:main")
         )
-        keyboard.add(types.InlineKeyboardButton("❌ بستن", callback_data="do:delete_message"))
+        keyboard.add(types.InlineKeyboardButton("âŒ Ø¨Ø³ØªÙ†", callback_data="do:delete_message"))
     else:
         keyboard.add(
-            types.InlineKeyboardButton("🔄 Retry", callback_data="do:retry"),
-            types.InlineKeyboardButton("🏠 Main Menu", callback_data="go:main")
+            types.InlineKeyboardButton("ðŸ”„ Retry", callback_data="do:retry"),
+            types.InlineKeyboardButton("ðŸ  Main Menu", callback_data="go:main")
         )
-        keyboard.add(types.InlineKeyboardButton("❌ Close", callback_data="do:delete_message"))
+        keyboard.add(types.InlineKeyboardButton("âŒ Close", callback_data="do:delete_message"))
     
     return keyboard
 
 def register_callback_handlers(bot, db_manager: DBManager):
     """
-    ثبت مدیریت‌کننده‌های پیشرفته کالبک کوئری
+    Ø«Ø¨Øª Ù…Ø¯ÛŒØ±ÛŒØªâ€ŒÚ©Ù†Ù†Ø¯Ù‡â€ŒÙ‡Ø§ÛŒ Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ú©Ø§Ù„Ø¨Ú© Ú©ÙˆØ¦Ø±ÛŒ
     Register enhanced callback query handlers with comprehensive functionality
     
     Args:
@@ -1004,13 +1002,13 @@ def register_callback_handlers(bot, db_manager: DBManager):
         db_manager (DBManager): Database manager instance
     """
     logger.info("Registering enhanced callback query handlers")
-    logger.info("ثبت مدیریت‌کننده‌های پیشرفته کالبک کوئری")
+    logger.info("Ø«Ø¨Øª Ù…Ø¯ÛŒØ±ÛŒØªâ€ŒÚ©Ù†Ù†Ø¯Ù‡â€ŒÙ‡Ø§ÛŒ Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ú©Ø§Ù„Ø¨Ú© Ú©ÙˆØ¦Ø±ÛŒ")
     
     # Register global callback handler with comprehensive error handling
     @bot.callback_query_handler(func=lambda call: True)
     async def main_callback_handler(call):
         """
-        مدیریت‌کننده اصلی کالبک با مدیریت خطای پیشرفته
+        Ù…Ø¯ÛŒØ±ÛŒØªâ€ŒÚ©Ù†Ù†Ø¯Ù‡ Ø§ØµÙ„ÛŒ Ú©Ø§Ù„Ø¨Ú© Ø¨Ø§ Ù…Ø¯ÛŒØ±ÛŒØª Ø®Ø·Ø§ÛŒ Ù¾ÛŒØ´Ø±ÙØªÙ‡
         Main callback handler with advanced error management
         """
         try:
@@ -1022,16 +1020,16 @@ def register_callback_handlers(bot, db_manager: DBManager):
             
         except Exception as e:
             logger.error(f"Critical error in callback handler: {e}")
-            logger.error(f"خطای حاد در مدیریت‌کننده کالبک: {e}")
+            logger.error(f"Ø®Ø·Ø§ÛŒ Ø­Ø§Ø¯ Ø¯Ø± Ù…Ø¯ÛŒØ±ÛŒØªâ€ŒÚ©Ù†Ù†Ø¯Ù‡ Ú©Ø§Ù„Ø¨Ú©: {e}")
             
             # Try to send error message to user
             try:
                 lang = await get_lang(call.message.chat.id, call.from_user.id, db_manager)
                 
                 if lang == "fa":
-                    error_text = "❌ خطای داخلی سیستم!\n\nلطفاً مجدداً تلاش کنید یا با پشتیبانی تماس بگیرید."
+                    error_text = "âŒ Ø®Ø·Ø§ÛŒ Ø¯Ø§Ø®Ù„ÛŒ Ø³ÛŒØ³ØªÙ…!\n\nÙ„Ø·ÙØ§Ù‹ Ù…Ø¬Ø¯Ø¯Ø§Ù‹ ØªÙ„Ø§Ø´ Ú©Ù†ÛŒØ¯ ÛŒØ§ Ø¨Ø§ Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ ØªÙ…Ø§Ø³ Ø¨Ú¯ÛŒØ±ÛŒØ¯."
                 else:
-                    error_text = "❌ Internal system error!\n\nPlease try again or contact support."
+                    error_text = "âŒ Internal system error!\n\nPlease try again or contact support."
                 
                 error_keyboard = await create_error_keyboard(lang)
                 
@@ -1049,18 +1047,18 @@ def register_callback_handlers(bot, db_manager: DBManager):
                 try:
                     await bot.answer_callback_query(
                         call.id, 
-                        "❌ System error!", 
+                        "âŒ System error!", 
                         show_alert=True
                     )
                 except Exception as answer_error:
                     logger.error(f"Failed to answer callback query: {answer_error}")
 
 # =============================================================================
-# ماژول تحلیل عملکرد کالبک - Callback Performance Analytics Module
+# Ù…Ø§Ú˜ÙˆÙ„ ØªØ­Ù„ÛŒÙ„ Ø¹Ù…Ù„Ú©Ø±Ø¯ Ú©Ø§Ù„Ø¨Ú© - Callback Performance Analytics Module
 # =============================================================================
 
 class CallbackAnalytics:
-    """تحلیل‌گر عملکرد کالبک - Callback Performance Analyzer"""
+    """ØªØ­Ù„ÛŒÙ„â€ŒÚ¯Ø± Ø¹Ù…Ù„Ú©Ø±Ø¯ Ú©Ø§Ù„Ø¨Ú© - Callback Performance Analyzer"""
     
     def __init__(self):
         self.callback_stats: Dict[str, Dict[str, Any]] = {}
@@ -1068,7 +1066,7 @@ class CallbackAnalytics:
         self.error_counts: Dict[str, int] = {}
         
     def record_callback(self, action: str, response_time: float, success: bool):
-        """ثبت آمار کالبک - Record callback statistics"""
+        """Ø«Ø¨Øª Ø¢Ù…Ø§Ø± Ú©Ø§Ù„Ø¨Ú© - Record callback statistics"""
         if action not in self.callback_stats:
             self.callback_stats[action] = {
                 'total_calls': 0,
@@ -1099,7 +1097,7 @@ class CallbackAnalytics:
         self.callback_stats[action]['avg_response_time'] = sum(self.response_times[action]) / len(self.response_times[action])
     
     def get_performance_report(self) -> Dict[str, Any]:
-        """دریافت گزارش عملکرد - Get performance report"""
+        """Ø¯Ø±ÛŒØ§ÙØª Ú¯Ø²Ø§Ø±Ø´ Ø¹Ù…Ù„Ú©Ø±Ø¯ - Get performance report"""
         report = {
             'total_callbacks': sum(stats['total_calls'] for stats in self.callback_stats.values()),
             'total_errors': sum(self.error_counts.values()),
@@ -1122,18 +1120,18 @@ class CallbackAnalytics:
 callback_analytics = CallbackAnalytics()
 
 # =============================================================================
-# مدیریت کش کالبک - Callback Cache Management
+# Ù…Ø¯ÛŒØ±ÛŒØª Ú©Ø´ Ú©Ø§Ù„Ø¨Ú© - Callback Cache Management
 # =============================================================================
 
 class CallbackCache:
-    """مدیر کش کالبک - Callback Cache Manager"""
+    """Ù…Ø¯ÛŒØ± Ú©Ø´ Ú©Ø§Ù„Ø¨Ú© - Callback Cache Manager"""
     
     def __init__(self, ttl: int = 300):  # 5 minutes TTL
         self.cache: Dict[str, Dict[str, Any]] = {}
         self.ttl = ttl
     
     def get(self, key: str) -> Optional[Any]:
-        """دریافت از کش - Get from cache"""
+        """Ø¯Ø±ÛŒØ§ÙØª Ø§Ø² Ú©Ø´ - Get from cache"""
         if key in self.cache:
             if time.time() - self.cache[key]['timestamp'] < self.ttl:
                 return self.cache[key]['data']
@@ -1142,14 +1140,14 @@ class CallbackCache:
         return None
     
     def set(self, key: str, data: Any):
-        """تنظیم در کش - Set in cache"""
+        """ØªÙ†Ø¸ÛŒÙ… Ø¯Ø± Ú©Ø´ - Set in cache"""
         self.cache[key] = {
             'data': data,
             'timestamp': time.time()
         }
     
     def clear_expired(self):
-        """پاک‌سازی کش منقضی - Clear expired cache"""
+        """Ù¾Ø§Ú©â€ŒØ³Ø§Ø²ÛŒ Ú©Ø´ Ù…Ù†Ù‚Ø¶ÛŒ - Clear expired cache"""
         current_time = time.time()
         expired_keys = [
             key for key, value in self.cache.items()
@@ -1160,7 +1158,7 @@ class CallbackCache:
             del self.cache[key]
     
     def get_cache_stats(self) -> Dict[str, Any]:
-        """دریافت آمار کش - Get cache statistics"""
+        """Ø¯Ø±ÛŒØ§ÙØª Ø¢Ù…Ø§Ø± Ú©Ø´ - Get cache statistics"""
         return {
             'total_entries': len(self.cache),
             'memory_usage': sum(len(str(value)) for value in self.cache.values()),
@@ -1171,11 +1169,11 @@ class CallbackCache:
 callback_cache = CallbackCache()
 
 # =============================================================================
-# تنظیمات پیشرفته کالبک - Advanced Callback Configuration
+# ØªÙ†Ø¸ÛŒÙ…Ø§Øª Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ú©Ø§Ù„Ø¨Ú© - Advanced Callback Configuration
 # =============================================================================
 
 class CallbackConfig:
-    """پیکربندی کالبک - Callback Configuration"""
+    """Ù¾ÛŒÚ©Ø±Ø¨Ù†Ø¯ÛŒ Ú©Ø§Ù„Ø¨Ú© - Callback Configuration"""
     
     # Rate limiting settings
     MAX_CALLBACKS_PER_MINUTE = 30
@@ -1208,7 +1206,7 @@ class CallbackConfig:
 callback_config = CallbackConfig()
 
 # =============================================================================
-# وابصادرات ماژول - Module Exports
+# ÙˆØ§Ø¨ØµØ§Ø¯Ø±Ø§Øª Ù…Ø§Ú˜ÙˆÙ„ - Module Exports
 # =============================================================================
 
 __all__ = [
@@ -1255,6 +1253,7 @@ __all__ = [
     
     # Registration
     'register_callback_handlers',
+    'register_handlers',  # Alias for compatibility
     
     # Data classes
     'CallbackAction',
@@ -1263,10 +1262,19 @@ __all__ = [
 
 # Initialization message
 logger.info("Enhanced Callback Handlers Module loaded successfully")
-logger.info("ماژول مدیریت‌کننده‌های پیشرفته کالبک با موفقیت بارگذاری شد")
+logger.info("Ù…Ø§Ú˜ÙˆÙ„ Ù…Ø¯ÛŒØ±ÛŒØªâ€ŒÚ©Ù†Ù†Ø¯Ù‡â€ŒÙ‡Ø§ÛŒ Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ú©Ø§Ù„Ø¨Ú© Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø¨Ø§Ø±Ú¯Ø°Ø§Ø±ÛŒ Ø´Ø¯")
 
 # Performance monitoring setup
 logger.info(f"Callback performance monitoring: {'enabled' if callback_config.ENABLE_ANALYTICS else 'disabled'}")
 logger.info(f"Callback caching: {'enabled' if callback_config.ENABLE_CACHING else 'disabled'}")
-logger.info(f"نظارت بر عملکرد کالبک: {'فعال' if callback_config.ENABLE_ANALYTICS else 'غیرفعال'}")
-logger.info(f"کش کالبک: {'فعال' if callback_config.ENABLE_CACHING else 'غیرفعال'}")
+logger.info(f"Ù†Ø¸Ø§Ø±Øª Ø¨Ø± Ø¹Ù…Ù„Ú©Ø±Ø¯ Ú©Ø§Ù„Ø¨Ú©: {'ÙØ¹Ø§Ù„' if callback_config.ENABLE_ANALYTICS else 'ØºÛŒØ±ÙØ¹Ø§Ù„'}")
+logger.info(f"Ú©Ø´ Ú©Ø§Ù„Ø¨Ú©: {'ÙØ¹Ø§Ù„' if callback_config.ENABLE_CACHING else 'ØºÛŒØ±ÙØ¹Ø§Ù„'}")
+
+# Alias for compatibility with app.py
+def register_handlers(bot: AsyncTeleBot, db_manager) -> None:
+    """
+    Alias for register_callback_handlers to maintain compatibility
+    Ù†Ø§Ù… Ù…Ø³ØªØ¹Ø§Ø± Ø¨Ø±Ø§ÛŒ register_callback_handlers Ø¨Ø±Ø§ÛŒ Ø­ÙØ¸ Ø³Ø§Ø²Ú¯Ø§Ø±ÛŒ
+    """
+    return register_callback_handlers(bot, db_manager)
+

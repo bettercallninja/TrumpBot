@@ -50,8 +50,8 @@ async def use_item(self, user_id: int, item_id: str) -> bool:
 #### Multi-language Support
 ```python
 # Dynamic translation system
-item_name = T['items'][item_id][lang]
-emoji = T['item_emojis'].get(item_id, '📦')
+item_name = T[lang]['items'][item_id][lang]
+emoji = T[lang]['item_emojis'].get(item_id, '📦')
 ```
 
 #### Smart Category System

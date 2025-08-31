@@ -26,8 +26,18 @@
 import os
 import sys
 import logging
+import platform
 from pathlib import Path
 from dotenv import load_dotenv
+
+# Fix Windows event loop policy early for psycopg compatibility
+if platform.system() == 'Windows':
+    import asyncio
+    try:
+        # Set Windows-compatible event loop policy for async database operations
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    except (AttributeError, RuntimeError):
+        pass
 
 # 🔧 Environment Setup | راه‌اندازی محیط
 # Load environment variables from .env file | بارگذاری متغیرهای محیط از فایل .env

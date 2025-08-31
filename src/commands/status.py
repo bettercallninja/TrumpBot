@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Enhanced Status and Defense Management System
@@ -328,7 +328,7 @@ async def handle_status_callback(call: types.CallbackQuery, bot: AsyncTeleBot, d
         
         if action == 'refresh':
             await send_status_message(call.message, bot, db_manager, call.from_user, lang, edit=True)
-            await bot.answer_callback_query(call.id, T.get('refresh_status', {}).get(lang, "Status refreshed!"))
+            await bot.answer_callback_query(call.id, T[lang].get('refresh_status', {}))
             return
         
         if action == 'detailed':
@@ -349,7 +349,7 @@ async def handle_status_callback(call: types.CallbackQuery, bot: AsyncTeleBot, d
         if not item_details or item_details.get('type') != ItemType.SHIELD.value:
             await bot.answer_callback_query(
                 call.id, 
-                T.get('item_not_found', {}).get(lang, "Item not found"), 
+                T[lang].get('item_not_found', {}), 
                 show_alert=True
             )
             return
@@ -360,7 +360,7 @@ async def handle_status_callback(call: types.CallbackQuery, bot: AsyncTeleBot, d
         if not await status_manager.check_item_availability(call.message.chat.id, call.from_user.id, item_id):
             await bot.answer_callback_query(
                 call.id, 
-                T.get('item_not_owned', {}).get(lang, "You don't have this item").format(item_name=T.get('items', {}).get(item_id, {}).get(lang, item_id)), 
+                T[lang].get('item_not_owned', {}).format(item_name=T[lang].get('items', {}).get(item_id, item_id)), 
                 show_alert=True
             )
             return
@@ -369,18 +369,18 @@ async def handle_status_callback(call: types.CallbackQuery, bot: AsyncTeleBot, d
         if await status_manager.has_active_defense(call.message.chat.id, call.from_user.id):
             await bot.answer_callback_query(
                 call.id, 
-                T.get('defense_already_active', {}).get(lang, "Defense already active!"), 
+                T[lang].get('defense_already_active', {}), 
                 show_alert=True
             )
             return
 
         # Activate defense
         if await status_manager.activate_defense(call.message.chat.id, call.from_user.id, item_id):
-            item_name = T.get('items', {}).get(item_id, {}).get(lang, item_id)
+            item_name = T[lang].get('items', {}).get(item_id, item_id)
             duration_hours = item_details.get('duration_seconds', 3600) // 3600
             await bot.answer_callback_query(
                 call.id, 
-                T.get('defense_activated', {}).get(lang, "Defense activated!").format(item_name=item_name, hours=duration_hours), 
+                T[lang].get('defense_activated', {}).format(item_name=item_name, hours=duration_hours), 
                 show_alert=True
             )
 
@@ -413,11 +413,11 @@ async def send_status_message(message: types.Message, bot: AsyncTeleBot, db_mana
         inventory_summary = await status_manager.get_inventory_summary(message.chat.id, user.id)
         
         # Format defense status
-        defense_text = T.get('defense_status_none', {}).get(lang, "No active defense")
+        defense_text = T[lang].get('defense_status_none', {})
         if active_defense:
-            item_name = T.get('items', {}).get(active_defense['defense_type'], {}).get(lang, active_defense['defense_type'])
+            item_name = T[lang].get('items', {}).get(active_defense['defense_type'], active_defense['defense_type'])
             remaining_time = active_defense.get('remaining_minutes', 0)
-            defense_text = T.get('defense_status_active', {}).get(lang, "Active defense").format(
+            defense_text = T[lang].get('defense_status_active', {}).format(
                 item_name=item_name, 
                 time_left=max(0, remaining_time)
             )
@@ -432,7 +432,7 @@ async def send_status_message(message: types.Message, bot: AsyncTeleBot, db_mana
         damage_dealt = combat_stats.get('total_damage_dealt', 0)
         avg_damage = (damage_dealt / total_attacks) if total_attacks > 0 else 0
         
-        status_text = T.get('status_message', {}).get(lang, "Status: {first_name}").format(
+        status_text = T[lang].get('status_message', {}).format(
             first_name=user.first_name or "Unknown",
             medals=player_data.get('score', 0),
             tg_stars=player_data.get('tg_stars', 0),
@@ -441,7 +441,7 @@ async def send_status_message(message: types.Message, bot: AsyncTeleBot, db_mana
             defense_status=defense_text
         )
         
-        # Add analytics section
+    # Add analytics section
         if lang == "fa":
             analytics_text = f"""
 📊 <b>تحلیل‌های عملکرد:</b>
@@ -484,7 +484,7 @@ async def send_status_message(message: types.Message, bot: AsyncTeleBot, db_mana
         defense_items = await status_manager.get_defense_items(message.chat.id, user.id)
         for item in defense_items:
             if not await status_manager.has_active_defense(message.chat.id, user.id):
-                button_text = T.get('activate_button', {}).get(lang, "Activate {item_name}").format(
+                button_text = T[lang].get('activate_button', {}).format(
                     item_name=item['name']
                 )
                 keyboard.add(types.InlineKeyboardButton(
@@ -494,18 +494,18 @@ async def send_status_message(message: types.Message, bot: AsyncTeleBot, db_mana
         
         # Navigation buttons
         detailed_btn = types.InlineKeyboardButton(
-            f"📊 {T.get('view_detailed_status', {}).get(lang, 'Detailed')}", 
+            f"📊 {T[lang].get('view_detailed_status', {})}", 
             callback_data="status:detailed"
         )
         refresh_btn = types.InlineKeyboardButton(
-            f"🔄 {T.get('refresh_status', {}).get(lang, 'Refresh')}", 
+            f"🔄 {T[lang].get('refresh_status', {})}", 
             callback_data="status:refresh"
         )
         keyboard.add(detailed_btn, refresh_btn)
         
         # Close button
         keyboard.add(types.InlineKeyboardButton(
-            T.get('close_button', {}).get(lang, "❌ Close"), 
+            T[lang].get('close_button', {}), 
             callback_data="status:close"
         ))
 
@@ -561,82 +561,82 @@ async def send_detailed_status(message: types.Message, bot: AsyncTeleBot, db_man
         
         if lang == "fa":
             detailed_text = f"""
-🎯 <b>وضعیت تفصیلی {user.first_name or 'Unknown'}</b>
+    🎯 <b>وضعیت تفصیلی {user.first_name or 'Unknown'}</b>
 
-📊 <b>امتیاز کلی وضعیت:</b> {status_score:,}
+    📊 <b>امتیاز کلی وضعیت:</b> {status_score:,}
 
-🏆 <b>آمار رتبه‌بندی:</b>
-• رتبه فعلی: #{rank_info.get('rank', 0)} از {rank_info.get('total_players', 0)}
-• درصد رتبه: {((rank_info.get('total_players', 1) - rank_info.get('rank', 0)) / rank_info.get('total_players', 1) * 100):.1f}%
+    🏆 <b>آمار رتبه‌بندی:</b>
+    • رتبه فعلی: #{rank_info.get('rank', 0)} از {rank_info.get('total_players', 0)}
+    • درصد رتبه: {((rank_info.get('total_players', 1) - rank_info.get('rank', 0)) / rank_info.get('total_players', 1) * 100):.1f}%
 
-⚔️ <b>تحلیل‌های نبرد پیشرفته:</b>
-• کل حملات: {total_attacks:,}
-• کل آسیب وارد شده: {damage_dealt:,}
-• متوسط آسیب هر حمله: {(damage_dealt / total_attacks):.1f} (اگر > 0)
-• نرخ بقا: {survival_rate:.1f}%
-• کارایی آسیب: {damage_efficiency:.2f}
+    ⚔️ <b>تحلیل‌های نبرد پیشرفته:</b>
+    • کل حملات: {total_attacks:,}
+    • کل آسیب وارد شده: {damage_dealt:,}
+    • متوسط آسیب هر حمله: {(damage_dealt / total_attacks):.1f} (اگر > 0)
+    • نرخ بقا: {survival_rate:.1f}%
+    • کارایی آسیب: {damage_efficiency:.2f}
 
-📈 <b>روندهای عملکرد:</b>
-• میانگین حمله روزانه: {(total_attacks / activity_stats.get('days_active', 1)):.1f}
-• میانگین آسیب روزانه: {(damage_dealt / activity_stats.get('days_active', 1)):.1f}
+    📈 <b>رونده‌های عملکرد:</b>
+    • میانگین حمله روزانه: {(total_attacks / activity_stats.get('days_active', 1)):.1f}
+    • میانگین آسیب روزانه: {(damage_dealt / activity_stats.get('days_active', 1)):.1f}
 
-💰 <b>منابع:</b>
-• مدال‌ها: {player_data.get('score', 0):,}
-• ستاره‌های تلگرام: {player_data.get('tg_stars', 0)}
-• نرخ کسب مدال: {(player_data.get('score', 0) / total_attacks):.1f} (اگر > 0)
+    💰 <b>منابع:</b>
+    • مدال‌ها: {player_data.get('score', 0):,}
+    • ستاره‌های تلگرام: {player_data.get('tg_stars', 0)}
+    • نرخ کسب مدال: {(player_data.get('score', 0) / total_attacks):.1f} (اگر > 0)
 
-❤️ <b>وضعیت سلامت:</b>
-• HP فعلی: {player_data.get('hp', 100)}/100
-• سطح: {player_data.get('level', 1)}
-• پیشرفت تا سطح بعد: در حال محاسبه...
+    ❤️ <b>وضعیت سلامت:</b>
+    • HP فعلی: {player_data.get('hp', 100)}/100
+    • سطح: {player_data.get('level', 1)}
+    • پیشرفت تا سطح بعد: در حال محاسبه...
             """
         else:
             detailed_text = f"""
-🎯 <b>Detailed Status for {user.first_name or 'Unknown'}</b>
+    🎯 <b>Detailed Status for {user.first_name or 'Unknown'}</b>
 
-📊 <b>Overall Status Score:</b> {status_score:,}
+    📊 <b>Overall Status Score:</b> {status_score:,}
 
-🏆 <b>Ranking Statistics:</b>
-• Current Rank: #{rank_info.get('rank', 0)} of {rank_info.get('total_players', 0)}
-• Percentile: {((rank_info.get('total_players', 1) - rank_info.get('rank', 0)) / rank_info.get('total_players', 1) * 100):.1f}%
+    🏆 <b>Ranking Statistics:</b>
+    • Current Rank: #{rank_info.get('rank', 0)} of {rank_info.get('total_players', 0)}
+    • Percentile: {((rank_info.get('total_players', 1) - rank_info.get('rank', 0)) / rank_info.get('total_players', 1) * 100):.1f}%
 
-⚔️ <b>Advanced Combat Analytics:</b>
-• Total Attacks: {total_attacks:,}
-• Total Damage Dealt: {damage_dealt:,}
-• Average Damage per Attack: {(damage_dealt / total_attacks):.1f} (if > 0)
-• Survival Rate: {survival_rate:.1f}%
-• Damage Efficiency: {damage_efficiency:.2f}
+    ⚔️ <b>Advanced Combat Analytics:</b>
+    • Total Attacks: {total_attacks:,}
+    • Total Damage Dealt: {damage_dealt:,}
+    • Average Damage per Attack: {(damage_dealt / total_attacks):.1f} (if > 0)
+    • Survival Rate: {survival_rate:.1f}%
+    • Damage Efficiency: {damage_efficiency:.2f}
 
-📈 <b>Performance Trends:</b>
-• Average Attacks per Day: {(total_attacks / activity_stats.get('days_active', 1)):.1f}
-• Average Damage per Day: {(damage_dealt / activity_stats.get('days_active', 1)):.1f}
+    📈 <b>Performance Trends:</b>
+    • Average Attacks per Day: {(total_attacks / activity_stats.get('days_active', 1)):.1f}
+    • Average Damage per Day: {(damage_dealt / activity_stats.get('days_active', 1)):.1f}
 
-💰 <b>Resources:</b>
-• Medals: {player_data.get('score', 0):,}
-• TG Stars: {player_data.get('tg_stars', 0)}
-• Medal Earn Rate: {(player_data.get('score', 0) / total_attacks):.1f} (if > 0)
+    💰 <b>Resources:</b>
+    • Medals: {player_data.get('score', 0):,}
+    • TG Stars: {player_data.get('tg_stars', 0)}
+    • Medal Earn Rate: {(player_data.get('score', 0) / total_attacks):.1f} (if > 0)
 
-❤️ <b>Health Status:</b>
-• Current HP: {player_data.get('hp', 100)}/100
-• Level: {player_data.get('level', 1)}
-• Progress to Next Level: Calculating...
+    ❤️ <b>Health Status:</b>
+    • Current HP: {player_data.get('hp', 100)}/100
+    • Level: {player_data.get('level', 1)}
+    • Progress to Next Level: Calculating...
             """
         
         # Create simplified keyboard for detailed view
         keyboard = types.InlineKeyboardMarkup(row_width=2)
         
         quick_btn = types.InlineKeyboardButton(
-            f"⚡ {T.get('quick_status', {}).get(lang, 'Quick')}", 
+            f"⚡ {T[lang].get('quick_status', {})}", 
             callback_data="status:quick"
         )
         refresh_btn = types.InlineKeyboardButton(
-            f"🔄 {T.get('refresh_status', {}).get(lang, 'Refresh')}", 
+            f"🔄 {T[lang].get('refresh_status', {})}", 
             callback_data="status:refresh"
         )
         keyboard.add(quick_btn, refresh_btn)
         
         keyboard.add(types.InlineKeyboardButton(
-            T.get('close_button', {}).get(lang, "❌ Close"), 
+            T[lang].get('close_button', {}), 
             callback_data="status:close"
         ))
 
@@ -685,3 +685,4 @@ def register_handlers(bot: AsyncTeleBot, db_manager: DBManager) -> None:
     async def status_callback_handler(call: types.CallbackQuery):
         """Enhanced callback handler for status interactions"""
         await handle_status_callback(call, bot, db_manager)
+

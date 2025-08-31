@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Statistics commands module with comprehensive analytics and bilingual support
@@ -203,52 +203,52 @@ class StatsManager:
             lang = await helpers.get_lang(message.chat.id, message.from_user.id, self.db_manager)
             
             # Build dashboard message
-            dashboard_text = f"📊 <b>{T['stats_dashboard'][lang]}</b>\n\n"
-            dashboard_text += f"📈 <b>{T['stats_overview'][lang]}</b>\n"
-            dashboard_text += f"{T.get('help_intro', {}).get(lang, 'Choose a statistics category to view detailed information:')}"
+            dashboard_text = f"ðŸ“Š <b>{T[lang]['stats_dashboard'][lang]}</b>\n\n"
+            dashboard_text += f"ðŸ“ˆ <b>{T[lang]['stats_overview'][lang]}</b>\n"
+            dashboard_text += f"{T[lang].get('help_intro', {})}"
             
             keyboard = types.InlineKeyboardMarkup(row_width=2)
             
             # Main statistics categories
             personal_btn = types.InlineKeyboardButton(
-                f"👤 {T['personal_stats'][lang]}", 
+                f"ðŸ‘¤ {T[lang]['personal_stats'][lang]}", 
                 callback_data="stats:personal"
             )
             combat_btn = types.InlineKeyboardButton(
-                f"⚔️ {T['combat_analytics'][lang]}", 
+                f"âš”ï¸ {T[lang]['combat_analytics'][lang]}", 
                 callback_data="stats:combat"
             )
             keyboard.add(personal_btn, combat_btn)
             
             # Group and ranking
             group_btn = types.InlineKeyboardButton(
-                f"👥 {T['group_stats'][lang]}", 
+                f"ðŸ‘¥ {T[lang]['group_stats'][lang]}", 
                 callback_data="stats:group"
             )
             leaderboard_btn = types.InlineKeyboardButton(
-                f"🏆 {T['leaderboard_ranking'][lang]}", 
+                f"ðŸ† {T[lang]['leaderboard_ranking'][lang]}", 
                 callback_data="stats:leaderboard"
             )
             keyboard.add(group_btn, leaderboard_btn)
             
             # Additional features
             weapons_btn = types.InlineKeyboardButton(
-                f"🔫 {T['view_weapons'][lang]}", 
+                f"ðŸ”« {T[lang]['view_weapons'][lang]}", 
                 callback_data="stats:weapons"
             )
             trends_btn = types.InlineKeyboardButton(
-                f"📈 {T['view_trends'][lang]}", 
+                f"ðŸ“ˆ {T[lang]['view_trends'][lang]}", 
                 callback_data="stats:trends"
             )
             keyboard.add(weapons_btn, trends_btn)
             
             # Utility buttons
             refresh_btn = types.InlineKeyboardButton(
-                f"🔄 {T['refresh_stats'][lang]}", 
+                f"ðŸ”„ {T[lang]['refresh_stats'][lang]}", 
                 callback_data="stats:refresh"
             )
             close_btn = types.InlineKeyboardButton(
-                f"❌ {T['close_stats'][lang]}", 
+                f"âŒ {T[lang]['close_stats'][lang]}", 
                 callback_data="stats:close"
             )
             keyboard.add(refresh_btn, close_btn)
@@ -264,7 +264,7 @@ class StatsManager:
             logger.error(f"Error showing stats dashboard: {e}")
             await bot.send_message(
                 message.chat.id, 
-                "❌ Error displaying statistics dashboard. Please try again."
+                "âŒ Error displaying statistics dashboard. Please try again."
             )
     
     async def show_personal_stats(self, bot: AsyncTeleBot, call: types.CallbackQuery):
@@ -276,50 +276,50 @@ class StatsManager:
             if not player_stats:
                 await bot.answer_callback_query(
                     call.id, 
-                    T['stats_no_data'][lang], 
+                    T[lang]['stats_no_data'][lang], 
                     show_alert=True
                 )
                 return
             
             # Build personal stats message
-            stats_text = f"👤 <b>{T['personal_stats'][lang]}</b>\n"
+            stats_text = f"ðŸ‘¤ <b>{T[lang]['personal_stats'][lang]}</b>\n"
             stats_text += f"<b>{player_stats.get('first_name', 'Player')}</b>\n\n"
             
             # Basic info
-            stats_text += f"📊 <b>{T['stats_overview'][lang]}:</b>\n"
-            stats_text += f"🏆 {T['your_rank'][lang]}: <b>#{player_stats.get('rank', 'N/A')}</b>\n"
-            stats_text += f"📈 {T['current_level'][lang]}: <b>{player_stats.get('level', 1)}</b>\n"
-            stats_text += f"🏅 {T['total_score'][lang]}: <b>{player_stats.get('score', 0)}</b>\n"
-            stats_text += f"❤️ {T['current_hp'][lang]}: <b>{player_stats.get('hp', 0)}/{player_stats.get('max_hp', 100)}</b>\n\n"
+            stats_text += f"ðŸ“Š <b>{T[lang]['stats_overview'][lang]}:</b>\n"
+            stats_text += f"ðŸ† {T[lang]['your_rank'][lang]}: <b>#{player_stats.get('rank', 'N/A')}</b>\n"
+            stats_text += f"ðŸ“ˆ {T[lang]['current_level'][lang]}: <b>{player_stats.get('level', 1)}</b>\n"
+            stats_text += f"ðŸ… {T[lang]['total_score'][lang]}: <b>{player_stats.get('score', 0)}</b>\n"
+            stats_text += f"â¤ï¸ {T[lang]['current_hp'][lang]}: <b>{player_stats.get('hp', 0)}/{player_stats.get('max_hp', 100)}</b>\n\n"
             
             # Combat stats
-            stats_text += f"⚔️ <b>{T['combat_analytics'][lang]}:</b>\n"
-            stats_text += f"🗡️ {T['battles_fought'][lang]}: <b>{player_stats.get('total_attacks', 0)}</b>\n"
-            stats_text += f"✅ {T['battles_won'][lang]}: <b>{player_stats.get('successful_attacks', 0)}</b>\n"
-            stats_text += f"📊 {T['win_rate'][lang]}: <b>{player_stats.get('win_rate', 0)}%</b>\n"
-            stats_text += f"💥 {T['total_damage_dealt'][lang]}: <b>{player_stats.get('total_damage_dealt', 0) or 0}</b>\n"
-            stats_text += f"🛡️ {T['times_attacked'][lang]}: <b>{player_stats.get('times_attacked', 0)}</b>\n"
-            stats_text += f"🔒 {T['successful_defenses'][lang]}: <b>{player_stats.get('successful_defenses', 0)}</b>\n"
-            stats_text += f"📈 {T['survival_rate'][lang]}: <b>{player_stats.get('survival_rate', 100)}%</b>\n\n"
+            stats_text += f"âš”ï¸ <b>{T[lang]['combat_analytics'][lang]}:</b>\n"
+            stats_text += f"ðŸ—¡ï¸ {T[lang]['battles_fought'][lang]}: <b>{player_stats.get('total_attacks', 0)}</b>\n"
+            stats_text += f"âœ… {T[lang]['battles_won'][lang]}: <b>{player_stats.get('successful_attacks', 0)}</b>\n"
+            stats_text += f"ðŸ“Š {T[lang]['win_rate'][lang]}: <b>{player_stats.get('win_rate', 0)}%</b>\n"
+            stats_text += f"ðŸ’¥ {T[lang]['total_damage_dealt'][lang]}: <b>{player_stats.get('total_damage_dealt', 0) or 0}</b>\n"
+            stats_text += f"ðŸ›¡ï¸ {T[lang]['times_attacked'][lang]}: <b>{player_stats.get('times_attacked', 0)}</b>\n"
+            stats_text += f"ðŸ”’ {T[lang]['successful_defenses'][lang]}: <b>{player_stats.get('successful_defenses', 0)}</b>\n"
+            stats_text += f"ðŸ“ˆ {T[lang]['survival_rate'][lang]}: <b>{player_stats.get('survival_rate', 100)}%</b>\n\n"
             
             # Additional metrics
-            stats_text += f"📋 <b>{T.get('additional_metrics', {}).get(lang, 'Additional Metrics')}:</b>\n"
-            stats_text += f"⚖️ K/D {T['kill_death_ratio'][lang]}: <b>{player_stats.get('kd_ratio', 0)}</b>\n"
-            stats_text += f"📦 {T['weapons_owned'][lang]}: <b>{player_stats.get('unique_items', 0)}</b>\n"
+            stats_text += f"ðŸ“‹ <b>{T[lang].get('additional_metrics', {})}:</b>\n"
+            stats_text += f"âš–ï¸ K/D {T[lang]['kill_death_ratio'][lang]}: <b>{player_stats.get('kd_ratio', 0)}</b>\n"
+            stats_text += f"ðŸ“¦ {T[lang]['weapons_owned'][lang]}: <b>{player_stats.get('unique_items', 0)}</b>\n"
             
             if player_stats.get('favorite_weapon'):
                 weapon_name = get_item_display_name(player_stats['favorite_weapon'], lang)
                 emoji = get_item_emoji(player_stats['favorite_weapon'])
-                stats_text += f"🔫 {T['favorite_weapon'][lang]}: <b>{emoji} {weapon_name}</b>\n"
+                stats_text += f"ðŸ”« {T[lang]['favorite_weapon'][lang]}: <b>{emoji} {weapon_name}</b>\n"
             
             keyboard = types.InlineKeyboardMarkup()
             keyboard.add(
-                types.InlineKeyboardButton(f"⚔️ {T['view_combat'][lang]}", callback_data="stats:combat"),
-                types.InlineKeyboardButton(f"🏆 {T['view_leaderboard'][lang]}", callback_data="stats:leaderboard")
+                types.InlineKeyboardButton(f"âš”ï¸ {T[lang]['view_combat'][lang]}", callback_data="stats:combat"),
+                types.InlineKeyboardButton(f"ðŸ† {T[lang]['view_leaderboard'][lang]}", callback_data="stats:leaderboard")
             )
             keyboard.add(
-                types.InlineKeyboardButton(f"🔙 {T['back_btn'][lang]}", callback_data="stats:main"),
-                types.InlineKeyboardButton(f"❌ {T['close_stats'][lang]}", callback_data="stats:close")
+                types.InlineKeyboardButton(f"ðŸ”™ {T[lang]['back_btn'][lang]}", callback_data="stats:main"),
+                types.InlineKeyboardButton(f"âŒ {T[lang]['close_stats'][lang]}", callback_data="stats:close")
             )
             
             await bot.edit_message_text(
@@ -332,7 +332,7 @@ class StatsManager:
             
         except Exception as e:
             logger.error(f"Error showing personal stats: {e}")
-            await bot.answer_callback_query(call.id, T['stats_error'][lang])
+            await bot.answer_callback_query(call.id, T[lang]['stats_error'][lang])
     
     async def show_group_stats(self, bot: AsyncTeleBot, call: types.CallbackQuery):
         """Display comprehensive group statistics"""
@@ -343,55 +343,55 @@ class StatsManager:
             if not group_stats:
                 await bot.answer_callback_query(
                     call.id, 
-                    T['stats_no_data'][lang], 
+                    T[lang]['stats_no_data'][lang], 
                     show_alert=True
                 )
                 return
             
             # Build group stats message
-            stats_text = f"👥 <b>{T['group_stats'][lang]}</b>\n\n"
+            stats_text = f"ðŸ‘¥ <b>{T[lang]['group_stats'][lang]}</b>\n\n"
             
             # Player statistics
-            stats_text += f"👨‍👩‍👧‍👦 <b>{T.get('player_overview', {}).get(lang, 'Player Overview')}:</b>\n"
-            stats_text += f"👤 {T['total_players'][lang]}: <b>{group_stats.get('total_players', 0)}</b>\n"
-            stats_text += f"🟢 {T['active_players'][lang]}: <b>{group_stats.get('active_players', 0)}</b>\n"
-            stats_text += f"🏆 {T.get('highest_score', {}).get(lang, 'Highest Score')}: <b>{group_stats.get('highest_score', 0) or 0}</b>\n"
-            stats_text += f"📊 {T.get('average_score', {}).get(lang, 'Average Score')}: <b>{round(group_stats.get('avg_score', 0) or 0)}</b>\n\n"
+            stats_text += f"ðŸ‘¨â€ðŸ‘©â€ðŸ‘§â€ðŸ‘¦ <b>{T[lang].get('player_overview', {})}:</b>\n"
+            stats_text += f"ðŸ‘¤ {T[lang]['total_players'][lang]}: <b>{group_stats.get('total_players', 0)}</b>\n"
+            stats_text += f"ðŸŸ¢ {T[lang]['active_players'][lang]}: <b>{group_stats.get('active_players', 0)}</b>\n"
+            stats_text += f"ðŸ† {T[lang].get('highest_score', {})}: <b>{group_stats.get('highest_score', 0) or 0}</b>\n"
+            stats_text += f"ðŸ“Š {T[lang].get('average_score', {})}: <b>{round(group_stats.get('avg_score', 0) or 0)}</b>\n\n"
             
             # Combat statistics
-            stats_text += f"⚔️ <b>{T['combat_analytics'][lang]}:</b>\n"
-            stats_text += f"🗡️ {T['total_battles'][lang]}: <b>{group_stats.get('total_battles', 0)}</b>\n"
-            stats_text += f"👥 {T.get('active_fighters', {}).get(lang, 'Active Fighters')}: <b>{group_stats.get('active_attackers', 0)}</b>\n"
-            stats_text += f"💥 {T.get('total_damage', {}).get(lang, 'Total Damage')}: <b>{group_stats.get('total_damage', 0) or 0}</b>\n"
-            stats_text += f"📊 {T['average_damage'][lang]}: <b>{round(group_stats.get('avg_damage', 0) or 0)}</b>\n\n"
+            stats_text += f"âš”ï¸ <b>{T[lang]['combat_analytics'][lang]}:</b>\n"
+            stats_text += f"ðŸ—¡ï¸ {T[lang]['total_battles'][lang]}: <b>{group_stats.get('total_battles', 0)}</b>\n"
+            stats_text += f"ðŸ‘¥ {T[lang].get('active_fighters', {})}: <b>{group_stats.get('active_attackers', 0)}</b>\n"
+            stats_text += f"ðŸ’¥ {T[lang].get('total_damage', {})}: <b>{group_stats.get('total_damage', 0) or 0}</b>\n"
+            stats_text += f"ðŸ“Š {T[lang]['average_damage'][lang]}: <b>{round(group_stats.get('avg_damage', 0) or 0)}</b>\n\n"
             
             # Most active player
             if group_stats.get('most_active_player'):
                 most_active = group_stats['most_active_player']
-                stats_text += f"🥇 {T['most_active_player'][lang]}: <b>{most_active.get('first_name', 'Unknown')}</b>\n"
-                stats_text += f"   {T.get('attacks_made', {}).get(lang, 'Attacks Made')}: <b>{most_active.get('attack_count', 0)}</b>\n\n"
+                stats_text += f"ðŸ¥‡ {T[lang]['most_active_player'][lang]}: <b>{most_active.get('first_name', 'Unknown')}</b>\n"
+                stats_text += f"   {T[lang].get('attacks_made', {})}: <b>{most_active.get('attack_count', 0)}</b>\n\n"
             
             # Popular weapon
             if group_stats.get('popular_weapon'):
                 weapon_name = get_item_display_name(group_stats['popular_weapon'], lang)
                 emoji = get_item_emoji(group_stats['popular_weapon'])
-                stats_text += f"🔫 {T.get('most_popular_weapon', {}).get(lang, 'Most Popular Weapon')}: <b>{emoji} {weapon_name}</b>\n\n"
+                stats_text += f"ðŸ”« {T[lang].get('most_popular_weapon', {})}: <b>{emoji} {weapon_name}</b>\n\n"
             
             # Top 3 players preview
             if group_stats.get('top_players'):
-                stats_text += f"🏆 <b>{T.get('top_players_preview', {}).get(lang, 'Top Players')}:</b>\n"
+                stats_text += f"ðŸ† <b>{T[lang].get('top_players_preview', {})}:</b>\n"
                 for i, player in enumerate(group_stats['top_players'][:3], 1):
-                    medal = "🥇" if i == 1 else "🥈" if i == 2 else "🥉"
-                    stats_text += f"{medal} <b>{player.get('first_name', 'Unknown')}</b> - {player.get('score', 0)} 🏅\n"
+                    medal = "ðŸ¥‡" if i == 1 else "ðŸ¥ˆ" if i == 2 else "ðŸ¥‰"
+                    stats_text += f"{medal} <b>{player.get('first_name', 'Unknown')}</b> - {player.get('score', 0)} ðŸ…\n"
             
             keyboard = types.InlineKeyboardMarkup()
             keyboard.add(
-                types.InlineKeyboardButton(f"🏆 {T['view_leaderboard'][lang]}", callback_data="stats:leaderboard"),
-                types.InlineKeyboardButton(f"👤 {T['view_personal'][lang]}", callback_data="stats:personal")
+                types.InlineKeyboardButton(f"ðŸ† {T[lang]['view_leaderboard'][lang]}", callback_data="stats:leaderboard"),
+                types.InlineKeyboardButton(f"ðŸ‘¤ {T[lang]['view_personal'][lang]}", callback_data="stats:personal")
             )
             keyboard.add(
-                types.InlineKeyboardButton(f"🔙 {T['back_btn'][lang]}", callback_data="stats:main"),
-                types.InlineKeyboardButton(f"❌ {T['close_stats'][lang]}", callback_data="stats:close")
+                types.InlineKeyboardButton(f"ðŸ”™ {T[lang]['back_btn'][lang]}", callback_data="stats:main"),
+                types.InlineKeyboardButton(f"âŒ {T[lang]['close_stats'][lang]}", callback_data="stats:close")
             )
             
             await bot.edit_message_text(
@@ -404,7 +404,7 @@ class StatsManager:
             
         except Exception as e:
             logger.error(f"Error showing group stats: {e}")
-            await bot.answer_callback_query(call.id, T['stats_error'][lang])
+            await bot.answer_callback_query(call.id, T[lang]['stats_error'][lang])
     
     async def show_leaderboard(self, bot: AsyncTeleBot, call: types.CallbackQuery):
         """Display detailed leaderboard with rankings"""
@@ -415,13 +415,13 @@ class StatsManager:
             if not leaderboard:
                 await bot.answer_callback_query(
                     call.id, 
-                    T['stats_no_data'][lang], 
+                    T[lang]['stats_no_data'][lang], 
                     show_alert=True
                 )
                 return
             
             # Build leaderboard message
-            leaderboard_text = f"🏆 <b>{T['leaderboard_ranking'][lang]}</b>\n\n"
+            leaderboard_text = f"ðŸ† <b>{T[lang]['leaderboard_ranking'][lang]}</b>\n\n"
             
             for player in leaderboard:
                 rank = int(player.get('rank', 0))
@@ -432,26 +432,26 @@ class StatsManager:
                 
                 # Rank emoji
                 if rank == 1:
-                    rank_emoji = "🥇"
+                    rank_emoji = "ðŸ¥‡"
                 elif rank == 2:
-                    rank_emoji = "🥈"
+                    rank_emoji = "ðŸ¥ˆ"
                 elif rank == 3:
-                    rank_emoji = "🥉"
+                    rank_emoji = "ðŸ¥‰"
                 else:
                     rank_emoji = f"{rank}."
                 
                 leaderboard_text += f"{rank_emoji} <b>{name}</b>\n"
-                leaderboard_text += f"   📊 {T['total_score'][lang]}: <b>{score}</b> 🏅\n"
-                leaderboard_text += f"   📈 {T['current_level'][lang]}: <b>{level}</b> | 🗡️ {T.get('attacks', {}).get(lang, 'Attacks')}: <b>{attacks}</b>\n\n"
+                leaderboard_text += f"   ðŸ“Š {T[lang]['total_score'][lang]}: <b>{score}</b> ðŸ…\n"
+                leaderboard_text += f"   ðŸ“ˆ {T[lang]['current_level'][lang]}: <b>{level}</b> | ðŸ—¡ï¸ {T[lang].get('attacks', {})}: <b>{attacks}</b>\n\n"
             
             keyboard = types.InlineKeyboardMarkup()
             keyboard.add(
-                types.InlineKeyboardButton(f"👤 {T['view_personal'][lang]}", callback_data="stats:personal"),
-                types.InlineKeyboardButton(f"👥 {T['view_group'][lang]}", callback_data="stats:group")
+                types.InlineKeyboardButton(f"ðŸ‘¤ {T[lang]['view_personal'][lang]}", callback_data="stats:personal"),
+                types.InlineKeyboardButton(f"ðŸ‘¥ {T[lang]['view_group'][lang]}", callback_data="stats:group")
             )
             keyboard.add(
-                types.InlineKeyboardButton(f"🔙 {T['back_btn'][lang]}", callback_data="stats:main"),
-                types.InlineKeyboardButton(f"❌ {T['close_stats'][lang]}", callback_data="stats:close")
+                types.InlineKeyboardButton(f"ðŸ”™ {T[lang]['back_btn'][lang]}", callback_data="stats:main"),
+                types.InlineKeyboardButton(f"âŒ {T[lang]['close_stats'][lang]}", callback_data="stats:close")
             )
             
             await bot.edit_message_text(
@@ -464,7 +464,7 @@ class StatsManager:
             
         except Exception as e:
             logger.error(f"Error showing leaderboard: {e}")
-            await bot.answer_callback_query(call.id, T['stats_error'][lang])
+            await bot.answer_callback_query(call.id, T[lang]['stats_error'][lang])
     
     async def handle_stats_callback(self, bot: AsyncTeleBot, call: types.CallbackQuery):
         """Handle all statistics related callbacks"""
@@ -475,26 +475,26 @@ class StatsManager:
 
             if action == "main":
                 # Refresh the main dashboard
-                dashboard_text = f"📊 <b>{T['stats_dashboard'][lang]}</b>\n\n"
-                dashboard_text += f"📈 <b>{T['stats_overview'][lang]}</b>\n"
-                dashboard_text += f"{T.get('help_intro', {}).get(lang, 'Choose a statistics category to view detailed information:')}"
+                dashboard_text = f"ðŸ“Š <b>{T[lang]['stats_dashboard'][lang]}</b>\n\n"
+                dashboard_text += f"ðŸ“ˆ <b>{T[lang]['stats_overview'][lang]}</b>\n"
+                dashboard_text += f"{T[lang].get('help_intro', {})}"
 
                 keyboard = types.InlineKeyboardMarkup(row_width=2)
                 keyboard.add(
-                    types.InlineKeyboardButton(f"👤 {T['personal_stats'][lang]}", callback_data="stats:personal"),
-                    types.InlineKeyboardButton(f"⚔️ {T['combat_analytics'][lang]}", callback_data="stats:combat")
+                    types.InlineKeyboardButton(f"ðŸ‘¤ {T[lang]['personal_stats'][lang]}", callback_data="stats:personal"),
+                    types.InlineKeyboardButton(f"âš”ï¸ {T[lang]['combat_analytics'][lang]}", callback_data="stats:combat")
                 )
                 keyboard.add(
-                    types.InlineKeyboardButton(f"👥 {T['group_stats'][lang]}", callback_data="stats:group"),
-                    types.InlineKeyboardButton(f"🏆 {T['leaderboard_ranking'][lang]}", callback_data="stats:leaderboard")
+                    types.InlineKeyboardButton(f"ðŸ‘¥ {T[lang]['group_stats'][lang]}", callback_data="stats:group"),
+                    types.InlineKeyboardButton(f"ðŸ† {T[lang]['leaderboard_ranking'][lang]}", callback_data="stats:leaderboard")
                 )
                 keyboard.add(
-                    types.InlineKeyboardButton(f"🔫 {T['view_weapons'][lang]}", callback_data="stats:weapons"),
-                    types.InlineKeyboardButton(f"📈 {T['view_trends'][lang]}", callback_data="stats:trends")
+                    types.InlineKeyboardButton(f"ðŸ”« {T[lang]['view_weapons'][lang]}", callback_data="stats:weapons"),
+                    types.InlineKeyboardButton(f"ðŸ“ˆ {T[lang]['view_trends'][lang]}", callback_data="stats:trends")
                 )
                 keyboard.add(
-                    types.InlineKeyboardButton(f"🔄 {T['refresh_stats'][lang]}", callback_data="stats:refresh"),
-                    types.InlineKeyboardButton(f"❌ {T['close_stats'][lang]}", callback_data="stats:close")
+                    types.InlineKeyboardButton(f"ðŸ”„ {T[lang]['refresh_stats'][lang]}", callback_data="stats:refresh"),
+                    types.InlineKeyboardButton(f"âŒ {T[lang]['close_stats'][lang]}", callback_data="stats:close")
                 )
 
                 await bot.edit_message_text(
@@ -519,14 +519,14 @@ class StatsManager:
             
             elif action == "weapons":
                 # Show weapon statistics (placeholder for future enhancement)
-                await bot.answer_callback_query(call.id, f"🔫 {T.get('coming_soon', {}).get(lang, 'Weapon statistics coming soon!')}")
+                await bot.answer_callback_query(call.id, f"ðŸ”« {T[lang].get('coming_soon', {})}")
             
             elif action == "trends":
                 # Show trend analysis (placeholder for future enhancement)
-                await bot.answer_callback_query(call.id, f"📈 {T.get('coming_soon', {}).get(lang, 'Trend analysis coming soon!')}")
+                await bot.answer_callback_query(call.id, f"ðŸ“ˆ {T[lang].get('coming_soon', {})}")
             
             elif action == "refresh":
-                await bot.answer_callback_query(call.id, T['stats_updated'][lang])
+                await bot.answer_callback_query(call.id, T[lang]['stats_updated'][lang])
                 # Trigger main dashboard refresh
                 await self.handle_stats_callback(bot, types.CallbackQuery(
                     id=call.id,
@@ -542,7 +542,7 @@ class StatsManager:
             
         except Exception as e:
             logger.error(f"Error handling stats callback: {e}")
-            await bot.answer_callback_query(call.id, "❌ Error processing request.")
+            await bot.answer_callback_query(call.id, "âŒ Error processing request.")
 
 
 def register_handlers(bot: AsyncTeleBot, db_manager: DBManager):
@@ -569,3 +569,5 @@ async def handle_stats_callback(call: types.CallbackQuery, bot: AsyncTeleBot, db
     """Legacy callback handler for backward compatibility"""
     stats_manager = StatsManager(db_manager)
     await stats_manager.handle_stats_callback(bot, call)
+
+

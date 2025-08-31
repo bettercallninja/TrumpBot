@@ -147,7 +147,7 @@ def format_duration(seconds: int, lang: str = "en") -> str:
     """Format duration with bilingual support | فرمت مدت زمان با پشتیبانی دوزبانه"""
     try:
         if seconds <= 0:
-            return T.get('time_expired', {}).get(lang, "Expired")
+            return T[lang].get('time_expired', {})
         
         days = seconds // 86400
         hours = (seconds % 86400) // 3600
@@ -1795,10 +1795,7 @@ async def handle_regular_messages(message: telebot.types.Message, bot: telebot.a
         # Enhanced mention handling
         if is_mentioned:
             responses_key = f'enhanced_mentioned_responses.{lang}'
-            responses = T.get('enhanced_mentioned_responses', {}).get(lang, [
-                "سلام {first_name}! چطور می‌تونم کمکت کنم؟ 🎮" if lang == "fa" else "Hello {first_name}! How can I help you? 🎮",
-                "آماده بازی هستی {first_name}؟ ⚔️" if lang == "fa" else "Ready to play, {first_name}? ⚔️"
-            ])
+            responses = T[lang].get('enhanced_mentioned_responses', {})
             return random.choice(responses).format(first_name=message.from_user.first_name or "User")
         
         # Enhanced attack keyword detection
@@ -1827,9 +1824,7 @@ async def handle_regular_messages(message: telebot.types.Message, bot: telebot.a
         
         # Random engagement (reduced frequency for enhanced quality)
         if random.random() < 0.03:  # 3% chance for quality over quantity
-            engagement_responses = T.get('random_engagement', {}).get(lang, [
-                "کارت خوبه! ادامه بده 👍" if lang == "fa" else "Good job! Keep it up 👍"
-            ])
+            engagement_responses = T[lang].get('random_engagement', {})
             return random.choice(engagement_responses)
         
         return None

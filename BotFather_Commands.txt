@@ -1,0 +1,174 @@
+📋 TrumpBot v2.0.0 Enterprise - BotFather Commands Setup
+=====================================================
+
+Copy and paste these commands into BotFather when setting up your bot:
+
+/setcommands
+
+🎮 CORE GAME COMMANDS / دستورات اصلی بازی:
+
+start - Start the bot and show welcome menu / شروع ربات و نمایش منوی خوش‌آمدگویی
+menu - Show main game menu / نمایش منوی اصلی بازی
+main - Show main game menu / نمایش منوی اصلی بازی
+help - Show comprehensive help system / نمایش سیستم راهنمای جامع
+
+⚔️ COMBAT COMMANDS / دستورات نبرد:
+
+attack - Attack another player / حمله به بازیکن دیگر
+weapons - Show weapons comparison and stats / نمایش مقایسه و آمار تسلیحات
+battle_stats - Show your combat statistics / نمایش آمارهای نبرد شما
+
+📊 INFORMATION COMMANDS / دستورات اطلاعاتی:
+
+profile - Show detailed user profile / نمایش پروفایل تفصیلی کاربر
+me - Show detailed user profile / نمایش پروفایل تفصیلی کاربر
+status - Check your current game status / بررسی وضعیت فعلی بازی شما
+stats - Show quick statistics overview / نمایش خلاصه سریع آمار
+leaderboard - Show chat rankings / نمایش رده‌بندی چت
+top - Show chat rankings / نمایش رده‌بندی چت
+chat_stats - Show chat-wide statistics / نمایش آمارهای کلی چت
+
+🛒 SHOP & INVENTORY COMMANDS / دستورات فروشگاه و موجودی:
+
+shop - Browse available items for purchase / مرور آیتم‌های موجود برای خرید
+store - Browse available items for purchase / مرور آیتم‌های موجود برای خرید
+inventory - View your items and equipment / مشاهده آیتم‌ها و تجهیزات شما
+inv - View your items and equipment / مشاهده آیتم‌ها و تجهیزات شما
+
+⭐ PREMIUM COMMANDS / دستورات ویژه:
+
+stars - Manage TG Stars and premium features / مدیریت ستاره‌های تلگرام و ویژگی‌های ویژه
+
+⚙️ UTILITY COMMANDS / دستورات کاربردی:
+
+language - Change bot language (English/Persian) / تغییر زبان ربات (انگلیسی/فارسی)
+lang - Change bot language (English/Persian) / تغییر زبان ربات (انگلیسی/فارسی)
+
+=====================================================
+
+📝 BOTFATHER SETUP INSTRUCTIONS / راهنمای تنظیم BotFather:
+
+1. Open @BotFather in Telegram
+2. Send /setcommands
+3. Select your bot
+4. Copy and paste ONLY the command lines below (without descriptions):
+
+start
+menu
+main
+help
+attack
+weapons
+battle_stats
+profile
+me
+status
+stats
+leaderboard
+top
+chat_stats
+shop
+store
+inventory
+inv
+stars
+language
+lang
+
+=====================================================
+
+📋 COMMAND DESCRIPTIONS FOR BOTFATHER / توضیحات دستورات برای BotFather:
+
+If BotFather asks for command descriptions, use these:
+
+start - Start bot and show welcome menu
+menu - Show main game menu
+main - Show main game menu  
+help - Show comprehensive help system
+attack - Attack another player
+weapons - Show weapons comparison and stats
+battle_stats - Show your combat statistics
+profile - Show detailed user profile
+me - Show detailed user profile
+status - Check your current game status
+stats - Show quick statistics overview
+leaderboard - Show chat rankings
+top - Show chat rankings
+chat_stats - Show chat-wide statistics
+shop - Browse available items for purchase
+store - Browse available items for purchase
+inventory - View your items and equipment
+inv - View your items and equipment
+stars - Manage TG Stars and premium features
+language - Change bot language (English/Persian)
+lang - Change bot language (English/Persian)
+
+=====================================================
+
+🌐 MULTILINGUAL SUPPORT / پشتیبانی چندزبانه:
+
+The bot automatically detects user language preference and responds accordingly.
+Supported languages:
+- English (en) 🇬🇧
+- Persian/Farsi (fa) 🇮🇷
+
+ربات به طور خودکار زبان ترجیحی کاربر را تشخیص می‌دهد و بر اساس آن پاسخ می‌دهد.
+زبان‌های پشتیبانی شده:
+- انگلیسی (en) 🇬🇧  
+- فارسی (fa) 🇮🇷
+
+=====================================================
+
+🚀 ADVANCED FEATURES / ویژگی‌های پیشرفته:
+
+✅ Comprehensive combat system with multiple weapons
+✅ Advanced inventory management with premium items
+✅ TG Stars integration for premium purchases
+✅ Real-time leaderboards and statistics
+✅ Multi-language support (English + Persian)
+✅ Advanced defense systems (shields, intercepts)
+✅ Daily bonus system
+✅ Comprehensive help and tutorial system
+✅ Chat-wide statistics and analytics
+✅ Premium membership tiers
+✅ Achievement system integration
+
+✅ سیستم نبرد جامع با تسلیحات متعدد
+✅ مدیریت پیشرفته موجودی با آیتم‌های ویژه
+✅ یکپارچگی ستاره‌های تلگرام برای خریدهای ویژه
+✅ جدول امتیازات و آمار در زمان واقعی
+✅ پشتیبانی چندزبانه (انگلیسی + فارسی)
+✅ سیستم‌های دفاعی پیشرفته (سپر، رهگیری)
+✅ سیستم پاداش روزانه
+✅ سیستم راهنما و آموزش جامع
+✅ آمار و تحلیل‌های کلی چت
+✅ سطوح عضویت ویژه
+✅ یکپارچگی سیستم دستاوردها
+
+=====================================================
+
+📞 SUPPORT / پشتیبانی:
+
+For technical support and updates:
+Telegram: @bettercallninja
+
+برای پشتیبانی فنی و به‌روزرسانی‌ها:
+تلگرام: @bettercallninja
+
+=====================================================
+
+💡 NOTES / نکات:
+
+- All commands work in group chats only (except /start, /help, /language)
+- The bot requires admin permissions for optimal functionality
+- Premium features require TG Stars
+- Daily bonuses refresh every 24 hours
+- Combat has cooldown periods to prevent spam
+
+- همه دستورات فقط در چت‌های گروهی کار می‌کنند (به جز /start، /help، /language)
+- ربات برای عملکرد بهینه نیاز به مجوزهای ادمین دارد
+- ویژگی‌های ویژه نیاز به ستاره‌های تلگرام دارند
+- پاداش‌های روزانه هر ۲۴ ساعت تازه می‌شوند
+- نبرد دارای دوره‌های انتظار برای جلوگیری از هرزنامه است
+
+=====================================================

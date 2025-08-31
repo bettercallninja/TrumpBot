@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Enhanced Bot Configuration Management System
@@ -11,7 +11,7 @@ import logging
 from typing import Optional, Dict, Any, List, Union
 from dataclasses import dataclass, field
 from enum import Enum
-from telebot.async_telebot import AsyncTeleBot
+# Note: AsyncTeleBot import moved to create_bot() function to avoid import delays
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -133,7 +133,7 @@ class EnhancedBotConfig:
         self.BOT_VERSION: str = "2.0.0"
         self.BOT_DESCRIPTION: Dict[str, str] = {
             "en": "Advanced Telegram combat game bot with comprehensive features",
-            "fa": "ربات پیشرفته بازی نبرد تلگرام با امکانات جامع"
+            "fa": "Ø±Ø¨Ø§Øª Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ø¨Ø§Ø²ÛŒ Ù†Ø¨Ø±Ø¯ ØªÙ„Ú¯Ø±Ø§Ù… Ø¨Ø§ Ø§Ù…Ú©Ø§Ù†Ø§Øª Ø¬Ø§Ù…Ø¹"
         }
         
         # Game configuration
@@ -402,16 +402,16 @@ class EnhancedBotConfig:
         """Get human-readable configuration summary"""
         if language == "fa":
             return {
-                "نام ربات": self.BOT_NAME,
-                "نسخه": self.BOT_VERSION,
-                "حداکثر حملات روزانه": str(self.game_mechanics.max_attacks_per_day),
-                "زمان انتظار حمله": f"{self.game_mechanics.attack_cooldown} ثانیه",
-                "پاداش روزانه": f"{self.game_mechanics.daily_bonus} مدال",
-                "موشک‌های نامحدود": "فعال" if self.feature_flags.unlimited_missiles else "غیرفعال",
-                "ستاره‌های رایگان": "فعال" if self.feature_flags.free_stars_enabled else "غیرفعال",
-                "حالت دیباگ": "فعال" if self.feature_flags.debug_mode else "غیرفعال",
-                "امکانات پریمیوم": "فعال" if self.feature_flags.premium_features else "غیرفعال",
-                "زبان‌های پشتیبانی شده": "انگلیسی، فارسی"
+                "Ù†Ø§Ù… Ø±Ø¨Ø§Øª": self.BOT_NAME,
+                "Ù†Ø³Ø®Ù‡": self.BOT_VERSION,
+                "Ø­Ø¯Ø§Ú©Ø«Ø± Ø­Ù…Ù„Ø§Øª Ø±ÙˆØ²Ø§Ù†Ù‡": str(self.game_mechanics.max_attacks_per_day),
+                "Ø²Ù…Ø§Ù† Ø§Ù†ØªØ¸Ø§Ø± Ø­Ù…Ù„Ù‡": f"{self.game_mechanics.attack_cooldown} Ø«Ø§Ù†ÛŒÙ‡",
+                "Ù¾Ø§Ø¯Ø§Ø´ Ø±ÙˆØ²Ø§Ù†Ù‡": f"{self.game_mechanics.daily_bonus} Ù…Ø¯Ø§Ù„",
+                "Ù…ÙˆØ´Ú©â€ŒÙ‡Ø§ÛŒ Ù†Ø§Ù…Ø­Ø¯ÙˆØ¯": "ÙØ¹Ø§Ù„" if self.feature_flags.unlimited_missiles else "ØºÛŒØ±ÙØ¹Ø§Ù„",
+                "Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ Ø±Ø§ÛŒÚ¯Ø§Ù†": "ÙØ¹Ø§Ù„" if self.feature_flags.free_stars_enabled else "ØºÛŒØ±ÙØ¹Ø§Ù„",
+                "Ø­Ø§Ù„Øª Ø¯ÛŒØ¨Ø§Ú¯": "ÙØ¹Ø§Ù„" if self.feature_flags.debug_mode else "ØºÛŒØ±ÙØ¹Ø§Ù„",
+                "Ø§Ù…Ú©Ø§Ù†Ø§Øª Ù¾Ø±ÛŒÙ…ÛŒÙˆÙ…": "ÙØ¹Ø§Ù„" if self.feature_flags.premium_features else "ØºÛŒØ±ÙØ¹Ø§Ù„",
+                "Ø²Ø¨Ø§Ù†â€ŒÙ‡Ø§ÛŒ Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ Ø´Ø¯Ù‡": "Ø§Ù†Ú¯Ù„ÛŒØ³ÛŒØŒ ÙØ§Ø±Ø³ÛŒ"
             }
         else:
             return {
@@ -430,13 +430,14 @@ class EnhancedBotConfig:
 # Initialize enhanced configuration
 config = EnhancedBotConfig()
 
-# Validate configuration on import
-if not config.validate_configuration():
-    logger.warning("Configuration validation failed. Some features may not work correctly.")
+# Note: Validation will be performed when needed to avoid import delays
 
-def create_bot() -> Optional[AsyncTeleBot]:
+def create_bot():
     """Create and return enhanced bot instance with full configuration"""
     try:
+        # Import AsyncTeleBot here to avoid import delays
+        from telebot.async_telebot import AsyncTeleBot
+        
         if config.TOKEN:
             bot_instance = AsyncTeleBot(config.TOKEN, parse_mode="HTML")
             
@@ -506,6 +507,8 @@ DEFENSE_EFFECTIVENESS = config.DEFENSE_EFFECTIVENESS
 
 # Enhanced exports
 BotConfig = config  # Main configuration object
+BOT_CONFIG = config  # Backward compatibility alias
 GameMechanics = config.game_mechanics
 FeatureFlags = config.feature_flags
 SecuritySettings = config.security_settings
+

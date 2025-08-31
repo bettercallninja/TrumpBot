@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Attack commands module
@@ -25,7 +25,7 @@ class AttackManager:
     
     def __init__(self, db_manager: DBManager):
         self.db_manager = db_manager
-        self.config = BotConfig()
+        self.config = BotConfig
         
     def calculate_damage(self, weapon: str, attacker_level: int, target_level: int) -> int:
         """Calculate damage based on weapon and level difference"""
@@ -72,8 +72,8 @@ class AttackManager:
             
             if last_attack and last_attack['last_attack']:
                 time_since = helpers.now() - last_attack['last_attack']
-                if time_since < self.config.ATTACK_COOLDOWN:
-                    return self.config.ATTACK_COOLDOWN - time_since
+                if time_since < self.config.game_mechanics.attack_cooldown:
+                    return self.config.game_mechanics.attack_cooldown - time_since
             return None
         except Exception as e:
             logger.error(f"Error checking cooldown: {e}")
@@ -86,7 +86,7 @@ class AttackManager:
             return False
             
         # Special case for unlimited missiles
-        if self.config.UNLIMITED_MISSILES and weapon == "moab":
+        if self.config.feature_flags.unlimited_missiles and weapon == "moab":
             return True
             
         try:
@@ -117,7 +117,7 @@ class AttackManager:
                     weapons[item_id] = row['qty']
             
             # Add unlimited missiles if enabled
-            if self.config.UNLIMITED_MISSILES:
+            if self.config.feature_flags.unlimited_missiles:
                 weapons['moab'] = float('inf')
             
             return weapons
@@ -188,6 +188,19 @@ class AttackManager:
             logger.error(f"Error getting battle stats: {e}")
             return {"attacks": {"total": 0, "total_damage": 0, "avg_damage": 0}, "defense": {"times_attacked": 0, "damage_taken": 0}, "weapons": []}
 
+    async def get_user_level(self, chat_id: int, user_id: int) -> int:
+        """Get user level with fallback"""
+        try:
+            user_info = await self.db_manager.db(
+                "SELECT level FROM players WHERE chat_id=%s AND user_id=%s",
+                (chat_id, user_id), 
+                fetch="one_dict"
+            )
+            return user_info['level'] if user_info else 1
+        except Exception as e:
+            logger.error(f"Error getting user level: {e}")
+            return 1
+
 async def show_weapon_comparison(message: types.Message, bot: AsyncTeleBot, db_manager: DBManager, lang: str) -> None:
     """Show weapon comparison table"""
     try:
@@ -197,11 +210,11 @@ async def show_weapon_comparison(message: types.Message, bot: AsyncTeleBot, db_m
             await bot.send_message(message.chat.id, "No weapons available for comparison.")
             return
         
-        text = f"⚔️ **{T.get('weapon_comparison_title', {}).get(lang, 'Weapon Comparison')}**\n\n"
+        text = f"⚔️ **{T[lang].get('weapon_comparison_title', {})}**\n\n"
         text += "```\n"
         text += f"{'Weapon':<15} {'DMG':<4} {'⭐':<2} {'Type':<8}\n"
         text += "─" * 35 + "\n"
-        
+            
         # Sort weapons by damage
         sorted_weapons = []
         for weapon_id, weapon_data in weapons.items():
@@ -219,7 +232,7 @@ async def show_weapon_comparison(message: types.Message, bot: AsyncTeleBot, db_m
             text += f"{name:<15} {damage:<4} {stars:<2} {payment_type:<8}\n"
         
         text += "```\n"
-        text += f"🏅 = {T.get('medals', {}).get(lang, 'Medals')} | ⭐ = {T.get('tg_stars', {}).get(lang, 'TG Stars')}"
+        text += f"🏅 = {T[lang].get('medals', {})} | ⭐ = {T[lang].get('tg_stars', {})}"
         
         await bot.send_message(message.chat.id, text, parse_mode="Markdown")
         
@@ -231,47 +244,34 @@ async def show_battle_stats(message: types.Message, bot: AsyncTeleBot, db_manage
         attack_manager = AttackManager(db_manager)
         stats = await attack_manager.get_battle_stats(message.chat.id, message.from_user.id)
         
-        text = f"📊 **{T.get('battle_stats_title', {}).get(lang, 'Battle Statistics')}**\n\n"
+        text = f"📊 **{T[lang].get('battle_stats_title', {})}**\n\n"
         
         # Attack stats
         attack_stats = stats['attacks']
-        text += f"⚔️ **{T.get('attack_stats', {}).get(lang, 'Attack Statistics')}:**\n"
-        text += f"• {T.get('total_attacks', {}).get(lang, 'Total Attacks')}: {attack_stats['total']}\n"
-        text += f"• {T.get('total_damage', {}).get(lang, 'Total Damage')}: {attack_stats['total_damage']}\n"
-        text += f"• {T.get('avg_damage', {}).get(lang, 'Average Damage')}: {attack_stats['avg_damage']}\n\n"
+        text += f"⚔️ **{T[lang].get('attack_stats', {})}:**\n"
+        text += f"• {T[lang].get('total_attacks', {})}: {attack_stats['total']}\n"
+        text += f"• {T[lang].get('total_damage', {})}: {attack_stats['total_damage']}\n"
+        text += f"• {T[lang].get('avg_damage', {})}: {attack_stats['avg_damage']}\n\n"
         
         # Defense stats
         defense_stats = stats['defense']
-        text += f"🛡️ **{T.get('defense_stats', {}).get(lang, 'Defense Statistics')}:**\n"
-        text += f"• {T.get('times_attacked', {}).get(lang, 'Times Attacked')}: {defense_stats['times_attacked']}\n"
-        text += f"• {T.get('damage_taken', {}).get(lang, 'Damage Taken')}: {defense_stats['damage_taken']}\n\n"
+        text += f"🛡️ **{T[lang].get('defense_stats', {})}:**\n"
+        text += f"• {T[lang].get('times_attacked', {})}: {defense_stats['times_attacked']}\n"
+        text += f"• {T[lang].get('damage_taken', {})}: {defense_stats['damage_taken']}\n\n"
         
         # Top weapons
         if stats['weapons']:
-            text += f"🏆 **{T.get('top_weapons', {}).get(lang, 'Most Used Weapons')}:**\n"
+            text += f"🏆 **{T[lang].get('top_weapons', {})}:**\n"
             for i, weapon_data in enumerate(stats['weapons'], 1):
                 weapon_name = get_item_display_name(weapon_data['weapon'], lang)
                 usage_count = weapon_data['usage_count']
-                text += f"{i}. {weapon_name}: {usage_count} {T.get('uses', {}).get(lang, 'uses')}\n"
+                text += f"{i}. {weapon_name}: {usage_count} {T[lang].get('uses', {})}\n"
         
         await bot.send_message(message.chat.id, text, parse_mode="Markdown")
         
     except Exception as e:
         logger.error(f"Error showing battle stats: {e}")
         await bot.send_message(message.chat.id, "Error displaying battle statistics.")
-    
-    async def get_user_level(self, chat_id: int, user_id: int) -> int:
-        """Get user level with fallback"""
-        try:
-            user_info = await self.db_manager.db(
-                "SELECT level FROM players WHERE chat_id=%s AND user_id=%s",
-                (chat_id, user_id), 
-                fetch="one_dict"
-            )
-            return user_info['level'] if user_info else 1
-        except Exception as e:
-            logger.error(f"Error getting user level: {e}")
-            return 1
 
 async def show_attack_menu(message: types.Message, bot: AsyncTeleBot, db_manager: DBManager, lang: str) -> None:
     """Shows the attack menu with available weapons"""
@@ -282,11 +282,11 @@ async def show_attack_menu(message: types.Message, bot: AsyncTeleBot, db_manager
         if not weapons:
             await bot.send_message(
                 message.chat.id, 
-                T.get('no_weapons_available', {}).get(lang, "You don't have any weapons available!")
+                T[lang].get('no_weapons_available', {})
             )
             return
 
-        text = T.get('attack_menu_title', {}).get(lang, "🚀 **Choose your weapon:**")
+        text = T[lang].get('attack_menu_title', {})
         markup = types.InlineKeyboardMarkup(row_width=1)
 
         # Sort weapons by damage for better UX
@@ -312,7 +312,7 @@ async def show_attack_menu(message: types.Message, bot: AsyncTeleBot, db_manager
         
         # Add cancel button
         markup.add(types.InlineKeyboardButton(
-            T.get('cancel_button', {}).get(lang, "❌ Cancel"),
+            T[lang].get('cancel_button', {}),
             callback_data="attack:cancel"
         ))
         
@@ -363,7 +363,7 @@ async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: 
         )
         
         # Consume weapon if not unlimited
-        if not (attack_manager.config.UNLIMITED_MISSILES and weapon == "moab"):
+        if not (attack_manager.config.feature_flags.unlimited_missiles and weapon == "moab"):
             await db_manager.db(
                 "UPDATE inventories SET qty = qty - 1 WHERE chat_id=%s AND user_id=%s AND item=%s",
                 (message.chat.id, message.from_user.id, weapon)
@@ -382,7 +382,7 @@ async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: 
         weapon_stats = get_item_stats(weapon)
         
         # Create comprehensive attack report
-        msg = T.get('attack_report', {}).get(lang, "🎯 **Attack Report**\n").format(
+        msg = T[lang].get('attack_report', {}).format(
             attacker=message.from_user.first_name or "Unknown",
             target=target_user.first_name or "Unknown",
             emoji=weapon_emoji,
@@ -391,24 +391,24 @@ async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: 
         
         # Add weapon stats for premium weapons
         if weapon_stats.get('stars', 0) >= 4:
-            msg += f"\n💎 *Premium weapon used*"
+            msg += f"\nðŸ’Ž *Premium weapon used*"
         
         if has_defense and defense_type:
-            defense_name = T.get('defense_items', {}).get(defense_type, {}).get(lang, defense_type)
-            msg += T.get('attack_defended_report', {}).get(lang, "").format(
+            defense_name = T[lang].get('defense_items', {}).get(defense_type, defense_type)
+            msg += T[lang].get('attack_defended_report', {}).format(
                 target=target_user.first_name or "Unknown", 
                 defense=defense_name, 
                 original=damage,
                 final=final_damage
             )
         else:
-            msg += T.get('attack_damage_report', {}).get(lang, "").format(final=final_damage)
+            msg += T[lang].get('attack_damage_report', {}).format(final=final_damage)
             
-        msg += T.get('attack_hp_report', {}).get(lang, "").format(
+        msg += T[lang].get('attack_hp_report', {}).format(
             target=target_user.first_name or "Unknown", 
             hp=remaining_hp
         )
-        msg += T.get('attack_medals_report', {}).get(lang, "").format(
+        msg += T[lang].get('attack_medals_report', {}).format(
             attacker=message.from_user.first_name or "Unknown", 
             medals=medal_reward
         )
@@ -419,7 +419,7 @@ async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: 
                 "UPDATE players SET hp = 50 WHERE chat_id=%s AND user_id=%s",
                 (message.chat.id, target_user.id)
             )
-            msg += T.get('attack_defeat_report', {}).get(lang, "").format(
+            msg += T[lang].get('attack_defeat_report', {}).format(
                 target=target_user.first_name or "Unknown"
             )
 
@@ -428,13 +428,13 @@ async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: 
         
         # Revenge button
         revenge_btn = types.InlineKeyboardButton(
-            T.get('revenge_button', {}).get(lang, "⚔️ Revenge"), 
+            T[lang].get('revenge_button', {}), 
             callback_data=f"attack:revenge:{message.from_user.id}"
         )
         
         # Show stats button
         stats_btn = types.InlineKeyboardButton(
-            T.get('show_stats_button', {}).get(lang, "📊 Stats"),
+            T[lang].get('show_stats_button', {}),
             callback_data=f"stats:{target_user.id}"
         )
         
@@ -485,7 +485,7 @@ async def attack_command(message: types.Message, bot: AsyncTeleBot, db_manager: 
             if not target_data:
                 await bot.send_message(
                     message.chat.id, 
-                    T['target_not_found_error'][lang].format(username=target_username), 
+                    T[lang].get('target_not_found_error', {}).format(username=target_username), 
                     parse_mode="HTML"
                 )
                 return
@@ -494,7 +494,7 @@ async def attack_command(message: types.Message, bot: AsyncTeleBot, db_manager: 
                 target_user = (await bot.get_chat_member(message.chat.id, target_data['user_id'])).user
             except Exception as e:
                 logger.error(f"Error getting target user info: {e}")
-                await bot.send_message(message.chat.id, T['get_target_info_error'][lang])
+                await bot.send_message(message.chat.id, T[lang].get('get_target_info_error', {}))
                 return
                 
             if len(args) > 1:
@@ -502,7 +502,7 @@ async def attack_command(message: types.Message, bot: AsyncTeleBot, db_manager: 
 
         # Validate target
         if not target_user:
-            await bot.send_message(message.chat.id, T['invalid_target_error'][lang], parse_mode="HTML")
+            await bot.send_message(message.chat.id, T[lang].get('invalid_target_error', {}), parse_mode="HTML")
             return
 
         # Validate weapon
@@ -510,7 +510,7 @@ async def attack_command(message: types.Message, bot: AsyncTeleBot, db_manager: 
             available_weapons = list(get_weapon_items().keys())
             await bot.send_message(
                 message.chat.id, 
-                T.get('invalid_weapon_error', {}).get(lang, "❌ Invalid weapon!").format(
+                T[lang].get('invalid_weapon_error', {}).format(
                     weapon=weapon, 
                     available=", ".join(available_weapons)
                 ), 
@@ -520,7 +520,7 @@ async def attack_command(message: types.Message, bot: AsyncTeleBot, db_manager: 
 
         # Check self-attack
         if target_user.id == message.from_user.id:
-            await bot.send_message(message.chat.id, T['attack_yourself'][lang])
+            await bot.send_message(message.chat.id, T[lang].get('attack_yourself', {}))
             return
 
         # Check weapon availability
@@ -528,7 +528,7 @@ async def attack_command(message: types.Message, bot: AsyncTeleBot, db_manager: 
             weapon_name = get_item_display_name(weapon, lang)
             await bot.send_message(
                 message.chat.id, 
-                T.get('no_weapon_error', {}).get(lang, "❌ You don't have this weapon!").format(
+                T[lang].get('no_weapon_error', {}).format(
                     weapon_name=weapon_name
                 ), 
                 parse_mode="Markdown"
@@ -540,7 +540,7 @@ async def attack_command(message: types.Message, bot: AsyncTeleBot, db_manager: 
         if wait_time is not None:
             await bot.send_message(
                 message.chat.id, 
-                T['attack_cooldown_error'][lang].format(wait_time=wait_time)
+                T[lang].get('attack_cooldown_error', {}).format(wait_time=wait_time)
             )
             return
 
@@ -564,7 +564,7 @@ async def handle_attack_callback(call: types.CallbackQuery, bot: AsyncTeleBot, d
         
         if action == "cancel":
             await bot.edit_message_text(
-                T.get('attack_cancelled', {}).get(lang, "❌ Attack cancelled."),
+                T[lang].get('attack_cancelled', {}),
                 call.message.chat.id,
                 call.message.message_id
             )
@@ -609,7 +609,7 @@ async def handle_attack_callback(call: types.CallbackQuery, bot: AsyncTeleBot, d
                     logger.error(f"Error in revenge attack: {e}")
                     await bot.answer_callback_query(
                         call.id, 
-                        T.get('revenge_error', {}).get(lang, "Error processing revenge attack."),
+                        T[lang].get('revenge_error', {}),
                         show_alert=True
                     )
                     return
@@ -619,8 +619,8 @@ async def handle_attack_callback(call: types.CallbackQuery, bot: AsyncTeleBot, d
                 weapon_id = data_parts[2]
                 weapon_stats = get_item_stats(weapon_id)
                 
-                info_text = f"🔫 **{weapon_stats['name']}**\n\n"
-                info_text += f"💥 Damage: {weapon_stats.get('damage', 'N/A')}\n"
+                info_text = f"ℹ️ {weapon_stats['name']}\n\n"
+                info_text += f"🔥 Damage: {weapon_stats.get('damage', 'N/A')}\n"
                 info_text += f"⭐ Stars: {weapon_stats.get('stars', 'N/A')}\n"
                 info_text += f"💰 Price: {weapon_stats.get('price', 'N/A')}\n"
                 info_text += f"📝 {weapon_stats.get('description', 'No description')}"
@@ -662,3 +662,4 @@ def register_handlers(bot: AsyncTeleBot, db_manager: DBManager) -> None:
     @bot.callback_query_handler(func=lambda call: call.data.startswith('weapon_info:'))
     async def weapon_info_callback_handler(call: types.CallbackQuery) -> None:
         await handle_attack_callback(call, bot, db_manager)
+

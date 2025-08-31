@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Help system module
@@ -42,16 +42,16 @@ class HelpManager:
         recommendations = []
         
         if user_stats["level"] <= 2:
-            recommendations.append("📚 You're new! Check 'Basic Commands' to get started")
+            recommendations.append("ðŸ“š You're new! Check 'Basic Commands' to get started")
         
         if user_stats["score"] < 10:
-            recommendations.append("⚔️ Learn about 'Combat System' to earn medals")
+            recommendations.append("âš”ï¸ Learn about 'Combat System' to earn medals")
         
         if user_stats["items_count"] == 0:
-            recommendations.append("🛒 Visit 'Shop & Items' to get better weapons")
+            recommendations.append("ðŸ›’ Visit 'Shop & Items' to get better weapons")
         
         if user_stats["level"] >= 5:
-            recommendations.append("💰 Check 'TG Stars' for premium features")
+            recommendations.append("ðŸ’° Check 'TG Stars' for premium features")
         
         return recommendations
 
@@ -97,78 +97,78 @@ async def _show_commands_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_m
     """Show comprehensive commands help"""
     if lang == "fa":
         help_text = f"""
-🤖 **{T.get('comprehensive_commands', {}).get(lang, 'راهنمای کامل دستورات')}**
+ðŸ¤– **{T[lang].get('comprehensive_commands', {})}**
 
-⚔️ **{T.get('combat_commands', {}).get(lang, 'دستورات نبرد')}:**
-• `/attack [کاربر] [تسلیحات]` - حمله به بازیکن
-• `/weapons` - مقایسه همه تسلیحات
-• `/battle_stats` - مشاهده آمار نبرد شما
+âš”ï¸ **{T[lang].get('combat_commands', {})}:**
+â€¢ `/attack [Ú©Ø§Ø±Ø¨Ø±] [ØªØ³Ù„ÛŒØ­Ø§Øª]` - Ø­Ù…Ù„Ù‡ Ø¨Ù‡ Ø¨Ø§Ø²ÛŒÚ©Ù†
+â€¢ `/weapons` - Ù…Ù‚Ø§ÛŒØ³Ù‡ Ù‡Ù…Ù‡ ØªØ³Ù„ÛŒØ­Ø§Øª
+â€¢ `/battle_stats` - Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ø¢Ù…Ø§Ø± Ù†Ø¨Ø±Ø¯ Ø´Ù…Ø§
 
-📊 **{T.get('info_commands', {}).get(lang, 'دستورات اطلاعاتی')}:**
-• `/profile` یا `/me` - مشاهده پروفایل تفصیلی
-• `/leaderboard` یا `/top` - رتبه‌بندی چت
-• `/stats` - نمای کلی آمارها
-• `/status` - بررسی وضعیت فعلی
+ðŸ“Š **{T[lang].get('info_commands', {})}:**
+â€¢ `/profile` ÛŒØ§ `/me` - Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ù¾Ø±ÙˆÙØ§ÛŒÙ„ ØªÙØµÛŒÙ„ÛŒ
+â€¢ `/leaderboard` ÛŒØ§ `/top` - Ø±ØªØ¨Ù‡â€ŒØ¨Ù†Ø¯ÛŒ Ú†Øª
+â€¢ `/stats` - Ù†Ù…Ø§ÛŒ Ú©Ù„ÛŒ Ø¢Ù…Ø§Ø±Ù‡Ø§
+â€¢ `/status` - Ø¨Ø±Ø±Ø³ÛŒ ÙˆØ¶Ø¹ÛŒØª ÙØ¹Ù„ÛŒ
 
-🛒 **{T.get('shop_commands', {}).get(lang, 'دستورات فروشگاه')}:**
-• `/shop` - مرور آیتم‌های موجود
-• `/inventory` یا `/inv` - مشاهده آیتم‌های شما
-• `/use` - استفاده از آیتم‌ها
+ðŸ›’ **{T[lang].get('shop_commands', {})}:**
+â€¢ `/shop` - Ù…Ø±ÙˆØ± Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ÛŒ Ù…ÙˆØ¬ÙˆØ¯
+â€¢ `/inventory` ÛŒØ§ `/inv` - Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ÛŒ Ø´Ù…Ø§
+â€¢ `/use` - Ø§Ø³ØªÙØ§Ø¯Ù‡ Ø§Ø² Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§
 
-⚙️ **{T.get('utility_commands', {}).get(lang, 'دستورات کاربردی')}:**
-• `/menu` یا `/main` - منوی اصلی
-• `/help` - این سیستم راهنما
-• `/language` یا `/lang` - تغییر زبان
+âš™ï¸ **{T[lang].get('utility_commands', {})}:**
+â€¢ `/menu` ÛŒØ§ `/main` - Ù…Ù†ÙˆÛŒ Ø§ØµÙ„ÛŒ
+â€¢ `/help` - Ø§ÛŒÙ† Ø³ÛŒØ³ØªÙ… Ø±Ø§Ù‡Ù†Ù…Ø§
+â€¢ `/language` ÛŒØ§ `/lang` - ØªØºÛŒÛŒØ± Ø²Ø¨Ø§Ù†
 
-⭐ **{T.get('premium_commands', {}).get(lang, 'دستورات ویژه')}:**
-• `/stars` - اطلاعات ستاره‌های تلگرام
-• `/premium` - ویژگی‌های ویژه
+â­ **{T[lang].get('premium_commands', {})}:**
+â€¢ `/stars` - Ø§Ø·Ù„Ø§Ø¹Ø§Øª Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù…
+â€¢ `/premium` - ÙˆÛŒÚ˜Ú¯ÛŒâ€ŒÙ‡Ø§ÛŒ ÙˆÛŒÚ˜Ù‡
 
-💡 **{T.get('tips_section', {}).get(lang, 'نکات سریع')}:**
-• برای هدف‌گیری سریع به پیامی ریپلای کرده و `/attack` بزنید
-• از دکمه‌های `/menu` برای دسترسی سریع استفاده کنید
-• `/weapons` را بررسی کنید تا استراتژی خود را برنامه‌ریزی کنید
-• از `/bonus` برای دریافت پاداش روزانه غافل نشوید
+ðŸ’¡ **{T[lang].get('tips_section', {})}:**
+â€¢ Ø¨Ø±Ø§ÛŒ Ù‡Ø¯Ùâ€ŒÚ¯ÛŒØ±ÛŒ Ø³Ø±ÛŒØ¹ Ø¨Ù‡ Ù¾ÛŒØ§Ù…ÛŒ Ø±ÛŒÙ¾Ù„Ø§ÛŒ Ú©Ø±Ø¯Ù‡ Ùˆ `/attack` Ø¨Ø²Ù†ÛŒØ¯
+â€¢ Ø§Ø² Ø¯Ú©Ù…Ù‡â€ŒÙ‡Ø§ÛŒ `/menu` Ø¨Ø±Ø§ÛŒ Ø¯Ø³ØªØ±Ø³ÛŒ Ø³Ø±ÛŒØ¹ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ú©Ù†ÛŒØ¯
+â€¢ `/weapons` Ø±Ø§ Ø¨Ø±Ø±Ø³ÛŒ Ú©Ù†ÛŒØ¯ ØªØ§ Ø§Ø³ØªØ±Ø§ØªÚ˜ÛŒ Ø®ÙˆØ¯ Ø±Ø§ Ø¨Ø±Ù†Ø§Ù…Ù‡â€ŒØ±ÛŒØ²ÛŒ Ú©Ù†ÛŒØ¯
+â€¢ Ø§Ø² `/bonus` Ø¨Ø±Ø§ÛŒ Ø¯Ø±ÛŒØ§ÙØª Ù¾Ø§Ø¯Ø§Ø´ Ø±ÙˆØ²Ø§Ù†Ù‡ ØºØ§ÙÙ„ Ù†Ø´ÙˆÛŒØ¯
         """
     else:
         help_text = f"""
-🤖 **{T.get('comprehensive_commands', {}).get(lang, 'Complete Command Reference')}**
+ðŸ¤– **{T[lang].get('comprehensive_commands', {})}**
 
-⚔️ **{T.get('combat_commands', {}).get(lang, 'Combat Commands')}:**
-• `/attack [user] [weapon]` - Attack a player
-• `/weapons` - Compare all weapons
-• `/battle_stats` - View your combat statistics
+âš”ï¸ **{T[lang].get('combat_commands', {})}:**
+â€¢ `/attack [user] [weapon]` - Attack a player
+â€¢ `/weapons` - Compare all weapons
+â€¢ `/battle_stats` - View your combat statistics
 
-📊 **{T.get('info_commands', {}).get(lang, 'Information Commands')}:**
-• `/profile` or `/me` - View detailed profile
-• `/leaderboard` or `/top` - Chat rankings
-• `/stats` - Quick statistics overview
-• `/status` - Check your current status
+ðŸ“Š **{T[lang].get('info_commands', {})}:**
+â€¢ `/profile` or `/me` - View detailed profile
+â€¢ `/leaderboard` or `/top` - Chat rankings
+â€¢ `/stats` - Quick statistics overview
+â€¢ `/status` - Check your current status
 
-🛒 **{T.get('shop_commands', {}).get(lang, 'Shop Commands')}:**
-• `/shop` - Browse available items
-• `/inventory` or `/inv` - View your items
-• `/use` - Use items from inventory
+ðŸ›’ **{T[lang].get('shop_commands', {})}:**
+â€¢ `/shop` - Browse available items
+â€¢ `/inventory` or `/inv` - View your items
+â€¢ `/use` - Use items from inventory
 
-⚙️ **{T.get('utility_commands', {}).get(lang, 'Utility Commands')}:**
-• `/menu` or `/main` - Main menu
-• `/help` - This help system
-• `/language` or `/lang` - Change language
+âš™ï¸ **{T[lang].get('utility_commands', {})}:**
+â€¢ `/menu` or `/main` - Main menu
+â€¢ `/help` - This help system
+â€¢ `/language` or `/lang` - Change language
 
-⭐ **{T.get('premium_commands', {}).get(lang, 'Premium Commands')}:**
-• `/stars` - TG Stars information
-• `/premium` - Premium features
+â­ **{T[lang].get('premium_commands', {})}:**
+â€¢ `/stars` - TG Stars information
+â€¢ `/premium` - Premium features
 
-💡 **{T.get('tips_section', {}).get(lang, 'Quick Tips')}:**
-• Reply to a message with `/attack` for quick targeting
-• Use buttons in `/menu` for fastest access
-• Check `/weapons` to plan your strategy
-• Don't forget `/bonus` for daily medals
+ðŸ’¡ **{T[lang].get('tips_section', {})}:**
+â€¢ Reply to a message with `/attack` for quick targeting
+â€¢ Use buttons in `/menu` for fastest access
+â€¢ Check `/weapons` to plan your strategy
+â€¢ Don't forget `/bonus` for daily medals
         """
     
     keyboard = types.InlineKeyboardMarkup()
     back_btn = types.InlineKeyboardButton(
-        f"🔙 {T.get('back_to_help', {}).get(lang, 'Back to Help Menu')}", 
+        f"ðŸ”™ {T[lang].get('back_to_help', {})}", 
         callback_data='help:main'
     )
     keyboard.add(back_btn)
@@ -188,9 +188,9 @@ async def _show_combat_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_man
         weapons = get_weapon_items()
         
         if lang == "fa":
-            help_text = f"⚔️ **{T.get('weapons_guide', {}).get(lang, 'راهنمای تسلیحات')}**\n\n"
+            help_text = f"âš”ï¸ **{T[lang].get('weapons_guide', {})}**\n\n"
         else:
-            help_text = f"⚔️ **{T.get('weapons_guide', {}).get(lang, 'Weapons Guide')}**\n\n"
+            help_text = f"âš”ï¸ **{T[lang].get('weapons_guide', {})}**\n\n"
         
         for weapon_id, weapon_data in weapons.items():
             stats = get_item_stats(weapon_id)
@@ -198,88 +198,88 @@ async def _show_combat_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_man
             name = get_item_display_name(weapon_id, lang)
             damage = stats.get('damage', 0)
             
-            help_text += f"{emoji} **{name}**: {damage} {T.get('damage', {}).get(lang, 'damage')}\n"
+            help_text += f"{emoji} **{name}**: {damage} {T[lang].get('damage', {})}\n"
             if stats.get('description'):
-                help_text += f"   ↳ {stats['description']}\n"
+                help_text += f"   â†³ {stats['description']}\n"
             help_text += "\n"
         
         keyboard = types.InlineKeyboardMarkup()
         keyboard.add(
-            types.InlineKeyboardButton(f"🔙 {T.get('back_to_combat', {}).get(lang, 'Back to Combat')}", callback_data='help:combat'),
-            types.InlineKeyboardButton(f"🏠 {T.get('main_help', {}).get(lang, 'Main Help')}", callback_data='help:main')
+            types.InlineKeyboardButton(f"ðŸ”™ {T[lang].get('back_to_combat', {})}", callback_data='help:combat'),
+            types.InlineKeyboardButton(f"ðŸ  {T[lang].get('main_help', {})}", callback_data='help:main')
         )
     else:
         # General combat help
         if lang == "fa":
             help_text = f"""
-⚔️ **{T.get('combat_system_guide', {}).get(lang, 'راهنمای سیستم نبرد')}**
+âš”ï¸ **{T[lang].get('combat_system_guide', {})}**
 
-🎯 **{T.get('how_to_attack', {}).get(lang, 'نحوه حمله کردن')}:**
-1. از `/attack` برای باز کردن انتخاب تسلیحات استفاده کنید
-2. یا `/attack @نام_کاربری تسلیحات` برای حمله مستقیم
-3. به پیامی ریپلای کرده و `/attack` برای هدف‌گیری سریع
+ðŸŽ¯ **{T[lang].get('how_to_attack', {})}:**
+1. Ø§Ø² `/attack` Ø¨Ø±Ø§ÛŒ Ø¨Ø§Ø² Ú©Ø±Ø¯Ù† Ø§Ù†ØªØ®Ø§Ø¨ ØªØ³Ù„ÛŒØ­Ø§Øª Ø§Ø³ØªÙØ§Ø¯Ù‡ Ú©Ù†ÛŒØ¯
+2. ÛŒØ§ `/attack @Ù†Ø§Ù…_Ú©Ø§Ø±Ø¨Ø±ÛŒ ØªØ³Ù„ÛŒØ­Ø§Øª` Ø¨Ø±Ø§ÛŒ Ø­Ù…Ù„Ù‡ Ù…Ø³ØªÙ‚ÛŒÙ…
+3. Ø¨Ù‡ Ù¾ÛŒØ§Ù…ÛŒ Ø±ÛŒÙ¾Ù„Ø§ÛŒ Ú©Ø±Ø¯Ù‡ Ùˆ `/attack` Ø¨Ø±Ø§ÛŒ Ù‡Ø¯Ùâ€ŒÚ¯ÛŒØ±ÛŒ Ø³Ø±ÛŒØ¹
 
-💥 **{T.get('damage_calculation', {}).get(lang, 'سیستم آسیب')}:**
-• آسیب پایه به تسلیحات شما بستگی دارد
-• سطح شما بر خروجی آسیب تأثیر می‌گذارد
-• سطح هدف بر آسیب دریافتی تأثیر می‌گذارد
-• برخی تسلیحات اثرات ویژه دارند
+ðŸ’¥ **{T[lang].get('damage_calculation', {})}:**
+â€¢ Ø¢Ø³ÛŒØ¨ Ù¾Ø§ÛŒÙ‡ Ø¨Ù‡ ØªØ³Ù„ÛŒØ­Ø§Øª Ø´Ù…Ø§ Ø¨Ø³ØªÚ¯ÛŒ Ø¯Ø§Ø±Ø¯
+â€¢ Ø³Ø·Ø­ Ø´Ù…Ø§ Ø¨Ø± Ø®Ø±ÙˆØ¬ÛŒ Ø¢Ø³ÛŒØ¨ ØªØ£Ø«ÛŒØ± Ù…ÛŒâ€ŒÚ¯Ø°Ø§Ø±Ø¯
+â€¢ Ø³Ø·Ø­ Ù‡Ø¯Ù Ø¨Ø± Ø¢Ø³ÛŒØ¨ Ø¯Ø±ÛŒØ§ÙØªÛŒ ØªØ£Ø«ÛŒØ± Ù…ÛŒâ€ŒÚ¯Ø°Ø§Ø±Ø¯
+â€¢ Ø¨Ø±Ø®ÛŒ ØªØ³Ù„ÛŒØ­Ø§Øª Ø§Ø«Ø±Ø§Øª ÙˆÛŒÚ˜Ù‡ Ø¯Ø§Ø±Ù†Ø¯
 
-🛡️ **{T.get('defense_system', {}).get(lang, 'سیستم دفاعی')}:**
-• آیتم‌های دفاعی آسیب وارده را کاهش می‌دهند
-• دفاع فعال در وضعیت شما نشان داده می‌شود
-• اثربخشی دفاع بر حسب نوع آیتم متفاوت است
+ðŸ›¡ï¸ **{T[lang].get('defense_system', {})}:**
+â€¢ Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ÛŒ Ø¯ÙØ§Ø¹ÛŒ Ø¢Ø³ÛŒØ¨ ÙˆØ§Ø±Ø¯Ù‡ Ø±Ø§ Ú©Ø§Ù‡Ø´ Ù…ÛŒâ€ŒØ¯Ù‡Ù†Ø¯
+â€¢ Ø¯ÙØ§Ø¹ ÙØ¹Ø§Ù„ Ø¯Ø± ÙˆØ¶Ø¹ÛŒØª Ø´Ù…Ø§ Ù†Ø´Ø§Ù† Ø¯Ø§Ø¯Ù‡ Ù…ÛŒâ€ŒØ´ÙˆØ¯
+â€¢ Ø§Ø«Ø±Ø¨Ø®Ø´ÛŒ Ø¯ÙØ§Ø¹ Ø¨Ø± Ø­Ø³Ø¨ Ù†ÙˆØ¹ Ø¢ÛŒØªÙ… Ù…ØªÙØ§ÙˆØª Ø§Ø³Øª
 
-🏅 **{T.get('rewards_system', {}).get(lang, 'سیستم پاداش')}:**
-• برای حملات موفق مدال کسب کنید
-• مدال‌های جایزه برای شکست دادن حریفان
-• تسلیحات ویژه پاداش اضافی می‌دهند
-• سطح بالا ببرید تا به محتوای بهتری دسترسی پیدا کنید
+ðŸ… **{T[lang].get('rewards_system', {})}:**
+â€¢ Ø¨Ø±Ø§ÛŒ Ø­Ù…Ù„Ø§Øª Ù…ÙˆÙÙ‚ Ù…Ø¯Ø§Ù„ Ú©Ø³Ø¨ Ú©Ù†ÛŒØ¯
+â€¢ Ù…Ø¯Ø§Ù„â€ŒÙ‡Ø§ÛŒ Ø¬Ø§ÛŒØ²Ù‡ Ø¨Ø±Ø§ÛŒ Ø´Ú©Ø³Øª Ø¯Ø§Ø¯Ù† Ø­Ø±ÛŒÙØ§Ù†
+â€¢ ØªØ³Ù„ÛŒØ­Ø§Øª ÙˆÛŒÚ˜Ù‡ Ù¾Ø§Ø¯Ø§Ø´ Ø§Ø¶Ø§ÙÛŒ Ù…ÛŒâ€ŒØ¯Ù‡Ù†Ø¯
+â€¢ Ø³Ø·Ø­ Ø¨Ø§Ù„Ø§ Ø¨Ø¨Ø±ÛŒØ¯ ØªØ§ Ø¨Ù‡ Ù…Ø­ØªÙˆØ§ÛŒ Ø¨Ù‡ØªØ±ÛŒ Ø¯Ø³ØªØ±Ø³ÛŒ Ù¾ÛŒØ¯Ø§ Ú©Ù†ÛŒØ¯
 
-⏰ **{T.get('cooldowns', {}).get(lang, 'محدودیت‌ها و زمان انتظار')}:**
-• زمان انتظار حمله از هرزنامه جلوگیری می‌کند
-• برخی تسلیحات استفاده محدود دارند
-• HP در طول زمان بازسازی می‌شود
+â° **{T[lang].get('cooldowns', {})}:**
+â€¢ Ø²Ù…Ø§Ù† Ø§Ù†ØªØ¸Ø§Ø± Ø­Ù…Ù„Ù‡ Ø§Ø² Ù‡Ø±Ø²Ù†Ø§Ù…Ù‡ Ø¬Ù„ÙˆÚ¯ÛŒØ±ÛŒ Ù…ÛŒâ€ŒÚ©Ù†Ø¯
+â€¢ Ø¨Ø±Ø®ÛŒ ØªØ³Ù„ÛŒØ­Ø§Øª Ø§Ø³ØªÙØ§Ø¯Ù‡ Ù…Ø­Ø¯ÙˆØ¯ Ø¯Ø§Ø±Ù†Ø¯
+â€¢ HP Ø¯Ø± Ø·ÙˆÙ„ Ø²Ù…Ø§Ù† Ø¨Ø§Ø²Ø³Ø§Ø²ÛŒ Ù…ÛŒâ€ŒØ´ÙˆØ¯
             """
         else:
             help_text = f"""
-⚔️ **{T.get('combat_system_guide', {}).get(lang, 'Combat System Guide')}**
+âš”ï¸ **{T[lang].get('combat_system_guide', {})}**
 
-🎯 **{T.get('how_to_attack', {}).get(lang, 'How to Attack')}:**
+ðŸŽ¯ **{T[lang].get('how_to_attack', {})}:**
 1. Use `/attack` to open weapon selection
 2. Or `/attack @username weapon` for direct attack
 3. Reply to a message with `/attack` for quick targeting
 
-💥 **{T.get('damage_calculation', {}).get(lang, 'Damage System')}:**
-• Base damage depends on your weapon
-• Your level affects damage output
-• Target's level affects damage received
-• Some weapons have special effects
+ðŸ’¥ **{T[lang].get('damage_calculation', {})}:**
+â€¢ Base damage depends on your weapon
+â€¢ Your level affects damage output
+â€¢ Target's level affects damage received
+â€¢ Some weapons have special effects
 
-🛡️ **{T.get('defense_system', {}).get(lang, 'Defense System')}:**
-• Defense items reduce incoming damage
-• Active defense shows in your status
-• Defense effectiveness varies by item type
+ðŸ›¡ï¸ **{T[lang].get('defense_system', {})}:**
+â€¢ Defense items reduce incoming damage
+â€¢ Active defense shows in your status
+â€¢ Defense effectiveness varies by item type
 
-🏅 **{T.get('rewards_system', {}).get(lang, 'Reward System')}:**
-• Earn medals for successful attacks
-• Bonus medals for defeating opponents
-• Premium weapons give extra rewards
-• Level up to access better content
+ðŸ… **{T[lang].get('rewards_system', {})}:**
+â€¢ Earn medals for successful attacks
+â€¢ Bonus medals for defeating opponents
+â€¢ Premium weapons give extra rewards
+â€¢ Level up to access better content
 
-⏰ **{T.get('cooldowns', {}).get(lang, 'Cooldowns & Limits')}:**
-• Attack cooldown prevents spam
-• Some weapons have limited uses
-• HP regenerates over time
+â° **{T[lang].get('cooldowns', {})}:**
+â€¢ Attack cooldown prevents spam
+â€¢ Some weapons have limited uses
+â€¢ HP regenerates over time
             """
         
         keyboard = types.InlineKeyboardMarkup(row_width=2)
         keyboard.add(
-            types.InlineKeyboardButton(f"🔫 {T.get('weapons_detail', {}).get(lang, 'Weapons')}", callback_data='help:combat:weapons'),
-            types.InlineKeyboardButton(f"📊 {T.get('stats_detail', {}).get(lang, 'Statistics')}", callback_data='help:stats')
+            types.InlineKeyboardButton(f"ðŸ”« {T[lang].get('weapons_detail', {})}", callback_data='help:combat:weapons'),
+            types.InlineKeyboardButton(f"ðŸ“Š {T[lang].get('stats_detail', {})}", callback_data='help:stats')
         )
         keyboard.add(
-            types.InlineKeyboardButton(f"🔙 {T.get('back_to_help', {}).get(lang, 'Back to Help')}", callback_data='help:main')
+            types.InlineKeyboardButton(f"ðŸ”™ {T[lang].get('back_to_help', {})}", callback_data='help:main')
         )
     
     await bot.edit_message_text(
@@ -293,44 +293,44 @@ async def _show_combat_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_man
 async def _show_items_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_manager: DBManager, lang: str, subsection: Optional[str]):
     """Show items and shop help"""
     help_text = f"""
-🛒 **{T.get('shop_system_guide', {}).get(lang, 'Shop & Items System')}**
+ðŸ›’ **{T[lang].get('shop_system_guide', {})}**
 
-💰 **{T.get('currency_types', {}).get(lang, 'Currency Types')}:**
-• 🏅 **Medals**: Earn by attacking and winning battles
-• ⭐ **TG Stars**: Premium currency for special items
+ðŸ’° **{T[lang].get('currency_types', {})}:**
+â€¢ ðŸ… **Medals**: Earn by attacking and winning battles
+â€¢ â­ **TG Stars**: Premium currency for special items
 
-🗂️ **{T.get('item_categories', {}).get(lang, 'Item Categories')}:**
-• ⚔️ **Weapons**: Deal damage to opponents
-• 🛡️ **Defense**: Reduce incoming damage
-• 🚀 **Boost**: Temporary enhancements
-• 💎 **Premium**: Exclusive TG Stars items
+ðŸ—‚ï¸ **{T[lang].get('item_categories', {})}:**
+â€¢ âš”ï¸ **Weapons**: Deal damage to opponents
+â€¢ ðŸ›¡ï¸ **Defense**: Reduce incoming damage
+â€¢ ðŸš€ **Boost**: Temporary enhancements
+â€¢ ðŸ’Ž **Premium**: Exclusive TG Stars items
 
-🛍️ **{T.get('shopping_guide', {}).get(lang, 'How to Shop')}:**
+ðŸ›ï¸ **{T[lang].get('shopping_guide', {})}:**
 1. Use `/shop` to browse items
 2. Check item stats before buying
 3. Use `/buy [item_name]` to purchase
 4. View your items with `/inventory`
 
-📦 **{T.get('inventory_management', {}).get(lang, 'Managing Inventory')}:**
-• Items stack when you buy multiples
-• Some items have usage limits
-• Premium items never expire
-• Weapons are consumed when used
+ðŸ“¦ **{T[lang].get('inventory_management', {})}:**
+â€¢ Items stack when you buy multiples
+â€¢ Some items have usage limits
+â€¢ Premium items never expire
+â€¢ Weapons are consumed when used
 
-💡 **{T.get('shopping_tips', {}).get(lang, 'Shopping Tips')}:**
-• Start with basic weapons like missiles
-• Invest in defense items for protection
-• Save TG Stars for premium weapons
-• Check `/weapons` to compare damage
+ðŸ’¡ **{T[lang].get('shopping_tips', {})}:**
+â€¢ Start with basic weapons like missiles
+â€¢ Invest in defense items for protection
+â€¢ Save TG Stars for premium weapons
+â€¢ Check `/weapons` to compare damage
     """
     
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(
-        types.InlineKeyboardButton(f"🛒 {T.get('open_shop', {}).get(lang, 'Open Shop')}", callback_data='quick:shop'),
-        types.InlineKeyboardButton(f"📦 {T.get('view_inventory', {}).get(lang, 'View Inventory')}", callback_data='quick:inventory')
+        types.InlineKeyboardButton(f"ðŸ›’ {T[lang].get('open_shop', {})}", callback_data='quick:shop'),
+        types.InlineKeyboardButton(f"ðŸ“¦ {T[lang].get('view_inventory', {})}", callback_data='quick:inventory')
     )
     keyboard.add(
-        types.InlineKeyboardButton(f"🔙 {T.get('back_to_help', {}).get(lang, 'Back to Help')}", callback_data='help:main')
+        types.InlineKeyboardButton(f"ðŸ”™ {T[lang].get('back_to_help', {})}", callback_data='help:main')
     )
     
     await bot.edit_message_text(
@@ -344,46 +344,46 @@ async def _show_items_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_mana
 async def _show_stats_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_manager: DBManager, lang: str):
     """Show statistics and progression help"""
     help_text = f"""
-📊 **{T.get('statistics_guide', {}).get(lang, 'Statistics & Progression Guide')}**
+ðŸ“Š **{T[lang].get('statistics_guide', {})}**
 
-📈 **{T.get('player_stats', {}).get(lang, 'Player Statistics')}:**
-• **Level**: Increases with score, affects damage
-• **Score**: Total medals earned from battles
-• **HP**: Health points, reduced by attacks
-• **Rank**: Your position in the chat leaderboard
+ðŸ“ˆ **{T[lang].get('player_stats', {})}:**
+â€¢ **Level**: Increases with score, affects damage
+â€¢ **Score**: Total medals earned from battles
+â€¢ **HP**: Health points, reduced by attacks
+â€¢ **Rank**: Your position in the chat leaderboard
 
-⚔️ **{T.get('combat_stats', {}).get(lang, 'Combat Statistics')}:**
-• **Total Attacks**: Number of attacks you've made
-• **Total Damage**: Cumulative damage dealt
-• **Times Attacked**: How often you've been targeted
-• **Damage Taken**: Total damage received
+âš”ï¸ **{T[lang].get('combat_stats', {})}:**
+â€¢ **Total Attacks**: Number of attacks you've made
+â€¢ **Total Damage**: Cumulative damage dealt
+â€¢ **Times Attacked**: How often you've been targeted
+â€¢ **Damage Taken**: Total damage received
 
-🏆 **{T.get('progression_system', {}).get(lang, 'Progression System')}:**
-• Earn medals by attacking other players
-• Level up automatically based on score
-• Higher levels deal more damage
-• Unlock better weapons as you progress
+ðŸ† **{T[lang].get('progression_system', {})}:**
+â€¢ Earn medals by attacking other players
+â€¢ Level up automatically based on score
+â€¢ Higher levels deal more damage
+â€¢ Unlock better weapons as you progress
 
-📋 **{T.get('available_stats', {}).get(lang, 'Available Commands')}:**
-• `/profile` - Detailed personal statistics
-• `/battle_stats` - Combat-focused statistics
-• `/leaderboard` - See top players in chat
-• `/status` - Quick status overview
+ðŸ“‹ **{T[lang].get('available_stats', {})}:**
+â€¢ `/profile` - Detailed personal statistics
+â€¢ `/battle_stats` - Combat-focused statistics
+â€¢ `/leaderboard` - See top players in chat
+â€¢ `/status` - Quick status overview
 
-🎯 **{T.get('improvement_tips', {}).get(lang, 'Improvement Tips')}:**
-• Attack regularly to gain experience
-• Buy better weapons to deal more damage
-• Use defense items to protect yourself
-• Study the leaderboard to track progress
+ðŸŽ¯ **{T[lang].get('improvement_tips', {})}:**
+â€¢ Attack regularly to gain experience
+â€¢ Buy better weapons to deal more damage
+â€¢ Use defense items to protect yourself
+â€¢ Study the leaderboard to track progress
     """
     
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(
-        types.InlineKeyboardButton(f"👤 {T.get('view_profile', {}).get(lang, 'View Profile')}", callback_data='quick:stats'),
-        types.InlineKeyboardButton(f"🏆 {T.get('view_leaderboard', {}).get(lang, 'Leaderboard')}", callback_data='quick:leaderboard')
+        types.InlineKeyboardButton(f"ðŸ‘¤ {T[lang].get('view_profile', {})}", callback_data='quick:stats'),
+        types.InlineKeyboardButton(f"ðŸ† {T[lang].get('view_leaderboard', {})}", callback_data='quick:leaderboard')
     )
     keyboard.add(
-        types.InlineKeyboardButton(f"🔙 {T.get('back_to_help', {}).get(lang, 'Back to Help')}", callback_data='help:main')
+        types.InlineKeyboardButton(f"ðŸ”™ {T[lang].get('back_to_help', {})}", callback_data='help:main')
     )
     
     await bot.edit_message_text(
@@ -398,41 +398,41 @@ async def _show_faq_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_manage
     """Show frequently asked questions"""
     if lang == "fa":
         help_text = f"""
-❓ **{T.get('faq_title', {}).get(lang, 'سوالات متداول')}**
+â“ **{T[lang].get('faq_title', {})}**
 
-**س: چگونه بازی را شروع کنم؟**
-ج: از `/menu` برای مشاهده همه گزینه‌ها استفاده کنید و با `/attack` نبرد را آغاز کنید.
+**Ø³: Ú†Ú¯ÙˆÙ†Ù‡ Ø¨Ø§Ø²ÛŒ Ø±Ø§ Ø´Ø±ÙˆØ¹ Ú©Ù†Ù…ØŸ**
+Ø¬: Ø§Ø² `/menu` Ø¨Ø±Ø§ÛŒ Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ù‡Ù…Ù‡ Ú¯Ø²ÛŒÙ†Ù‡â€ŒÙ‡Ø§ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ú©Ù†ÛŒØ¯ Ùˆ Ø¨Ø§ `/attack` Ù†Ø¨Ø±Ø¯ Ø±Ø§ Ø¢ØºØ§Ø² Ú©Ù†ÛŒØ¯.
 
-**س: چرا نمی‌توانم به کسی حمله کنم؟**
-ج: بررسی کنید که آیا تسلیحات دارید، در زمان انتظار هستید، یا هدف در چت وجود دارد.
+**Ø³: Ú†Ø±Ø§ Ù†Ù…ÛŒâ€ŒØªÙˆØ§Ù†Ù… Ø¨Ù‡ Ú©Ø³ÛŒ Ø­Ù…Ù„Ù‡ Ú©Ù†Ù…ØŸ**
+Ø¬: Ø¨Ø±Ø±Ø³ÛŒ Ú©Ù†ÛŒØ¯ Ú©Ù‡ Ø¢ÛŒØ§ ØªØ³Ù„ÛŒØ­Ø§Øª Ø¯Ø§Ø±ÛŒØ¯ØŒ Ø¯Ø± Ø²Ù…Ø§Ù† Ø§Ù†ØªØ¸Ø§Ø± Ù‡Ø³ØªÛŒØ¯ØŒ ÛŒØ§ Ù‡Ø¯Ù Ø¯Ø± Ú†Øª ÙˆØ¬ÙˆØ¯ Ø¯Ø§Ø±Ø¯.
 
-**س: چگونه تسلیحات بهتری به دست آورم؟**
-ج: از `/shop` برای خرید تسلیحات با مدال بازدید کنید، یا ستاره‌های تلگرام برای آیتم‌های ویژه کسب کنید.
+**Ø³: Ú†Ú¯ÙˆÙ†Ù‡ ØªØ³Ù„ÛŒØ­Ø§Øª Ø¨Ù‡ØªØ±ÛŒ Ø¨Ù‡ Ø¯Ø³Øª Ø¢ÙˆØ±Ù…ØŸ**
+Ø¬: Ø§Ø² `/shop` Ø¨Ø±Ø§ÛŒ Ø®Ø±ÛŒØ¯ ØªØ³Ù„ÛŒØ­Ø§Øª Ø¨Ø§ Ù…Ø¯Ø§Ù„ Ø¨Ø§Ø²Ø¯ÛŒØ¯ Ú©Ù†ÛŒØ¯ØŒ ÛŒØ§ Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù… Ø¨Ø±Ø§ÛŒ Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ÛŒ ÙˆÛŒÚ˜Ù‡ Ú©Ø³Ø¨ Ú©Ù†ÛŒØ¯.
 
-**س: ستاره‌های تلگرام چیست؟**
-ج: ارز ویژه‌ای که از طریق تلگرام قابل کسب یا خرید برای آیتم‌های انحصاری است.
+**Ø³: Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù… Ú†ÛŒØ³ØªØŸ**
+Ø¬: Ø§Ø±Ø² ÙˆÛŒÚ˜Ù‡â€ŒØ§ÛŒ Ú©Ù‡ Ø§Ø² Ø·Ø±ÛŒÙ‚ ØªÙ„Ú¯Ø±Ø§Ù… Ù‚Ø§Ø¨Ù„ Ú©Ø³Ø¨ ÛŒØ§ Ø®Ø±ÛŒØ¯ Ø¨Ø±Ø§ÛŒ Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ÛŒ Ø§Ù†Ø­ØµØ§Ø±ÛŒ Ø§Ø³Øª.
 
-**س: چرا حمله‌ام آسیب کمتری زد؟**
-ج: هدف ممکن است آیتم‌های دفاعی داشته باشد، یا تفاوت سطح بر محاسبه آسیب تأثیر می‌گذارد.
+**Ø³: Ú†Ø±Ø§ Ø­Ù…Ù„Ù‡â€ŒØ§Ù… Ø¢Ø³ÛŒØ¨ Ú©Ù…ØªØ±ÛŒ Ø²Ø¯ØŸ**
+Ø¬: Ù‡Ø¯Ù Ù…Ù…Ú©Ù† Ø§Ø³Øª Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ÛŒ Ø¯ÙØ§Ø¹ÛŒ Ø¯Ø§Ø´ØªÙ‡ Ø¨Ø§Ø´Ø¯ØŒ ÛŒØ§ ØªÙØ§ÙˆØª Ø³Ø·Ø­ Ø¨Ø± Ù…Ø­Ø§Ø³Ø¨Ù‡ Ø¢Ø³ÛŒØ¨ ØªØ£Ø«ÛŒØ± Ù…ÛŒâ€ŒÚ¯Ø°Ø§Ø±Ø¯.
 
-**س: چگونه HP خود را درمان کنم؟**
-ج: HP به طور خودکار در طول زمان بازسازی می‌شود، یا می‌توانید از آیتم‌های درمانی فروشگاه استفاده کنید.
+**Ø³: Ú†Ú¯ÙˆÙ†Ù‡ HP Ø®ÙˆØ¯ Ø±Ø§ Ø¯Ø±Ù…Ø§Ù† Ú©Ù†Ù…ØŸ**
+Ø¬: HP Ø¨Ù‡ Ø·ÙˆØ± Ø®ÙˆØ¯Ú©Ø§Ø± Ø¯Ø± Ø·ÙˆÙ„ Ø²Ù…Ø§Ù† Ø¨Ø§Ø²Ø³Ø§Ø²ÛŒ Ù…ÛŒâ€ŒØ´ÙˆØ¯ØŒ ÛŒØ§ Ù…ÛŒâ€ŒØªÙˆØ§Ù†ÛŒØ¯ Ø§Ø² Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ÛŒ Ø¯Ø±Ù…Ø§Ù†ÛŒ ÙØ±ÙˆØ´Ú¯Ø§Ù‡ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ú©Ù†ÛŒØ¯.
 
-**س: آیا می‌توانم زبان خود را تغییر دهم؟**
-ج: بله! از `/language` برای تغییر بین انگلیسی و فارسی استفاده کنید.
+**Ø³: Ø¢ÛŒØ§ Ù…ÛŒâ€ŒØªÙˆØ§Ù†Ù… Ø²Ø¨Ø§Ù† Ø®ÙˆØ¯ Ø±Ø§ ØªØºÛŒÛŒØ± Ø¯Ù‡Ù…ØŸ**
+Ø¬: Ø¨Ù„Ù‡! Ø§Ø² `/language` Ø¨Ø±Ø§ÛŒ ØªØºÛŒÛŒØ± Ø¨ÛŒÙ† Ø§Ù†Ú¯Ù„ÛŒØ³ÛŒ Ùˆ ÙØ§Ø±Ø³ÛŒ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ú©Ù†ÛŒØ¯.
 
-**س: سیستم رتبه‌بندی چگونه کار می‌کند؟**
-ج: رتبه‌بندی بر اساس امتیاز کل (مدال‌های کسب شده) است. از `/leaderboard` برای مشاهده رده‌بندی فعلی استفاده کنید.
+**Ø³: Ø³ÛŒØ³ØªÙ… Ø±ØªØ¨Ù‡â€ŒØ¨Ù†Ø¯ÛŒ Ú†Ú¯ÙˆÙ†Ù‡ Ú©Ø§Ø± Ù…ÛŒâ€ŒÚ©Ù†Ø¯ØŸ**
+Ø¬: Ø±ØªØ¨Ù‡â€ŒØ¨Ù†Ø¯ÛŒ Ø¨Ø± Ø§Ø³Ø§Ø³ Ø§Ù…ØªÛŒØ§Ø² Ú©Ù„ (Ù…Ø¯Ø§Ù„â€ŒÙ‡Ø§ÛŒ Ú©Ø³Ø¨ Ø´Ø¯Ù‡) Ø§Ø³Øª. Ø§Ø² `/leaderboard` Ø¨Ø±Ø§ÛŒ Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ø±Ø¯Ù‡â€ŒØ¨Ù†Ø¯ÛŒ ÙØ¹Ù„ÛŒ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ú©Ù†ÛŒØ¯.
 
-**س: وقتی HP من به صفر می‌رسد چه اتفاقی می‌افتد؟**
-ج: شما شکست می‌خورید اما خودکار 50 HP برمی‌گردانید. مهاجم مدال‌های جایزه دریافت می‌کند.
+**Ø³: ÙˆÙ‚ØªÛŒ HP Ù…Ù† Ø¨Ù‡ ØµÙØ± Ù…ÛŒâ€ŒØ±Ø³Ø¯ Ú†Ù‡ Ø§ØªÙØ§Ù‚ÛŒ Ù…ÛŒâ€ŒØ§ÙØªØ¯ØŸ**
+Ø¬: Ø´Ù…Ø§ Ø´Ú©Ø³Øª Ù…ÛŒâ€ŒØ®ÙˆØ±ÛŒØ¯ Ø§Ù…Ø§ Ø®ÙˆØ¯Ú©Ø§Ø± 50 HP Ø¨Ø±Ù…ÛŒâ€ŒÚ¯Ø±Ø¯Ø§Ù†ÛŒØ¯. Ù…Ù‡Ø§Ø¬Ù… Ù…Ø¯Ø§Ù„â€ŒÙ‡Ø§ÛŒ Ø¬Ø§ÛŒØ²Ù‡ Ø¯Ø±ÛŒØ§ÙØª Ù…ÛŒâ€ŒÚ©Ù†Ø¯.
 
-**س: آیا محدودیتی برای حملات وجود دارد؟**
-ج: بله، زمان انتظار بین حملات برای جلوگیری از هرزنامه وجود دارد.
+**Ø³: Ø¢ÛŒØ§ Ù…Ø­Ø¯ÙˆØ¯ÛŒØªÛŒ Ø¨Ø±Ø§ÛŒ Ø­Ù…Ù„Ø§Øª ÙˆØ¬ÙˆØ¯ Ø¯Ø§Ø±Ø¯ØŸ**
+Ø¬: Ø¨Ù„Ù‡ØŒ Ø²Ù…Ø§Ù† Ø§Ù†ØªØ¸Ø§Ø± Ø¨ÛŒÙ† Ø­Ù…Ù„Ø§Øª Ø¨Ø±Ø§ÛŒ Ø¬Ù„ÙˆÚ¯ÛŒØ±ÛŒ Ø§Ø² Ù‡Ø±Ø²Ù†Ø§Ù…Ù‡ ÙˆØ¬ÙˆØ¯ Ø¯Ø§Ø±Ø¯.
         """
     else:
         help_text = f"""
-❓ **{T.get('faq_title', {}).get(lang, 'Frequently Asked Questions')}**
+â“ **{T[lang].get('faq_title', {})}**
 
 **Q: How do I start playing?**
 A: Use `/menu` to see all available options and start with `/attack` to begin combat.
@@ -473,8 +473,8 @@ A: Weapons increase attack damage, while defense items reduce incoming damage or
     
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(
-        types.InlineKeyboardButton(f"🆘 {T.get('contact_support', {}).get(lang, 'More Help')}", url="https://t.me/YourSupportBot"),
-        types.InlineKeyboardButton(f"🔙 {T.get('back_to_help', {}).get(lang, 'Back to Help')}", callback_data='help:main')
+        types.InlineKeyboardButton(f"ðŸ†˜ {T[lang].get('contact_support', {})}", url="https://t.me/bettercallninja"),
+        types.InlineKeyboardButton(f"ðŸ”™ {T[lang].get('back_to_help', {})}", callback_data='help:main')
     )
     
     await bot.edit_message_text(
@@ -492,12 +492,12 @@ async def _show_traditional_help(call: types.CallbackQuery, bot: AsyncTeleBot, d
     """Show traditional help sections for backward compatibility"""
     try:
         # Get the appropriate help text for the requested section
-        help_text = T.get('help_sections', {}).get(help_section, {}).get(lang, f"Help section '{help_section}' not found.")
+        help_text = T[lang].get('help_sections', {}).get(help_section, f"Help section '{help_section}' not found.")
         
         # Create a "Back" button to return to the main help menu
         keyboard = types.InlineKeyboardMarkup()
         back_btn = types.InlineKeyboardButton(
-            T.get('back_button', {}).get(lang, "🔙 Back"),
+            T[lang].get('back_button', {}),
             callback_data='help:main'
         )
         keyboard.add(back_btn)
@@ -521,51 +521,51 @@ async def _send_main_help_menu(message: types.Message, bot: AsyncTeleBot, db_man
         recommendations = help_manager.get_contextual_help_recommendations(user_stats)
         
         # Build contextual intro
-        intro_text = f"📚 **{T.get('help_welcome', {}).get(lang, 'TrumpBot Help Center')}**\n\n"
+        intro_text = f"ðŸ“š **{T[lang].get('help_welcome', {})}**\n\n"
         
         if recommendations:
-            intro_text += f"💡 **{T.get('recommendations_for_you', {}).get(lang, 'Recommendations for you')}:**\n"
+            intro_text += f"ðŸ’¡ **{T[lang].get('recommendations_for_you', {})}:**\n"
             for rec in recommendations[:2]:  # Show max 2 recommendations
-                intro_text += f"• {rec}\n"
+                intro_text += f"â€¢ {rec}\n"
             intro_text += "\n"
         
-        intro_text += T.get('help_intro', {}).get(lang, "Select a category to get detailed help:")
+        intro_text += T[lang].get('help_intro', {})
         
         # Create enhanced keyboard with modern categories
         keyboard = types.InlineKeyboardMarkup(row_width=2)
         
         # First row - Core help
         commands_btn = types.InlineKeyboardButton(
-            f"🤖 {T.get('commands_help', {}).get(lang, 'Commands')}", 
+            f"ðŸ¤– {T[lang].get('commands_help', {})}", 
             callback_data='help:commands'
         )
         combat_btn = types.InlineKeyboardButton(
-            f"⚔️ {T.get('combat_help', {}).get(lang, 'Combat')}", 
+            f"âš”ï¸ {T[lang].get('combat_help', {})}", 
             callback_data='help:combat'
         )
         keyboard.add(commands_btn, combat_btn)
         
         # Second row - Management
         items_btn = types.InlineKeyboardButton(
-            f"🛒 {T.get('items_help', {}).get(lang, 'Shop & Items')}", 
+            f"ðŸ›’ {T[lang].get('items_help', {})}", 
             callback_data='help:items'
         )
         stats_btn = types.InlineKeyboardButton(
-            f"📊 {T.get('stats_help', {}).get(lang, 'Statistics')}", 
+            f"ðŸ“Š {T[lang].get('stats_help', {})}", 
             callback_data='help:stats'
         )
         keyboard.add(items_btn, stats_btn)
         
         # Third row - Additional help
         faq_btn = types.InlineKeyboardButton(
-            f"❓ {T.get('faq_help', {}).get(lang, 'FAQ')}", 
+            f"â“ {T[lang].get('faq_help', {})}", 
             callback_data='help:faq'
         )
         keyboard.add(faq_btn)
         
         # Fourth row - Quick actions
         menu_btn = types.InlineKeyboardButton(
-            f"📋 {T.get('main_menu', {}).get(lang, 'Main Menu')}", 
+            f"ðŸ“‹ {T[lang].get('main_menu', {})}", 
             callback_data='quick:menu'
         )
         keyboard.add(menu_btn)
@@ -582,7 +582,7 @@ async def _send_main_help_menu(message: types.Message, bot: AsyncTeleBot, db_man
         # Fallback to simple help
         await bot.send_message(
             message.chat.id,
-            T.get('help_intro', {}).get(lang, "Help system temporarily unavailable.")
+            T[lang].get('help_intro', {})
         )
 
 async def _edit_to_main_help_menu(message: types.Message, bot: AsyncTeleBot, db_manager: DBManager, lang: str):
@@ -593,44 +593,44 @@ async def _edit_to_main_help_menu(message: types.Message, bot: AsyncTeleBot, db_
         recommendations = help_manager.get_contextual_help_recommendations(user_stats)
         
         # Build contextual intro
-        intro_text = f"📚 **{T.get('help_welcome', {}).get(lang, 'TrumpBot Help Center')}**\n\n"
+        intro_text = f"ðŸ“š **{T[lang].get('help_welcome', {})}**\n\n"
         
         if recommendations:
-            intro_text += f"💡 **{T.get('recommendations_for_you', {}).get(lang, 'Recommendations for you')}:**\n"
+            intro_text += f"ðŸ’¡ **{T[lang].get('recommendations_for_you', {})}:**\n"
             for rec in recommendations[:2]:  # Show max 2 recommendations
-                intro_text += f"• {rec}\n"
+                intro_text += f"â€¢ {rec}\n"
             intro_text += "\n"
         
-        intro_text += T.get('help_intro', {}).get(lang, "Select a category to get detailed help:")
+        intro_text += T[lang].get('help_intro', {})
         
         # Create enhanced keyboard
         keyboard = types.InlineKeyboardMarkup(row_width=2)
         
         # First row - Core help
         commands_btn = types.InlineKeyboardButton(
-            f"🤖 {T.get('commands_help', {}).get(lang, 'Commands')}", 
+            f"ðŸ¤– {T[lang].get('commands_help', {})}", 
             callback_data='help:commands'
         )
         combat_btn = types.InlineKeyboardButton(
-            f"⚔️ {T.get('combat_help', {}).get(lang, 'Combat')}", 
+            f"âš”ï¸ {T[lang].get('combat_help', {})}", 
             callback_data='help:combat'
         )
         keyboard.add(commands_btn, combat_btn)
         
         # Second row - Management
         items_btn = types.InlineKeyboardButton(
-            f"🛒 {T.get('items_help', {}).get(lang, 'Shop & Items')}", 
+            f"ðŸ›’ {T[lang].get('items_help', {})}", 
             callback_data='help:items'
         )
         stats_btn = types.InlineKeyboardButton(
-            f"📊 {T.get('stats_help', {}).get(lang, 'Statistics')}", 
+            f"ðŸ“Š {T[lang].get('stats_help', {})}", 
             callback_data='help:stats'
         )
         keyboard.add(items_btn, stats_btn)
         
         # Third row - Additional help
         faq_btn = types.InlineKeyboardButton(
-            f"❓ {T.get('faq_help', {}).get(lang, 'FAQ')}", 
+            f"â“ {T[lang].get('faq_help', {})}", 
             callback_data='help:faq'
         )
         keyboard.add(faq_btn)
@@ -706,4 +706,5 @@ def register_handlers(bot: AsyncTeleBot, db_manager: DBManager):
             
         except Exception as e:
             logger.error(f"Error handling quick action {call.data}: {e}")
-            await bot.answer_callback_query(call.id, "❌ Error processing request.")
+            await bot.answer_callback_query(call.id, "âŒ Error processing request.")
+

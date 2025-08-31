@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 General commands module
@@ -24,7 +24,7 @@ class GeneralManager:
     def __init__(self, db_manager: DBManager, bot: AsyncTeleBot):
         self.db_manager = db_manager
         self.bot = bot
-        self.config = BotConfig()
+        self.config = BotConfig
     
     async def ensure_user_exists(self, chat_id: int, user: types.User) -> None:
         """Ensure user exists in database with enhanced error handling"""
@@ -139,57 +139,57 @@ async def show_main_menu(message: types.Message, bot: AsyncTeleBot, db_manager: 
         await general_manager.ensure_user_exists(message.chat.id, message.from_user)
         
         bot_info = await bot.get_me()
-        text = T.get('start_message', {}).get(lang, "🤖 Welcome to {bot_name}!").format(
+        text = T[lang].get('start_message', {}).format(
             first_name=message.from_user.first_name or "User",
             bot_name=bot_info.first_name or "TrumpBot"
         )
         
         # Add quick stats
         stats = await general_manager.get_user_stats(message.chat.id, message.from_user.id)
-        text += f"\n\n📊 **{T.get('quick_stats', {}).get(lang, 'Quick Stats')}:**"
-        text += f"\n• {T.get('level', {}).get(lang, 'Level')}: {stats['level']}"
-        text += f"\n• {T.get('score', {}).get(lang, 'Score')}: {stats['score']}"
-        text += f"\n• {T.get('hp', {}).get(lang, 'HP')}: {stats['hp']}"
+        text += f"\n\nðŸ“Š **{T[lang].get('quick_stats', {})}:**"
+        text += f"\nâ€¢ {T[lang].get('level', {})}: {stats['level']}"
+        text += f"\nâ€¢ {T[lang].get('score', {})}: {stats['score']}"
+        text += f"\nâ€¢ {T[lang].get('hp', {})}: {stats['hp']}"
         
         # Create enhanced keyboard
         markup = types.InlineKeyboardMarkup(row_width=2)
         
         # First row - Core commands
         attack_btn = types.InlineKeyboardButton(
-            f"⚔️ {T.get('attack_button', {}).get(lang, 'Attack')}", 
+            f"âš”ï¸ {T[lang].get('attack_button', {})}", 
             callback_data='quick:attack'
         )
         stats_btn = types.InlineKeyboardButton(
-            f"📊 {T.get('stats_button', {}).get(lang, 'Stats')}", 
+            f"ðŸ“Š {T[lang].get('stats_button', {})}", 
             callback_data='quick:stats'
         )
         markup.add(attack_btn, stats_btn)
         
         # Second row - Management
         shop_btn = types.InlineKeyboardButton(
-            f"🛒 {T.get('shop_button', {}).get(lang, 'Shop')}", 
+            f"ðŸ›’ {T[lang].get('shop_button', {})}", 
             callback_data='quick:shop'
         )
         inventory_btn = types.InlineKeyboardButton(
-            f"🎒 {T.get('inventory_button', {}).get(lang, 'Inventory')}", 
+            f"ðŸŽ’ {T[lang].get('inventory_button', {})}", 
             callback_data='quick:inventory'
         )
         markup.add(shop_btn, inventory_btn)
         
         # Third row - Information
         help_btn = types.InlineKeyboardButton(
-            f"❓ {T.get('help_button', {}).get(lang, 'Help')}", 
+            f"â“ {T[lang].get('help_button', {})}", 
             callback_data='help:main'
         )
         lang_btn = types.InlineKeyboardButton(
-            f"🌐 {T.get('language_button', {}).get(lang, 'Language')}", 
+            f"ðŸŒ {T[lang].get('language_button', {})}", 
             callback_data='lang:main'
         )
         markup.add(help_btn, lang_btn)
         
         # Fourth row - Leaderboard
         leaderboard_btn = types.InlineKeyboardButton(
-            f"🏆 {T.get('leaderboard_button', {}).get(lang, 'Leaderboard')}", 
+            f"ðŸ† {T[lang].get('leaderboard_button', {})}", 
             callback_data='quick:leaderboard'
         )
         markup.add(leaderboard_btn)
@@ -205,7 +205,7 @@ async def show_main_menu(message: types.Message, bot: AsyncTeleBot, db_manager: 
         logger.error(f"Error showing main menu: {e}")
         await bot.send_message(
             message.chat.id, 
-            T.get('error_generic', {}).get(lang, "Sorry, there was an error processing your request.")
+            T[lang].get('error_generic', {})
         )
 
 async def show_user_profile(message: types.Message, bot: AsyncTeleBot, db_manager: DBManager, lang: str, target_user_id: Optional[int] = None) -> None:
@@ -226,43 +226,47 @@ async def show_user_profile(message: types.Message, bot: AsyncTeleBot, db_manage
             target_user = message.from_user
             display_name = target_user.first_name or "Unknown"
         
+        general_manager = GeneralManager(db_manager, bot)
+        await general_manager.ensure_user_exists(message.chat.id, message.from_user)
+        lang = await general_manager.get_user_language(message.chat.id, message.from_user.id)
+        
         stats = await general_manager.get_user_stats(message.chat.id, user_id)
         
-        text = f"👤 **{T.get('profile_title', {}).get(lang, 'User Profile')}:** {display_name}\n\n"
+        text = f"ðŸ‘¤ **{T[lang].get('profile_title', {})}:** {display_name}\n\n"
         
         # Basic stats
-        text += f"📊 **{T.get('statistics', {}).get(lang, 'Statistics')}:**\n"
-        text += f"• {T.get('level', {}).get(lang, 'Level')}: {stats['level']}\n"
-        text += f"• {T.get('score', {}).get(lang, 'Score')}: {stats['score']}\n"
-        text += f"• {T.get('hp', {}).get(lang, 'HP')}: {stats['hp']}/100\n\n"
+        text += f"ðŸ“Š **{T[lang].get('statistics', {})}:**\n"
+        text += f"â€¢ {T[lang].get('level', {})}: {stats['level']}\n"
+        text += f"â€¢ {T[lang].get('score', {})}: {stats['score']}\n"
+        text += f"â€¢ {T[lang].get('hp', {})}: {stats['hp']}/100\n\n"
         
         # Combat stats
-        text += f"⚔️ **{T.get('combat_stats', {}).get(lang, 'Combat Statistics')}:**\n"
-        text += f"• {T.get('total_attacks', {}).get(lang, 'Total Attacks')}: {stats['attacks']}\n"
-        text += f"• {T.get('total_damage', {}).get(lang, 'Total Damage')}: {stats['total_damage']}\n"
-        text += f"• {T.get('times_attacked', {}).get(lang, 'Times Attacked')}: {stats['times_attacked']}\n\n"
+        text += f"âš”ï¸ **{T[lang].get('combat_stats', {})}:**\n"
+        text += f"â€¢ {T[lang].get('total_attacks', {})}: {stats['attacks']}\n"
+        text += f"â€¢ {T[lang].get('total_damage', {})}: {stats['total_damage']}\n"
+        text += f"â€¢ {T[lang].get('times_attacked', {})}: {stats['times_attacked']}\n\n"
         
         # Join date
-        join_date = stats['created_at'].strftime("%Y-%m-%d") if stats.get('created_at') else "Unknown"
-        text += f"📅 {T.get('join_date', {}).get(lang, 'Joined')}: {join_date}"
+        #join_date = stats['created_at'].strftime("%Y-%m-%d") if stats.get('created_at') else "Unknown"
+        #text += f"ðŸ“… {T[lang].get('join_date', {})}: {join_date}"
         
         # Add action buttons if viewing own profile
         if user_id == message.from_user.id:
             markup = types.InlineKeyboardMarkup(row_width=2)
             
             attack_btn = types.InlineKeyboardButton(
-                f"⚔️ {T.get('attack_button', {}).get(lang, 'Attack')}", 
+                f"âš”ï¸ {T[lang].get('attack_button', {})}", 
                 callback_data='quick:attack'
             )
             inventory_btn = types.InlineKeyboardButton(
-                f"🎒 {T.get('inventory_button', {}).get(lang, 'Inventory')}", 
+                f"ðŸŽ’ {T[lang].get('inventory_button', {})}", 
                 callback_data='quick:inventory'
             )
             markup.add(attack_btn, inventory_btn)
         else:
             markup = types.InlineKeyboardMarkup()
             attack_btn = types.InlineKeyboardButton(
-                f"⚔️ {T.get('attack_user', {}).get(lang, 'Attack User')}", 
+                f"âš”ï¸ {T[lang].get('attack_user', {})}", 
                 callback_data=f'attack_user:{user_id}'
             )
             markup.add(attack_btn)
@@ -278,7 +282,7 @@ async def show_user_profile(message: types.Message, bot: AsyncTeleBot, db_manage
         logger.error(f"Error showing user profile: {e}")
         await bot.send_message(
             message.chat.id, 
-            T.get('error_generic', {}).get(lang, "Error displaying profile.")
+            T[lang].get('error_generic', {})
         )
 
 async def show_leaderboard(message: types.Message, bot: AsyncTeleBot, db_manager: DBManager, lang: str) -> None:
@@ -290,20 +294,20 @@ async def show_leaderboard(message: types.Message, bot: AsyncTeleBot, db_manager
         if not leaderboard:
             await bot.send_message(
                 message.chat.id, 
-                T.get('no_players', {}).get(lang, "No players found in this chat.")
+                T[lang].get('no_players', {})
             )
             return
         
-        text = f"🏆 **{T.get('leaderboard_title', {}).get(lang, 'Chat Leaderboard')}**\n\n"
+        text = f"ðŸ† **{T[lang].get('leaderboard_title', {})}**\n\n"
         
-        medals = ["🥇", "🥈", "🥉"]
+        medals = ["ðŸ¥‡", "ðŸ¥ˆ", "ðŸ¥‰"]
         for i, player in enumerate(leaderboard, 1):
             medal = medals[i-1] if i <= 3 else f"{i}."
             name = player.get('first_name') or player.get('username') or "Unknown"
             score = player.get('score', 0)
             level = player.get('level', 1)
             
-            text += f"{medal} **{name}** - {score} {T.get('points', {}).get(lang, 'pts')} (Lv.{level})\n"
+            text += f"{medal} **{name}** - {score} {T[lang].get('points', {})} (Lv.{level})\n"
         
         # Find current user's position
         try:
@@ -318,13 +322,13 @@ async def show_leaderboard(message: types.Message, bot: AsyncTeleBot, db_manager
             
             if user_position:
                 pos = user_position.get('position', 'N/A')
-                text += f"\n📍 {T.get('your_position', {}).get(lang, 'Your position')}: #{pos}"
+                text += f"\nðŸ“ {T[lang].get('your_position', {})}: #{pos}"
         except Exception as e:
             logger.warning(f"Error getting user position: {e}")
         
         markup = types.InlineKeyboardMarkup()
         refresh_btn = types.InlineKeyboardButton(
-            f"🔄 {T.get('refresh', {}).get(lang, 'Refresh')}", 
+            f"ðŸ”„ {T[lang].get('refresh', {})}", 
             callback_data='quick:leaderboard'
         )
         markup.add(refresh_btn)
@@ -340,7 +344,7 @@ async def show_leaderboard(message: types.Message, bot: AsyncTeleBot, db_manager
         logger.error(f"Error showing leaderboard: {e}")
         await bot.send_message(
             message.chat.id, 
-            T.get('error_generic', {}).get(lang, "Error displaying leaderboard.")
+            T[lang].get('error_generic', {})
         )
 
 async def show_chat_stats(message: types.Message, bot: AsyncTeleBot, db_manager: DBManager, lang: str) -> None:
@@ -349,19 +353,19 @@ async def show_chat_stats(message: types.Message, bot: AsyncTeleBot, db_manager:
         general_manager = GeneralManager(db_manager, bot)
         stats = await general_manager.get_chat_statistics(message.chat.id)
         
-        text = f"📈 **{T.get('chat_stats_title', {}).get(lang, 'Chat Statistics')}**\n\n"
+        text = f"ðŸ“ˆ **{T[lang].get('chat_stats_title', {})}**\n\n"
         
-        text += f"👥 {T.get('total_players', {}).get(lang, 'Total Players')}: {stats['total_players']}\n"
-        text += f"⚔️ {T.get('total_attacks', {}).get(lang, 'Total Attacks')}: {stats['total_attacks']}\n"
-        text += f"📊 {T.get('average_level', {}).get(lang, 'Average Level')}: {stats['average_level']}\n"
+        text += f"ðŸ‘¥ {T[lang].get('total_players', {})}: {stats['total_players']}\n"
+        text += f"âš”ï¸ {T[lang].get('total_attacks', {})}: {stats['total_attacks']}\n"
+        text += f"ðŸ“Š {T[lang].get('average_level', {})}: {stats['average_level']}\n"
         
         if stats['top_attacker_id']:
             try:
                 top_attacker_member = await bot.get_chat_member(message.chat.id, stats['top_attacker_id'])
                 attacker_name = top_attacker_member.user.first_name or "Unknown"
-                text += f"\n🏆 {T.get('most_active_attacker', {}).get(lang, 'Most Active Attacker')}: {attacker_name} ({stats['top_attacker_attacks']} attacks)"
+                text += f"\nðŸ† {T[lang].get('most_active_attacker', {})}: {attacker_name} ({stats['top_attacker_attacks']} attacks)"
             except Exception:
-                text += f"\n🏆 {T.get('most_active_attacker', {}).get(lang, 'Most Active Attacker')}: Unknown ({stats['top_attacker_attacks']} attacks)"
+                text += f"\nðŸ† {T[lang].get('most_active_attacker', {})}: Unknown ({stats['top_attacker_attacks']} attacks)"
         
         await bot.send_message(
             message.chat.id, 
@@ -373,15 +377,17 @@ async def show_chat_stats(message: types.Message, bot: AsyncTeleBot, db_manager:
         logger.error(f"Error showing chat stats: {e}")
         await bot.send_message(
             message.chat.id, 
-            T.get('error_generic', {}).get(lang, "Error displaying chat statistics.")
+            T[lang].get('error_generic', {})
         )
 
 async def handle_quick_callback(call: types.CallbackQuery, bot: AsyncTeleBot, db_manager: DBManager) -> None:
     """Handle quick action callbacks from main menu"""
     try:
         action = call.data.replace('quick:', '')
-        lang = await helpers.get_lang(call.message.chat.id, call.from_user.id, db_manager)
-        
+        general_manager = GeneralManager(db_manager, bot)
+        await general_manager.ensure_user_exists(call.message.chat.id, call.from_user)
+        lang = await general_manager.get_user_language(call.message.chat.id, call.from_user.id)
+
         if action == 'attack':
             # Import here to avoid circular imports
             from src.commands.attack import show_attack_menu
@@ -411,14 +417,14 @@ async def handle_quick_callback(call: types.CallbackQuery, bot: AsyncTeleBot, db
         elif action == 'shop':
             await bot.answer_callback_query(
                 call.id, 
-                T.get('shop_coming_soon', {}).get(lang, "Shop coming soon!"),
+                T[lang].get('shop_coming_soon', {}),
                 show_alert=True
             )
             
         elif action == 'inventory':
             await bot.answer_callback_query(
                 call.id, 
-                T.get('inventory_coming_soon', {}).get(lang, "Inventory coming soon!"),
+                T[lang].get('inventory_coming_soon', {}),
                 show_alert=True
             )
             
@@ -471,27 +477,25 @@ async def handle_language_callback(call: types.CallbackQuery, bot: AsyncTeleBot,
         if call.data == 'lang:main':
             # Show language selection menu
             markup = types.InlineKeyboardMarkup(row_width=2)
-            en_button = types.InlineKeyboardButton("🇬🇧 English", callback_data='lang:en')
-            fa_button = types.InlineKeyboardButton("🇮🇷 فارسی", callback_data='lang:fa')
+            en_button = types.InlineKeyboardButton("ðŸ‡¬ðŸ‡§ English", callback_data='lang:en')
+            fa_button = types.InlineKeyboardButton("ðŸ‡®ðŸ‡· ÙØ§Ø±Ø³ÛŒ", callback_data='lang:fa')
             markup.add(en_button, fa_button)
             
             current_lang = await helpers.get_lang(call.message.chat.id, call.from_user.id, db_manager)
             await bot.edit_message_text(
-                T.get('language_selection', {}).get(current_lang, "🌐 Select your language:"),
+                T[current_lang].get('language_selection', {}).get(current_lang, "ðŸŒ Select your language:"),
                 call.message.chat.id,
                 call.message.message_id,
                 reply_markup=markup
             )
         else:
             # Set language
-            new_lang = call.data.replace('lang:', '')
+            new_lang = call.data.split(':')[1]
             if new_lang in ['en', 'fa']:
-                await db_manager.db(
-                    "UPDATE players SET language=%s WHERE chat_id=%s AND user_id=%s",
-                    (new_lang, call.message.chat.id, call.from_user.id)
-                )
-                
-                success_msg = T.get('language_changed', {}).get(new_lang, "✅ Language changed successfully!")
+
+                await helpers.set_lang(call.message.chat.id, call.from_user.id, new_lang, db_manager)
+
+                success_msg = T[new_lang].get('language_changed', {}).get(new_lang, "âœ… Language changed successfully!")
                 await bot.edit_message_text(
                     success_msg,
                     call.message.chat.id,
@@ -617,13 +621,13 @@ def register_handlers(bot: AsyncTeleBot, db_manager: DBManager) -> None:
             lang = await general_manager.get_user_language(message.chat.id, message.from_user.id)
             
             markup = types.InlineKeyboardMarkup(row_width=2)
-            en_button = types.InlineKeyboardButton("🇬🇧 English", callback_data='lang:en')
-            fa_button = types.InlineKeyboardButton("🇮🇷 فارسی", callback_data='lang:fa')
+            en_button = types.InlineKeyboardButton("ðŸ‡¬ðŸ‡§ English", callback_data='lang:en')
+            fa_button = types.InlineKeyboardButton("ðŸ‡®ðŸ‡· ÙØ§Ø±Ø³ÛŒ", callback_data='lang:fa')
             markup.add(en_button, fa_button)
             
             await bot.send_message(
                 message.chat.id, 
-                T.get('language_selection', {}).get(lang, "🌐 Select your language:"), 
+                T[lang].get('language_selection', {}), 
                 reply_markup=markup
             )
             
@@ -654,3 +658,5 @@ def register_handlers(bot: AsyncTeleBot, db_manager: DBManager) -> None:
         except Exception as e:
             logger.error(f"Error in help callback: {e}")
             await bot.answer_callback_query(call.id, "Error displaying help.")
+
+

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 TG Stars commands and handling module with comprehensive functionality
@@ -95,51 +95,51 @@ class StarsManager:
             stars_balance = await self.get_user_stars_balance(message.chat.id, message.from_user.id)
             
             # Build dashboard message
-            dashboard_text = f"💎 <b>{T['stars_welcome'][lang]}</b>\n\n"
-            dashboard_text += f"⭐ <b>{T['stars_balance_overview'][lang]}</b>\n"
-            dashboard_text += f"{T['current_stars_balance'][lang].format(stars=stars_balance)}\n\n"
-            dashboard_text += f"📝 <b>{T['stars_description'][lang]}</b>\n\n"
+            dashboard_text = f"ðŸ’Ž <b>{T[lang]['stars_welcome'][lang]}</b>\n\n"
+            dashboard_text += f"â­ <b>{T[lang]['stars_balance_overview'][lang]}</b>\n"
+            dashboard_text += f"{T[lang]['current_stars_balance'][lang].format(stars=stars_balance)}\n\n"
+            dashboard_text += f"ðŸ“ <b>{T[lang]['stars_description'][lang]}</b>\n\n"
             
             # Add features section
-            dashboard_text += f"🌟 <b>{T['premium_features'][lang]}</b>\n"
-            dashboard_text += f"{T['feature_exclusive_weapons'][lang]}\n"
-            dashboard_text += f"{T['feature_special_abilities'][lang]}\n"
-            dashboard_text += f"{T['feature_premium_support'][lang]}\n"
-            dashboard_text += f"{T['feature_advanced_stats'][lang]}\n"
-            dashboard_text += f"{T['feature_custom_themes'][lang]}\n"
-            dashboard_text += f"{T['feature_early_access'][lang]}"
+            dashboard_text += f"ðŸŒŸ <b>{T[lang]['premium_features'][lang]}</b>\n"
+            dashboard_text += f"{T[lang]['feature_exclusive_weapons'][lang]}\n"
+            dashboard_text += f"{T[lang]['feature_special_abilities'][lang]}\n"
+            dashboard_text += f"{T[lang]['feature_premium_support'][lang]}\n"
+            dashboard_text += f"{T[lang]['feature_advanced_stats'][lang]}\n"
+            dashboard_text += f"{T[lang]['feature_custom_themes'][lang]}\n"
+            dashboard_text += f"{T[lang]['feature_early_access'][lang]}"
             
             keyboard = types.InlineKeyboardMarkup(row_width=2)
             
             # Main action buttons
             premium_shop_btn = types.InlineKeyboardButton(
-                f"🛒 {T['view_premium_shop'][lang]}", 
+                f"ðŸ›’ {T[lang]['view_premium_shop'][lang]}", 
                 callback_data="stars:premium_shop"
             )
             history_btn = types.InlineKeyboardButton(
-                f"📊 {T['view_history'][lang]}", 
+                f"ðŸ“Š {T[lang]['view_history'][lang]}", 
                 callback_data="stars:history"
             )
             keyboard.add(premium_shop_btn, history_btn)
             
             # Additional features
             buy_stars_btn = types.InlineKeyboardButton(
-                f"💰 {T['buy_stars'][lang]}", 
+                f"ðŸ’° {T[lang]['buy_stars'][lang]}", 
                 callback_data="stars:buy_stars"
             )
             help_btn = types.InlineKeyboardButton(
-                f"🆘 {T['stars_help'][lang]}", 
+                f"ðŸ†˜ {T[lang]['stars_help'][lang]}", 
                 callback_data="stars:help"
             )
             keyboard.add(buy_stars_btn, help_btn)
             
             # Utility buttons
             refresh_btn = types.InlineKeyboardButton(
-                f"🔄 {T['refresh_balance'][lang]}", 
+                f"ðŸ”„ {T[lang]['refresh_balance'][lang]}", 
                 callback_data="stars:refresh"
             )
             close_btn = types.InlineKeyboardButton(
-                f"❌ {T['close_stars_menu'][lang]}", 
+                f"âŒ {T[lang]['close_stars_menu'][lang]}", 
                 callback_data="stars:close"
             )
             keyboard.add(refresh_btn, close_btn)
@@ -155,7 +155,7 @@ class StarsManager:
             logger.error(f"Error showing stars dashboard: {e}")
             await bot.send_message(
                 message.chat.id, 
-                "❌ Error displaying TG Stars dashboard. Please try again."
+                "âŒ Error displaying TG Stars dashboard. Please try again."
             )
     
     async def show_premium_shop(self, bot: AsyncTeleBot, call: types.CallbackQuery):
@@ -168,15 +168,15 @@ class StarsManager:
             if not premium_items:
                 await bot.answer_callback_query(
                     call.id, 
-                    T['stars_error_item_unavailable'][lang], 
+                    T[lang]['stars_error_item_unavailable'][lang], 
                     show_alert=True
                 )
                 return
             
             # Build premium shop message
-            shop_text = f"🛒 <b>{T['premium_catalog'][lang]}</b>\n\n"
-            shop_text += f"⭐ {T['current_stars_balance'][lang].format(stars=stars_balance)}\n\n"
-            shop_text += f"💎 <b>{T['exclusive_items'][lang]}</b>:\n\n"
+            shop_text = f"ðŸ›’ <b>{T[lang]['premium_catalog'][lang]}</b>\n\n"
+            shop_text += f"â­ {T[lang]['current_stars_balance'][lang].format(stars=stars_balance)}\n\n"
+            shop_text += f"ðŸ’Ž <b>{T[lang]['exclusive_items'][lang]}</b>:\n\n"
             
             keyboard = types.InlineKeyboardMarkup(row_width=1)
             
@@ -190,21 +190,21 @@ class StarsManager:
                 # Build item description
                 item_desc = f"{emoji} <b>{item_name}</b>\n"
                 if stats.get('damage'):
-                    item_desc += f"⚔️ {T['damage'][lang]}: {stats['damage']}\n"
+                    item_desc += f"âš”ï¸ {T[lang]['damage'][lang]}: {stats['damage']}\n"
                 if stats.get('duration_seconds'):
                     hours = stats['duration_seconds'] // 3600
-                    item_desc += f"⏱️ {T['duration'][lang]}: {hours} {T['hours'][lang]}\n"
+                    item_desc += f"â±ï¸ {T[lang]['duration'][lang]}: {hours} {T[lang]['hours'][lang]}\n"
                 
                 shop_text += item_desc
-                shop_text += f"💰 {T['item_requires_stars'][lang].format(price=price)}\n"
+                shop_text += f"ðŸ’° {T[lang]['item_requires_stars'][lang].format(price=price)}\n"
                 
                 # Can afford check
                 can_afford = await self.can_afford_premium_item(call.message.chat.id, call.from_user.id, item_id)
                 if can_afford:
-                    button_text = f"✅ {emoji} {item_name} - ⭐{price}"
+                    button_text = f"âœ… {emoji} {item_name} - â­{price}"
                     callback_data = f"stars:buy:{item_id}"
                 else:
-                    button_text = f"❌ {emoji} {item_name} - ⭐{price}"
+                    button_text = f"âŒ {emoji} {item_name} - â­{price}"
                     callback_data = f"stars:insufficient:{item_id}"
                 
                 item_btn = types.InlineKeyboardButton(button_text, callback_data=callback_data)
@@ -213,11 +213,11 @@ class StarsManager:
             
             # Navigation buttons
             back_btn = types.InlineKeyboardButton(
-                f"🔙 {T['back_btn'][lang]}", 
+                f"ðŸ”™ {T[lang]['back_btn'][lang]}", 
                 callback_data="stars:main"
             )
             close_btn = types.InlineKeyboardButton(
-                f"❌ {T['close_stars_menu'][lang]}", 
+                f"âŒ {T[lang]['close_stars_menu'][lang]}", 
                 callback_data="stars:close"
             )
             keyboard.add(back_btn, close_btn)
@@ -232,7 +232,7 @@ class StarsManager:
             
         except Exception as e:
             logger.error(f"Error showing premium shop: {e}")
-            await bot.answer_callback_query(call.id, T['stars_error_generic'][lang])
+            await bot.answer_callback_query(call.id, T[lang]['stars_error_generic'][lang])
     
     async def show_transaction_history(self, bot: AsyncTeleBot, call: types.CallbackQuery):
         """Display user's transaction history"""
@@ -240,25 +240,25 @@ class StarsManager:
             lang = await helpers.get_lang(call.message.chat.id, call.from_user.id, self.db_manager)
             transactions = await self.get_transaction_history(call.message.chat.id, call.from_user.id)
             
-            history_text = f"📊 <b>{T['transaction_history'][lang]}</b>\n\n"
+            history_text = f"ðŸ“Š <b>{T[lang]['transaction_history'][lang]}</b>\n\n"
             
             if not transactions:
-                history_text += f"{T['no_transactions'][lang]}\n\n"
-                history_text += f"💡 {T['stars_purchase_info'][lang]}"
+                history_text += f"{T[lang]['no_transactions'][lang]}\n\n"
+                history_text += f"ðŸ’¡ {T[lang]['stars_purchase_info'][lang]}"
             else:
                 for tx in transactions:
                     item_name = get_item_display_name(tx['item_id'], lang)
                     emoji = get_item_emoji(tx['item_id'])
-                    status_emoji = "✅" if tx['status'] == 'completed' else "⏳" if tx['status'] == 'pending' else "❌"
+                    status_emoji = "âœ…" if tx['status'] == 'completed' else "â³" if tx['status'] == 'pending' else "âŒ"
                     
                     history_text += f"{status_emoji} {emoji} <b>{item_name}</b>\n"
-                    history_text += f"💰 {tx['amount']} ⭐ | {tx['date'].strftime('%Y-%m-%d %H:%M')}\n"
-                    history_text += f"📋 {T[f'transaction_{tx["status"]}'][lang]}\n\n"
+                    history_text += f"ðŸ’° {tx['amount']} â­ | {tx['date'].strftime('%Y-%m-%d %H:%M')}\n"
+                    history_text += f"ðŸ“‹ {T[lang][f'transaction_{tx["status"]}'][lang]}\n\n"
             
             keyboard = types.InlineKeyboardMarkup()
             keyboard.add(
-                types.InlineKeyboardButton(f"🔙 {T['back_btn'][lang]}", callback_data="stars:main"),
-                types.InlineKeyboardButton(f"❌ {T['close_stars_menu'][lang]}", callback_data="stars:close")
+                types.InlineKeyboardButton(f"ðŸ”™ {T[lang]['back_btn'][lang]}", callback_data="stars:main"),
+                types.InlineKeyboardButton(f"âŒ {T[lang]['close_stars_menu'][lang]}", callback_data="stars:close")
             )
             
             await bot.edit_message_text(
@@ -271,59 +271,59 @@ class StarsManager:
             
         except Exception as e:
             logger.error(f"Error showing transaction history: {e}")
-            await bot.answer_callback_query(call.id, T['stars_error_generic'][lang])
+            await bot.answer_callback_query(call.id, T[lang]['stars_error_generic'][lang])
     
     async def show_stars_help(self, bot: AsyncTeleBot, call: types.CallbackQuery):
         """Display TG Stars help and FAQ"""
         try:
             lang = await helpers.get_lang(call.message.chat.id, call.from_user.id, self.db_manager)
             
-            help_text = f"🆘 <b>{T['stars_help'][lang]}</b>\n\n"
-            help_text += f"❓ <b>{T['stars_faq'][lang]}</b>\n\n"
+            help_text = f"ðŸ†˜ <b>{T[lang]['stars_help'][lang]}</b>\n\n"
+            help_text += f"â“ <b>{T[lang]['stars_faq'][lang]}</b>\n\n"
             
             if lang == "fa":
                 help_text += """
-<b>🌟 ستاره‌های تلگرام چیست؟</b>
-ستاره‌های تلگرام ارز ویژه‌ای هستند که توسط تلگرام ارائه می‌شوند و برای خرید آیتم‌ها و ویژگی‌های ویژه استفاده می‌شوند.
+<b>ðŸŒŸ Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù… Ú†ÛŒØ³ØªØŸ</b>
+Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù… Ø§Ø±Ø² ÙˆÛŒÚ˜Ù‡â€ŒØ§ÛŒ Ù‡Ø³ØªÙ†Ø¯ Ú©Ù‡ ØªÙˆØ³Ø· ØªÙ„Ú¯Ø±Ø§Ù… Ø§Ø±Ø§Ø¦Ù‡ Ù…ÛŒâ€ŒØ´ÙˆÙ†Ø¯ Ùˆ Ø¨Ø±Ø§ÛŒ Ø®Ø±ÛŒØ¯ Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ Ùˆ ÙˆÛŒÚ˜Ú¯ÛŒâ€ŒÙ‡Ø§ÛŒ ÙˆÛŒÚ˜Ù‡ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ù…ÛŒâ€ŒØ´ÙˆÙ†Ø¯.
 
-<b>💰 چگونه ستاره‌های تلگرام خریداری کنم؟</b>
-می‌توانید مستقیماً از طریق سیستم پرداخت تلگرام ستاره‌های تلگرام خریداری کنید.
+<b>ðŸ’° Ú†Ú¯ÙˆÙ†Ù‡ Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù… Ø®Ø±ÛŒØ¯Ø§Ø±ÛŒ Ú©Ù†Ù…ØŸ</b>
+Ù…ÛŒâ€ŒØªÙˆØ§Ù†ÛŒØ¯ Ù…Ø³ØªÙ‚ÛŒÙ…Ø§Ù‹ Ø§Ø² Ø·Ø±ÛŒÙ‚ Ø³ÛŒØ³ØªÙ… Ù¾Ø±Ø¯Ø§Ø®Øª ØªÙ„Ú¯Ø±Ø§Ù… Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù… Ø®Ø±ÛŒØ¯Ø§Ø±ÛŒ Ú©Ù†ÛŒØ¯.
 
-<b>🛒 چه آیتم‌هایی با ستاره‌های تلگرام قابل خرید هستند؟</b>
-آیتم‌های ویژه و انحصاری که در فروشگاه ویژه موجود هستند، شامل تسلیحات پیشرفته و توانایی‌های ویژه.
+<b>ðŸ›’ Ú†Ù‡ Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ÛŒÛŒ Ø¨Ø§ Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù… Ù‚Ø§Ø¨Ù„ Ø®Ø±ÛŒØ¯ Ù‡Ø³ØªÙ†Ø¯ØŸ</b>
+Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ÛŒ ÙˆÛŒÚ˜Ù‡ Ùˆ Ø§Ù†Ø­ØµØ§Ø±ÛŒ Ú©Ù‡ Ø¯Ø± ÙØ±ÙˆØ´Ú¯Ø§Ù‡ ÙˆÛŒÚ˜Ù‡ Ù…ÙˆØ¬ÙˆØ¯ Ù‡Ø³ØªÙ†Ø¯ØŒ Ø´Ø§Ù…Ù„ ØªØ³Ù„ÛŒØ­Ø§Øª Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ùˆ ØªÙˆØ§Ù†Ø§ÛŒÛŒâ€ŒÙ‡Ø§ÛŒ ÙˆÛŒÚ˜Ù‡.
 
-<b>🔄 آیا ستاره‌های تلگرام قابل بازگشت هستند؟</b>
-بر اساس سیاست‌های تلگرام، ستاره‌های تلگرام معمولاً قابل بازگشت نیستند.
+<b>ðŸ”„ Ø¢ÛŒØ§ Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù… Ù‚Ø§Ø¨Ù„ Ø¨Ø§Ø²Ú¯Ø´Øª Ù‡Ø³ØªÙ†Ø¯ØŸ</b>
+Ø¨Ø± Ø§Ø³Ø§Ø³ Ø³ÛŒØ§Ø³Øªâ€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù…ØŒ Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù… Ù…Ø¹Ù…ÙˆÙ„Ø§Ù‹ Ù‚Ø§Ø¨Ù„ Ø¨Ø§Ø²Ú¯Ø´Øª Ù†ÛŒØ³ØªÙ†Ø¯.
 
-<b>📱 آیا می‌توانم ستاره‌های تلگرام را انتقال دهم؟</b>
-ستاره‌های تلگرام قابل انتقال به سایر کاربران نیستند.
+<b>ðŸ“± Ø¢ÛŒØ§ Ù…ÛŒâ€ŒØªÙˆØ§Ù†Ù… Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù… Ø±Ø§ Ø§Ù†ØªÙ‚Ø§Ù„ Ø¯Ù‡Ù…ØŸ</b>
+Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù… Ù‚Ø§Ø¨Ù„ Ø§Ù†ØªÙ‚Ø§Ù„ Ø¨Ù‡ Ø³Ø§ÛŒØ± Ú©Ø§Ø±Ø¨Ø±Ø§Ù† Ù†ÛŒØ³ØªÙ†Ø¯.
                 """
             else:
                 help_text += """
-<b>🌟 What are TG Stars?</b>
+<b>ðŸŒŸ What are TG Stars?</b>
 TG Stars are a premium currency provided by Telegram for purchasing special items and features.
 
-<b>💰 How do I buy TG Stars?</b>
+<b>ðŸ’° How do I buy TG Stars?</b>
 You can purchase TG Stars directly through Telegram's payment system.
 
-<b>🛒 What can I buy with TG Stars?</b>
+<b>ðŸ›’ What can I buy with TG Stars?</b>
 Exclusive premium items available in the premium shop, including advanced weapons and special abilities.
 
-<b>🔄 Are TG Stars refundable?</b>
+<b>ðŸ”„ Are TG Stars refundable?</b>
 According to Telegram's policies, TG Stars are generally non-refundable.
 
-<b>📱 Can I transfer TG Stars?</b>
+<b>ðŸ“± Can I transfer TG Stars?</b>
 TG Stars cannot be transferred to other users.
                 """
             
             keyboard = types.InlineKeyboardMarkup()
             keyboard.add(
-                types.InlineKeyboardButton(f"📞 {T['stars_support'][lang]}", url="https://t.me/TrumpBotSupport"),
-                types.InlineKeyboardButton(f"📜 {T['stars_terms'][lang]}", callback_data="stars:terms")
+                types.InlineKeyboardButton(f"ðŸ“ž {T[lang]['stars_support'][lang]}", url="https://t.me/TrumpBotSupport"),
+                types.InlineKeyboardButton(f"ðŸ“œ {T[lang]['stars_terms'][lang]}", callback_data="stars:terms")
             )
             keyboard.add(
-                types.InlineKeyboardButton(f"🔙 {T['back_btn'][lang]}", callback_data="stars:main"),
-                types.InlineKeyboardButton(f"❌ {T['close_stars_menu'][lang]}", callback_data="stars:close")
+                types.InlineKeyboardButton(f"ðŸ”™ {T[lang]['back_btn'][lang]}", callback_data="stars:main"),
+                types.InlineKeyboardButton(f"âŒ {T[lang]['close_stars_menu'][lang]}", callback_data="stars:close")
             )
             
             await bot.edit_message_text(
@@ -336,7 +336,7 @@ TG Stars cannot be transferred to other users.
             
         except Exception as e:
             logger.error(f"Error showing stars help: {e}")
-            await bot.answer_callback_query(call.id, T['stars_error_generic'][lang])
+            await bot.answer_callback_query(call.id, T[lang]['stars_error_generic'][lang])
     
     async def handle_stars_callback(self, bot: AsyncTeleBot, call: types.CallbackQuery):
         """Handle all TG Stars related callbacks"""
@@ -348,30 +348,30 @@ TG Stars cannot be transferred to other users.
             if action == "main":
                 # Refresh the main dashboard
                 stars_balance = await self.get_user_stars_balance(call.message.chat.id, call.from_user.id)
-                dashboard_text = f"💎 <b>{T['stars_welcome'][lang]}</b>\n\n"
-                dashboard_text += f"⭐ <b>{T['stars_balance_overview'][lang]}</b>\n"
-                dashboard_text += f"{T['current_stars_balance'][lang].format(stars=stars_balance)}\n\n"
-                dashboard_text += f"📝 <b>{T['stars_description'][lang]}</b>\n\n"
-                dashboard_text += f"🌟 <b>{T['premium_features'][lang]}</b>\n"
-                dashboard_text += f"{T['feature_exclusive_weapons'][lang]}\n"
-                dashboard_text += f"{T['feature_special_abilities'][lang]}\n"
-                dashboard_text += f"{T['feature_premium_support'][lang]}\n"
-                dashboard_text += f"{T['feature_advanced_stats'][lang]}\n"
-                dashboard_text += f"{T['feature_custom_themes'][lang]}\n"
-                dashboard_text += f"{T['feature_early_access'][lang]}"
+                dashboard_text = f"ðŸ’Ž <b>{T[lang]['stars_welcome'][lang]}</b>\n\n"
+                dashboard_text += f"â­ <b>{T[lang]['stars_balance_overview'][lang]}</b>\n"
+                dashboard_text += f"{T[lang]['current_stars_balance'][lang].format(stars=stars_balance)}\n\n"
+                dashboard_text += f"ðŸ“ <b>{T[lang]['stars_description'][lang]}</b>\n\n"
+                dashboard_text += f"ðŸŒŸ <b>{T[lang]['premium_features'][lang]}</b>\n"
+                dashboard_text += f"{T[lang]['feature_exclusive_weapons'][lang]}\n"
+                dashboard_text += f"{T[lang]['feature_special_abilities'][lang]}\n"
+                dashboard_text += f"{T[lang]['feature_premium_support'][lang]}\n"
+                dashboard_text += f"{T[lang]['feature_advanced_stats'][lang]}\n"
+                dashboard_text += f"{T[lang]['feature_custom_themes'][lang]}\n"
+                dashboard_text += f"{T[lang]['feature_early_access'][lang]}"
 
                 keyboard = types.InlineKeyboardMarkup(row_width=2)
                 keyboard.add(
-                    types.InlineKeyboardButton(f"🛒 {T['view_premium_shop'][lang]}", callback_data="stars:premium_shop"),
-                    types.InlineKeyboardButton(f"📊 {T['view_history'][lang]}", callback_data="stars:history")
+                    types.InlineKeyboardButton(f"ðŸ›’ {T[lang]['view_premium_shop'][lang]}", callback_data="stars:premium_shop"),
+                    types.InlineKeyboardButton(f"ðŸ“Š {T[lang]['view_history'][lang]}", callback_data="stars:history")
                 )
                 keyboard.add(
-                    types.InlineKeyboardButton(f"💰 {T['buy_stars'][lang]}", callback_data="stars:buy_stars"),
-                    types.InlineKeyboardButton(f"🆘 {T['stars_help'][lang]}", callback_data="stars:help")
+                    types.InlineKeyboardButton(f"ðŸ’° {T[lang]['buy_stars'][lang]}", callback_data="stars:buy_stars"),
+                    types.InlineKeyboardButton(f"ðŸ†˜ {T[lang]['stars_help'][lang]}", callback_data="stars:help")
                 )
                 keyboard.add(
-                    types.InlineKeyboardButton(f"🔄 {T['refresh_balance'][lang]}", callback_data="stars:refresh"),
-                    types.InlineKeyboardButton(f"❌ {T['close_stars_menu'][lang]}", callback_data="stars:close")
+                    types.InlineKeyboardButton(f"ðŸ”„ {T[lang]['refresh_balance'][lang]}", callback_data="stars:refresh"),
+                    types.InlineKeyboardButton(f"âŒ {T[lang]['close_stars_menu'][lang]}", callback_data="stars:close")
                 )
 
                 await bot.edit_message_text(
@@ -393,7 +393,7 @@ TG Stars cannot be transferred to other users.
             
             elif action == "buy":
                 item_id = data_parts[2] if len(data_parts) > 2 else ""
-                await self._initiate_purchase(call, bot, self.db_manager, lang, item_id)
+                await self._initiate_purchase(call, bot, lang, item_id)
             
             elif action == "insufficient":
                 item_id = data_parts[2] if len(data_parts) > 2 else ""
@@ -404,19 +404,19 @@ TG Stars cannot be transferred to other users.
                 
                 await bot.answer_callback_query(
                     call.id,
-                    T['insufficient_stars'][lang].format(required=needed),
+                    T[lang]['insufficient_stars'][lang].format(required=needed),
                     show_alert=True
                 )
             
             elif action == "buy_stars":
                 await bot.answer_callback_query(
                     call.id,
-                    T['stars_purchase_info'][lang],
+                    T[lang]['stars_purchase_info'][lang],
                     show_alert=True
                 )
             
             elif action == "refresh":
-                await bot.answer_callback_query(call.id, "🔄 Balance refreshed!")
+                await bot.answer_callback_query(call.id, "ðŸ”„ Balance refreshed!")
                 # Trigger main dashboard refresh
                 await self.handle_stars_callback(bot, types.CallbackQuery(
                     id=call.id,
@@ -432,87 +432,211 @@ TG Stars cannot be transferred to other users.
             
         except Exception as e:
             logger.error(f"Error handling stars callback: {e}")
-            await bot.answer_callback_query(call.id, "❌ Error processing request.")
-
-
-async def _initiate_purchase(call: types.CallbackQuery, bot: AsyncTeleBot, db_manager: DBManager, lang: str, item_id: str):
-    """Creates an invoice for a TG Stars purchase."""
-    item = ITEMS.get(item_id)
-    if not item or item.get('payment') != 'tg_stars':
-        await bot.answer_callback_query(call.id, T['item_not_found'][lang], show_alert=True)
-        return
-
-    price = item.get('stars_price', 0)
-    if price <= 0:
-        await bot.answer_callback_query(call.id, T['item_not_for_sale'][lang], show_alert=True)
-        return
-
-    # Create an invoice
-    item_name = get_item_display_name(item_id, lang)
-    invoice = types.LabeledPrice(label=item_name, amount=price)
+            await bot.answer_callback_query(call.id, "âŒ Error processing request.")
     
-    # The payload should contain information to identify the purchase later
-    payload = f"purchase:{item_id}:{call.from_user.id}"
+    async def _initiate_purchase(self, call: types.CallbackQuery, bot: AsyncTeleBot, lang: str, item_id: str):
+        """Creates an invoice for a TG Stars purchase."""
+        try:
+            item = ITEMS.get(item_id)
+            if not item or item.get('payment') != 'tg_stars':
+                await bot.answer_callback_query(
+                    call.id, 
+                    T[lang]['item_not_found'][lang] if lang == 'fa' else "âŒ Item not found or not available for TG Stars purchase.",
+                    show_alert=True
+                )
+                return
 
-    try:
-        await bot.send_invoice(
-            chat_id=call.message.chat.id,
-            title=T['invoice_title'][lang],
-            description=T['invoice_description'][lang].format(item_name=item_name),
-            invoice_payload=payload,
-            provider_token='',  # No provider token needed for Stars
-            currency='XTR',
-            prices=[invoice]
-        )
-    except Exception as e:
-        logger.error(f"Failed to create TG Stars invoice: {e}")
-        await bot.answer_callback_query(call.id, T['invoice_creation_failed'][lang], show_alert=True)
+            price = item.get('stars_price', 0)
+            if price <= 0:
+                await bot.answer_callback_query(
+                    call.id, 
+                    T[lang]['item_not_for_sale'][lang] if lang == 'fa' else "âŒ This item is not for sale.",
+                    show_alert=True
+                )
+                return
+
+            # Create an invoice
+            item_name = get_item_display_name(item_id, lang)
+            invoice = types.LabeledPrice(label=item_name, amount=price)
+            
+            # The payload should contain information to identify the purchase later
+            payload = f"purchase:{item_id}:{call.from_user.id}"
+
+            # Invoice titles and descriptions in both languages
+            if lang == 'fa':
+                title = f"ðŸŒŸ Ø®Ø±ÛŒØ¯ {item_name}"
+                description = f"Ø®Ø±ÛŒØ¯ {item_name} Ø¨Ø§ {price} Ø³ØªØ§Ø±Ù‡ ØªÙ„Ú¯Ø±Ø§Ù…\n\nðŸ’Ž Ø¢ÛŒØªÙ… Ù¾Ø±ÛŒÙ…ÛŒÙˆÙ… Ø§Ù†Ø­ØµØ§Ø±ÛŒ\nðŸ”¥ Ø¯Ø³ØªØ±Ø³ÛŒ ÙÙˆØ±ÛŒ Ù¾Ø³ Ø§Ø² Ù¾Ø±Ø¯Ø§Ø®Øª"
+            else:
+                title = f"ðŸŒŸ Purchase {item_name}"
+                description = f"Purchase {item_name} for {price} Telegram Stars\n\nðŸ’Ž Exclusive premium item\nðŸ”¥ Instant access after payment"
+
+            await bot.send_invoice(
+                chat_id=call.message.chat.id,
+                title=title,
+                description=description,
+                invoice_payload=payload,
+                provider_token='',  # No provider token needed for Stars
+                currency='XTR',
+                prices=[invoice]
+            )
+            
+            # Send confirmation message
+            confirmation_msg = (
+                f"âœ¨ {T[lang]['invoice_sent'][lang] if lang == 'fa' else 'Invoice sent successfully!'}\n\n"
+                f"ðŸ’° {T[lang]['total_cost'][lang] if lang == 'fa' else 'Total cost'}: {price} â­\n"
+                f"ðŸ›’ {T[lang]['item'][lang] if lang == 'fa' else 'Item'}: {item_name}\n\n"
+                f"ðŸ“‹ {T[lang]['payment_instructions'][lang] if lang == 'fa' else 'Click the invoice above to complete your purchase.'}"
+            )
+            
+            await bot.answer_callback_query(call.id, "âœ… Invoice created!")
+            
+        except Exception as e:
+            logger.error(f"Failed to create TG Stars invoice: {e}")
+            error_msg = (
+                "âŒ Ø®Ø·Ø§ Ø¯Ø± Ø§ÛŒØ¬Ø§Ø¯ ØµÙˆØ±ØªØ­Ø³Ø§Ø¨. Ù„Ø·ÙØ§Ù‹ Ù…Ø¬Ø¯Ø¯Ø§Ù‹ ØªÙ„Ø§Ø´ Ú©Ù†ÛŒØ¯." if lang == 'fa' 
+                else "âŒ Failed to create invoice. Please try again."
+            )
+            await bot.answer_callback_query(call.id, error_msg, show_alert=True)
 
 
 async def handle_pre_checkout_query(pre_checkout_query: types.PreCheckoutQuery, bot: AsyncTeleBot, db_manager: DBManager):
-    """Handles the pre-checkout query to validate the purchase."""
-    # The payload was set during invoice creation
-    payload_parts = pre_checkout_query.invoice_payload.split(':')
-    item_id = payload_parts[1]
-    user_id = int(payload_parts[2])
+    """Handles the pre-checkout query to validate the purchase with bilingual support."""
+    try:
+        # Get user language for error messages
+        lang = await helpers.get_lang(pre_checkout_query.from_user.id, pre_checkout_query.from_user.id, db_manager)
+        
+        # The payload was set during invoice creation
+        payload_parts = pre_checkout_query.invoice_payload.split(':')
+        if len(payload_parts) != 3:
+            error_msg = "Ù¾ÛŒÙ„ÙˆØ¯ Ù†Ø§Ù…Ø¹ØªØ¨Ø±" if lang == 'fa' else "Invalid payload"
+            await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=False, error_message=error_msg)
+            return
+            
+        item_id = payload_parts[1]
+        user_id = int(payload_parts[2])
 
-    # Basic validation
-    if pre_checkout_query.from_user.id != user_id:
-        await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=False, error_message="User ID mismatch.")
-        return
+        # Basic validation
+        if pre_checkout_query.from_user.id != user_id:
+            error_msg = "Ø¹Ø¯Ù… ØªØ·Ø¨ÛŒÙ‚ Ø´Ù†Ø§Ø³Ù‡ Ú©Ø§Ø±Ø¨Ø±" if lang == 'fa' else "User ID mismatch"
+            await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=False, error_message=error_msg)
+            return
 
-    item = ITEMS.get(item_id)
-    if not item or item.get('stars_price') != pre_checkout_query.total_amount:
-        await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=False, error_message="Item or price mismatch.")
-        return
+        item = ITEMS.get(item_id)
+        if not item or item.get('stars_price') != pre_checkout_query.total_amount:
+            error_msg = "Ø¹Ø¯Ù… ØªØ·Ø¨ÛŒÙ‚ Ø¢ÛŒØªÙ… ÛŒØ§ Ù‚ÛŒÙ…Øª" if lang == 'fa' else "Item or price mismatch"
+            await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=False, error_message=error_msg)
+            return
 
-    # Everything is okay, confirm the transaction
-    await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
+        # Everything is okay, confirm the transaction
+        await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
+        
+    except Exception as e:
+        logger.error(f"Error in pre-checkout validation: {e}")
+        error_msg = "Ø®Ø·Ø§ Ø¯Ø± Ø§Ø¹ØªØ¨Ø§Ø±Ø³Ù†Ø¬ÛŒ Ù¾Ø±Ø¯Ø§Ø®Øª" if lang == 'fa' else "Payment validation error"
+        await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=False, error_message=error_msg)
 
 
 async def handle_successful_payment(message: types.Message, bot: AsyncTeleBot, db_manager: DBManager):
-    """Handles a successful payment and grants the item to the user."""
-    payment_info = message.successful_payment
-    payload_parts = payment_info.invoice_payload.split(':')
-    item_id = payload_parts[1]
-    
-    # Add the item to the user's inventory
-    await db_manager.db("""
-        INSERT INTO inventories (chat_id, user_id, item, qty)
-        VALUES (%s, %s, %s, 1)
-        ON CONFLICT (chat_id, user_id, item) DO UPDATE
-        SET qty = inventories.qty + 1
-    """, (message.chat.id, message.from_user.id, item_id))
+    """Handles a successful payment and grants the item to the user with bilingual support."""
+    try:
+        lang = await helpers.get_lang(message.chat.id, message.from_user.id, db_manager)
+        payment_info = message.successful_payment
+        payload_parts = payment_info.invoice_payload.split(':')
+        
+        if len(payload_parts) != 3:
+            logger.error(f"Invalid payment payload: {payment_info.invoice_payload}")
+            return
+            
+        item_id = payload_parts[1]
+        
+        # Verify the item exists
+        item = ITEMS.get(item_id)
+        if not item:
+            logger.error(f"Unknown item purchased: {item_id}")
+            return
+        
+        # Add the item to the user's inventory
+        await db_manager.db("""
+            INSERT INTO inventories (chat_id, user_id, item, qty)
+            VALUES (%s, %s, %s, 1)
+            ON CONFLICT (chat_id, user_id, item) DO UPDATE
+            SET qty = inventories.qty + 1
+        """, (message.chat.id, message.from_user.id, item_id))
 
-    # Log the successful transaction
-    await db_manager.db("""
-        INSERT INTO tg_stars_purchases (chat_id, user_id, payment_id, item_id, stars_amount, purchase_time, status)
-        VALUES (%s, %s, %s, %s, %s, %s, 'completed')
-    """, (message.chat.id, message.from_user.id, payment_info.telegram_payment_charge_id, item_id, payment_info.total_amount, helpers.now()))
+        # Log the successful transaction
+        await db_manager.db("""
+            INSERT INTO tg_stars_purchases (chat_id, user_id, payment_id, item_id, stars_amount, purchase_time, status)
+            VALUES (%s, %s, %s, %s, %s, %s, 'completed')
+        """, (
+            message.chat.id, 
+            message.from_user.id, 
+            payment_info.telegram_payment_charge_id, 
+            item_id, 
+            payment_info.total_amount, 
+            helpers.now()
+        ))
 
-    lang = await helpers.get_lang(message.chat.id, message.from_user.id, db_manager)
-    item_name = get_item_display_name(item_id, lang)
-    await bot.send_message(message.chat.id, T['purchase_successful_stars'][lang].format(item_name=item_name))
+        # Send success message with both languages
+        item_name = get_item_display_name(item_id, lang)
+        emoji = get_item_emoji(item_id)
+        
+        if lang == 'fa':
+            success_msg = f"""ðŸŽ‰ <b>Ø®Ø±ÛŒØ¯ Ù…ÙˆÙÙ‚!</b>
+
+âœ… {emoji} <b>{item_name}</b> Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø¨Ù‡ Ø§Ù†Ø¨Ø§Ø± Ø´Ù…Ø§ Ø§Ø¶Ø§ÙÙ‡ Ø´Ø¯!
+
+ðŸ’° Ù…Ø¨Ù„Øº Ù¾Ø±Ø¯Ø§Ø®ØªÛŒ: {payment_info.total_amount} â­
+ðŸ†” Ø´Ù†Ø§Ø³Ù‡ ØªØ±Ø§Ú©Ù†Ø´: <code>{payment_info.telegram_payment_charge_id}</code>
+
+ðŸŽ® Ø§Ø² Ø¢ÛŒØªÙ… Ø¬Ø¯ÛŒØ¯ Ø®ÙˆØ¯ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ú©Ù†ÛŒØ¯!
+ðŸª Ø¨Ø±Ø§ÛŒ Ø®Ø±ÛŒØ¯ Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ÛŒ Ø¨ÛŒØ´ØªØ± Ø§Ø² Ø¯Ø³ØªÙˆØ± /stars Ø§Ø³ØªÙØ§Ø¯Ù‡ Ú©Ù†ÛŒØ¯."""
+        else:
+            success_msg = f"""ðŸŽ‰ <b>Purchase Successful!</b>
+
+âœ… {emoji} <b>{item_name}</b> has been added to your inventory!
+
+ðŸ’° Amount paid: {payment_info.total_amount} â­
+ðŸ†” Transaction ID: <code>{payment_info.telegram_payment_charge_id}</code>
+
+ðŸŽ® Enjoy your new item!
+ðŸª Use /stars command to purchase more items."""
+
+        # Create a keyboard with relevant actions
+        keyboard = types.InlineKeyboardMarkup(row_width=2)
+        
+        # View inventory button
+        inventory_btn = types.InlineKeyboardButton(
+            f"ðŸ“¦ {('Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ø§Ù†Ø¨Ø§Ø±' if lang == 'fa' else 'View Inventory')}", 
+            callback_data="inventory:show"
+        )
+        
+        # View more premium items button
+        shop_btn = types.InlineKeyboardButton(
+            f"ðŸ›’ {('ÙØ±ÙˆØ´Ú¯Ø§Ù‡ ÙˆÛŒÚ˜Ù‡' if lang == 'fa' else 'Premium Shop')}", 
+            callback_data="stars:premium_shop"
+        )
+        
+        keyboard.add(inventory_btn, shop_btn)
+        
+        await bot.send_message(
+            message.chat.id, 
+            success_msg, 
+            reply_markup=keyboard,
+            parse_mode="HTML"
+        )
+        
+        # Log successful purchase
+        logger.info(f"Successful TG Stars purchase: User {message.from_user.id} bought {item_id} for {payment_info.total_amount} stars")
+        
+    except Exception as e:
+        logger.error(f"Error handling successful payment: {e}")
+        # Send error message in user's language
+        lang = await helpers.get_lang(message.chat.id, message.from_user.id, db_manager)
+        error_msg = (
+            "âŒ Ø®Ø·Ø§ÛŒÛŒ Ø¯Ø± Ù¾Ø±Ø¯Ø§Ø²Ø´ Ù¾Ø±Ø¯Ø§Ø®Øª Ø´Ù…Ø§ Ø±Ø® Ø¯Ø§Ø¯. Ù„Ø·ÙØ§Ù‹ Ø¨Ø§ Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ ØªÙ…Ø§Ø³ Ø¨Ú¯ÛŒØ±ÛŒØ¯." if lang == 'fa'
+            else "âŒ An error occurred processing your payment. Please contact support."
+        )
+        await bot.send_message(message.chat.id, error_msg)
 
 
 def register_handlers(bot: AsyncTeleBot, db_manager: DBManager):
@@ -547,3 +671,4 @@ async def handle_stars_callback(call: types.CallbackQuery, bot: AsyncTeleBot, db
     """Legacy callback handler for backward compatibility"""
     stars_manager = StarsManager(db_manager)
     await stars_manager.handle_stars_callback(bot, call)
+

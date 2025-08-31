@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Inventory commands module
@@ -163,14 +163,13 @@ async def show_inventory_overview(message: types.Message, bot: AsyncTeleBot, db_
         
         if not inventory:
             # Empty inventory message
-            text = f"📦 **{T.get('inventory_empty_title', {}).get(lang, 'Empty Inventory')}**\n\n"
-            text += T.get('inventory_empty_message', {}).get(lang, 
-                "Your inventory is empty! Visit the shop to buy weapons and items.")
-            text += f"\n\n💡 {T.get('inventory_tip', {}).get(lang, 'Tip: Use /shop to browse available items')}"
+            text = f"📦 **{T[lang].get('inventory_empty_title', {})}**\n\n"
+            text += T[lang].get('inventory_empty_message', {})
+            text += f"\n\nðŸ’¡ {T[lang].get('inventory_tip', {})}"
             
             markup = types.InlineKeyboardMarkup()
             shop_btn = types.InlineKeyboardButton(
-                f"🛒 {T.get('open_shop', {}).get(lang, 'Open Shop')}", 
+                f"🛒 {T[lang].get('open_shop', {})}", 
                 callback_data='quick:shop'
             )
             markup.add(shop_btn)
@@ -180,25 +179,25 @@ async def show_inventory_overview(message: types.Message, bot: AsyncTeleBot, db_
         
         # Build comprehensive inventory display
         user_name = message.from_user.first_name or "Player"
-        text = f"🎒 **{T.get('inventory_title', {}).get(lang, '{name}\'s Inventory').format(name=user_name)}**\n\n"
+        text = f"🎒 **{T[lang].get('inventory_title', {}).format(name=user_name)}**\n\n"
         
         # Inventory statistics
-        text += f"📊 **{T.get('inventory_stats', {}).get(lang, 'Statistics')}:**\n"
-        text += f"• {T.get('total_items', {}).get(lang, 'Total Items')}: {stats['total_items']}\n"
-        text += f"• {T.get('total_quantity', {}).get(lang, 'Total Quantity')}: {stats['total_quantity']}\n"
-        text += f"• {T.get('total_value', {}).get(lang, 'Total Value')}: {stats['total_value']} 🏅\n"
-        
+        text += f"📊 **{T[lang].get('inventory_stats', {})}:**\n"
+        text += f"• {T[lang].get('total_items', {})}: {stats['total_items']}\n"
+        text += f"• {T[lang].get('total_quantity', {})}: {stats['total_quantity']}\n"
+        text += f"• {T[lang].get('total_value', {})}: {stats['total_value']} 🏅\n"
+            
         if stats['most_valuable']:
             valuable_name = get_item_display_name(stats['most_valuable'], lang)
-            text += f"• {T.get('most_valuable', {}).get(lang, 'Most Valuable')}: {valuable_name}\n"
+            text += f"â€¢ {T[lang].get('most_valuable', {})}: {valuable_name}\n"
         text += "\n"
         
         # Category breakdown
-        text += f"📂 **{T.get('categories', {}).get(lang, 'Categories')}:**\n"
+        text += f"🗂️ **{T[lang].get('categories', {})}:**\n"
         for category, count in stats['categories'].items():
             if count > 0:
-                category_name = T.get(f'category_{category}', {}).get(lang, category.title())
-                text += f"• {category_name}: {count}\n"
+                category_name = T[lang].get(f'category_{category}', {})
+                text += f"â€¢ {category_name}: {count}\n"
         text += "\n"
         
         # Create navigation keyboard
@@ -206,32 +205,32 @@ async def show_inventory_overview(message: types.Message, bot: AsyncTeleBot, db_
         
         # Category buttons
         weapons_btn = types.InlineKeyboardButton(
-            f"⚔️ {T.get('weapons', {}).get(lang, 'Weapons')}", 
+            f"⚔️ {T[lang].get('weapons', {})}", 
             callback_data='inventory:category:weapons'
         )
         defense_btn = types.InlineKeyboardButton(
-            f"🛡️ {T.get('defense', {}).get(lang, 'Defense')}", 
+            f"🛡️ {T[lang].get('defense', {})}", 
             callback_data='inventory:category:defense'
         )
         markup.add(weapons_btn, defense_btn)
         
         boost_btn = types.InlineKeyboardButton(
-            f"🚀 {T.get('boosts', {}).get(lang, 'Boosts')}", 
+            f"🚀 {T[lang].get('boosts', {})}", 
             callback_data='inventory:category:boost'
         )
         all_btn = types.InlineKeyboardButton(
-            f"📋 {T.get('all_items', {}).get(lang, 'All Items')}", 
+            f"📋 {T[lang].get('all_items', {})}", 
             callback_data='inventory:category:all'
         )
         markup.add(boost_btn, all_btn)
         
         # Additional options
         use_btn = types.InlineKeyboardButton(
-            f"🔧 {T.get('use_item', {}).get(lang, 'Use Item')}", 
+            f"🛠️ {T[lang].get('use_item', {})}", 
             callback_data='inventory:use'
         )
         close_btn = types.InlineKeyboardButton(
-            f"❌ {T.get('close', {}).get(lang, 'Close')}", 
+            f"✖️ {T[lang].get('close_button', {})}", 
             callback_data='inventory:close'
         )
         markup.add(use_btn, close_btn)
@@ -242,7 +241,7 @@ async def show_inventory_overview(message: types.Message, bot: AsyncTeleBot, db_
         logger.error(f"Error showing inventory overview: {e}")
         await bot.send_message(
             message.chat.id, 
-            T.get('inventory_error', {}).get(lang, "Error displaying inventory.")
+            T[lang].get('inventory_error', {})
         )
 
 async def show_inventory_category(call: types.CallbackQuery, bot: AsyncTeleBot, db_manager: DBManager, 
@@ -255,7 +254,7 @@ async def show_inventory_category(call: types.CallbackQuery, bot: AsyncTeleBot, 
         # Filter items by category
         if category == "all":
             filtered_items = inventory
-            category_title = T.get('all_items', {}).get(lang, 'All Items')
+            category_title = T[lang].get('all_items', {})
             category_emoji = "📋"
         else:
             filtered_items = {}
@@ -263,15 +262,15 @@ async def show_inventory_category(call: types.CallbackQuery, bot: AsyncTeleBot, 
                 item_stats = get_item_stats(item_id)
                 if item_stats.get('category') == category:
                     filtered_items[item_id] = qty
-            
-            category_title = T.get(f'category_{category}', {}).get(lang, category.title())
+
+            category_title = T[lang].get(f'category_{category}', {})
             category_emoji = {"weapons": "⚔️", "defense": "🛡️", "boost": "🚀"}.get(category, "📦")
         
         if not filtered_items:
             text = f"{category_emoji} **{category_title}**\n\n"
-            text += T.get('category_empty', {}).get(lang, "No items in this category.")
+            text += T[lang].get('category_empty', {})
         else:
-            text = f"{category_emoji} **{category_title}** ({len(filtered_items)} {T.get('items', {}).get(lang, 'items')})\n\n"
+            text = f"{category_emoji} **{category_title}** ({len(filtered_items)} {T[lang].get('items', {})})\n\n"
             
             # Sort items by value/rarity
             sorted_items = []
@@ -288,19 +287,19 @@ async def show_inventory_category(call: types.CallbackQuery, bot: AsyncTeleBot, 
                 
                 text += f"{emoji} **{name}** x{qty}\n"
                 if description:
-                    text += f"   ↳ {description[:50]}{'...' if len(description) > 50 else ''}\n"
+                    text += f"   â†³ {description[:50]}{'...' if len(description) > 50 else ''}\n"
                 
                 # Add item stats for weapons/defense
                 if category == "weapons" or category == "all":
                     if is_weapon(item_id):
                         weapon_stats = get_item_stats(item_id)
                         damage = weapon_stats.get('damage', 0)
-                        text += f"   💥 {T.get('damage', {}).get(lang, 'Damage')}: {damage}\n"
+                        text += f"   💥 {T[lang].get('damage', {})}: {damage}\n"
                 
                 if category == "defense" or category == "all":
                     if is_defense_item(item_id):
                         # Add defense effectiveness info
-                        text += f"   🛡️ {T.get('protection', {}).get(lang, 'Protection')}\n"
+                        text += f"   🛡️ {T[lang].get('protection', {})}\n"
                 
                 text += "\n"
         
@@ -315,7 +314,7 @@ async def show_inventory_category(call: types.CallbackQuery, bot: AsyncTeleBot, 
         buttons = []
         for cat, emoji in categories:
             if cat != category:  # Don't show current category
-                cat_name = T.get(f'category_{cat}', {}).get(lang, cat.title()) if cat != "all" else T.get('all_items', {}).get(lang, 'All')
+                cat_name = T[lang].get(f'category_{cat}', {}) if cat != "all" else T[lang].get('all_items', {})
                 buttons.append(types.InlineKeyboardButton(
                     f"{emoji} {cat_name}", 
                     callback_data=f'inventory:category:{cat}'
@@ -327,11 +326,11 @@ async def show_inventory_category(call: types.CallbackQuery, bot: AsyncTeleBot, 
         
         # Back to overview and close
         back_btn = types.InlineKeyboardButton(
-            f"🔙 {T.get('back_to_overview', {}).get(lang, 'Overview')}", 
+            f"🛠️ {T[lang].get('back_to_overview', {})}", 
             callback_data='inventory:overview'
         )
         close_btn = types.InlineKeyboardButton(
-            f"❌ {T.get('close', {}).get(lang, 'Close')}", 
+            f"✖️ {T[lang].get('close_button', {})}", 
             callback_data='inventory:close'
         )
         markup.add(back_btn, close_btn)
@@ -363,19 +362,19 @@ async def show_use_item_menu(call: types.CallbackQuery, bot: AsyncTeleBot, db_ma
                 usable_items[item_id] = qty
         
         if not usable_items:
-            text = f"🔧 **{T.get('use_items_title', {}).get(lang, 'Use Items')}**\n\n"
-            text += T.get('no_usable_items', {}).get(lang, "You don't have any usable items.")
-            text += f"\n\n💡 {T.get('usable_items_tip', {}).get(lang, 'Tip: Defense and boost items can be used.')}"
+            text = f"🛠️ **{T[lang].get('use_items_title', {})}**\n\n"
+            text += T[lang].get('no_usable_items', {})
+            text += f"\n\nðŸ’¡ {T[lang].get('usable_items_tip', {})}"
             
             markup = types.InlineKeyboardMarkup()
             back_btn = types.InlineKeyboardButton(
-                f"🔙 {T.get('back', {}).get(lang, 'Back')}", 
+                f"◀️ {T[lang].get('back', {})}", 
                 callback_data='inventory:overview'
             )
             markup.add(back_btn)
         else:
-            text = f"🔧 **{T.get('use_items_title', {}).get(lang, 'Use Items')}**\n\n"
-            text += T.get('select_item_to_use', {}).get(lang, "Select an item to use:")
+            text = f"🛠️ **{T[lang].get('use_items_title', {})}**\n\n"
+            text += T[lang].get('select_item_to_use', {})
             
             markup = types.InlineKeyboardMarkup(row_width=1)
             
@@ -401,7 +400,7 @@ async def show_use_item_menu(call: types.CallbackQuery, bot: AsyncTeleBot, db_ma
             
             # Back button
             back_btn = types.InlineKeyboardButton(
-                f"🔙 {T.get('back', {}).get(lang, 'Back')}", 
+                f"◀️ {T[lang].get('back', {})}", 
                 callback_data='inventory:overview'
             )
             markup.add(back_btn)
@@ -436,18 +435,14 @@ async def handle_item_usage(call: types.CallbackQuery, bot: AsyncTeleBot, db_man
             category = item_stats.get('category')
             
             if category == 'defense':
-                message = T.get('defense_activated', {}).get(lang, 
-                    "🛡️ {item} activated! You are now protected from attacks for 24 hours.").format(item=f"{emoji} {item_name}")
+                message = T[lang].get('defense_activated', {}).format(item=f"{emoji} {item_name}")
             elif category == 'boost':
                 if item_id == 'energy_drink':
-                    message = T.get('energy_drink_used', {}).get(lang, 
-                        "⚡ {item} consumed! Your HP has been restored.").format(item=f"{emoji} {item_name}")
+                    message = T[lang].get('energy_drink_used', {}).format(item=f"{emoji} {item_name}")
                 else:
-                    message = T.get('boost_activated', {}).get(lang, 
-                        "🚀 {item} activated! Boost effects applied.").format(item=f"{emoji} {item_name}")
+                    message = T[lang].get('boost_activated', {}).format(item=f"{emoji} {item_name}")
             else:
-                message = T.get('item_used_success', {}).get(lang, 
-                    "✅ {item} used successfully!").format(item=f"{emoji} {item_name}")
+                message = T[lang].get('item_used_success', {}).format(item=f"{emoji} {item_name}")
             
             await bot.answer_callback_query(call.id, message, show_alert=True)
             
@@ -456,7 +451,7 @@ async def handle_item_usage(call: types.CallbackQuery, bot: AsyncTeleBot, db_man
         else:
             await bot.answer_callback_query(
                 call.id, 
-                T.get('item_use_failed', {}).get(lang, "Failed to use item. You may not have this item."),
+                T[lang].get('item_use_failed', {}),
                 show_alert=True
             )
         
@@ -550,8 +545,8 @@ def register_handlers(bot: AsyncTeleBot, db_manager: DBManager) -> None:
                     msg += f"\n<b>{T['inventory_categories'][category][lang]}</b>\n"
                     for item_id, qty in sorted(items):
                         item_name = T['items'][item_id][lang]
-                        emoji = T['item_emojis'].get(item_id, '📦')
-                        msg += f"• {emoji} {item_name}: <b>x{qty}</b>\n"
+                        emoji = T['item_emojis'].get(item_id, 'ðŸ“¦')
+                        msg += f"â€¢ {emoji} {item_name}: <b>x{qty}</b>\n"
 
         keyboard = types.InlineKeyboardMarkup()
         keyboard.add(types.InlineKeyboardButton(T['close_button'][lang], callback_data="inventory:close"))
@@ -588,3 +583,4 @@ def register_handlers(bot: AsyncTeleBot, db_manager=None):
     async def handle_use_item_callbacks(call):
         """Handle item usage callbacks"""
         await inventory_manager.handle_item_usage(bot, call)
+

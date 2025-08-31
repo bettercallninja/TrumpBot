@@ -131,7 +131,7 @@ python main.py > bot.log 2>&1 &
 ```python
 from src.config.bot_config import BotConfig
 
-config = BotConfig()
+config = BotConfig
 # Access to all game constants:
 # - DAMAGE_MULTIPLIERS
 # - DEFENSE_EFFECTIVENESS  
