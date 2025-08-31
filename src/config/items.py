@@ -134,7 +134,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "medals_price": 25,
         "title": "Basic Missile",
         "description": "Standard military missile (+10 damage)",
-        "emoji": "ðŸš€",
+        "emoji": "🚀",
         "level_required": 1,
         "max_stack": 50
     },
@@ -150,7 +150,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "medals_price": 75,
         "title": "F22 Raptor Strike",
         "description": "Advanced fighter jet attack (+18 damage, 10% damage bonus)",
-        "emoji": "âœˆï¸",
+        "emoji": "✈️",
         "level_required": 3,
         "max_stack": 25
     },
@@ -166,7 +166,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "medals_price": 200,
         "title": "MOAB Heavy Bomb",
         "description": "Massive Ordnance Air Blast (+35 damage, 15% critical chance)",
-        "emoji": "ðŸ’£",
+        "emoji": "💣",
         "level_required": 5,
         "max_stack": 15
     },
@@ -183,7 +183,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "medals_price": 500,
         "title": "Nuclear Warhead",
         "description": "Ultimate destruction weapon (+60 damage, 25% bonus, 20% critical)",
-        "emoji": "â˜¢ï¸",
+        "emoji": "☢️",
         "level_required": 10,
         "max_stack": 8
     },
@@ -200,7 +200,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "medals_price": 1000,
         "title": "Antimatter Cannon",
         "description": "Theoretical ultimate weapon (+100 damage, 50% bonus, 30% critical)",
-        "emoji": "âš›ï¸",
+        "emoji": "⚛️",
         "level_required": 20,
         "max_stack": 3
     },
@@ -219,7 +219,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "medals_price": 100,
         "title": "Basic Shield",
         "description": "Standard defense barrier (3 hours, 50% reduction, 100 absorption)",
-        "emoji": "ðŸ›¡ï¸",
+        "emoji": "🛡️",
         "level_required": 2,
         "consumable": True
     },
@@ -236,7 +236,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "medals_price": 200,
         "title": "Aegis Defense Shield",
         "description": "Advanced protection system (4 hours, 65% reduction, 200 absorption)",
-        "emoji": "ðŸ›¡ï¸âš¡",
+        "emoji": "🛡️⚡",
         "level_required": 5,
         "consumable": True
     },
@@ -253,7 +253,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "medals_price": 150,
         "title": "Patriot Defense System",
         "description": "Missile interception system (6 hours, 70% effectiveness, +25 counter-damage)",
-        "emoji": "ðŸš€ðŸ›¡ï¸",
+        "emoji": "🚀🛡️",
         "level_required": 7,
         "consumable": True
     },
@@ -270,7 +270,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "medals_price": 400,
         "title": "Fortress Shield",
         "description": "Heavy fortification system (8 hours, 80% reduction, 500 absorption)",
-        "emoji": "ðŸ°",
+        "emoji": "🏰",
         "level_required": 12,
         "consumable": True
     },
@@ -287,7 +287,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "medals_price": 300,
         "title": "Aircraft Carrier",
         "description": "Naval arsenal expansion (+10 weapon capacity)",
-        "emoji": "ðŸš¢",
+        "emoji": "🚢",
         "level_required": 8,
         "consumable": False,
         "max_stack": 1
@@ -303,7 +303,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "medals_price": 800,
         "title": "Military Base",
         "description": "Advanced weapons storage facility (+25 capacity)",
-        "emoji": "ðŸ­",
+        "emoji": "🏭",
         "level_required": 15,
         "consumable": False,
         "max_stack": 1
@@ -321,7 +321,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "medals_price": 30,
         "title": "First Aid Kit",
         "description": "Basic medical supplies (+25 HP restoration)",
-        "emoji": "ðŸ¥",
+        "emoji": "🏥",
         "level_required": 1,
         "max_stack": 20
     },
@@ -336,7 +336,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "medals_price": 75,
         "title": "Field Medic Kit",
         "description": "Advanced medical equipment (+50 HP restoration)",
-        "emoji": "â›‘ï¸",
+        "emoji": "⛑️",
         "level_required": 4,
         "max_stack": 15
     },
@@ -355,7 +355,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 15,
         "title": "Stealth Bomber",
         "description": "Advanced stealth attack system (+85 damage, 30% bonus, 25% critical)",
-        "emoji": "ðŸ›©ï¸",
+        "emoji": "🛩️",
         "level_required": 12,
         "max_stack": 10
     },
@@ -372,7 +372,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 25,
         "title": "Orbital Strike Platform",
         "description": "Space-based weapons system (+120 damage, 40% bonus, 35% critical)",
-        "emoji": "ðŸ›°ï¸",
+        "emoji": "🛰️",
         "level_required": 18,
         "max_stack": 5
     },
@@ -389,7 +389,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 50,
         "title": "Quantum Destruction Cannon",
         "description": "Theoretical physics weapon (+200 damage, 75% bonus, 50% critical)",
-        "emoji": "âš¡âš›ï¸",
+        "emoji": "⚡⚛️",
         "level_required": 25,
         "max_stack": 2
     },
@@ -408,7 +408,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 12,
         "title": "Super Aegis Shield",
         "description": "Premium defense system (12 hours, 85% reduction, 750 absorption)",
-        "emoji": "ðŸ›¡ï¸âœ¨",
+        "emoji": "🛡️✨",
         "level_required": 10,
         "consumable": True
     },
@@ -425,7 +425,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 30,
         "title": "Quantum Energy Barrier",
         "description": "Ultimate protection field (24 hours, 95% reduction, 1500 absorption)",
-        "emoji": "âš¡ðŸ›¡ï¸",
+        "emoji": "⚡🛡️",
         "level_required": 20,
         "consumable": True
     },
@@ -442,7 +442,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 3,
         "title": "Small Medal Boost",
         "description": "Instant medal bonus (+250 medals)",
-        "emoji": "ðŸ…",
+        "emoji": "🏅",
         "level_required": 1,
         "max_stack": 10
     },
@@ -457,7 +457,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 5,
         "title": "Medal Boost",
         "description": "Instant medal bonus (+500 medals)",
-        "emoji": "ðŸ…ðŸ’°",
+        "emoji": "🏅💰",
         "level_required": 1,
         "max_stack": 10
     },
@@ -472,7 +472,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 8,
         "title": "Mega Medal Boost",
         "description": "Large instant medal bonus (+1000 medals)",
-        "emoji": "ðŸ†ðŸ’°",
+        "emoji": "🏆💰",
         "level_required": 5,
         "max_stack": 5
     },
@@ -488,7 +488,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 4,
         "title": "Energy Drink",
         "description": "Reduces attack cooldown by 50% for 1 hour",
-        "emoji": "âš¡",
+        "emoji": "⚡",
         "level_required": 3,
         "max_stack": 15
     },
@@ -504,7 +504,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 7,
         "title": "Adrenaline Shot",
         "description": "Reduces attack cooldown by 75% for 2 hours",
-        "emoji": "ðŸ’‰",
+        "emoji": "💉",
         "level_required": 8,
         "max_stack": 8
     },
@@ -519,7 +519,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 8,
         "title": "Advanced Repair Kit",
         "description": "Instantly restores full HP (100 HP)",
-        "emoji": "ðŸ”§",
+        "emoji": "🔧",
         "level_required": 5,
         "max_stack": 10
     },
@@ -534,7 +534,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 15,
         "title": "Nano Repair System",
         "description": "Advanced nanotechnology healing (+150 HP, overheal possible)",
-        "emoji": "ðŸ”¬",
+        "emoji": "🔬",
         "level_required": 12,
         "max_stack": 5
     },
@@ -550,7 +550,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 10,
         "title": "Experience Accelerator",
         "description": "Doubles experience gain for 4 hours",
-        "emoji": "ðŸ“ˆ",
+        "emoji": "📈",
         "level_required": 6,
         "max_stack": 3
     },
@@ -569,7 +569,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 50,
         "title": "VIP Status",
         "description": "Premium membership (30 days: +50% XP, +20% damage, exclusive features)",
-        "emoji": "ðŸ‘‘",
+        "emoji": "👑",
         "level_required": 1,
         "consumable": False,
         "max_stack": 1
@@ -588,7 +588,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars_price": 120,
         "title": "Elite Membership",
         "description": "Ultimate membership (90 days: +100% XP, +35% damage, 25% faster cooldowns)",
-        "emoji": "ðŸ’ŽðŸ‘‘",
+        "emoji": "💎👑",
         "level_required": 10,
         "consumable": False,
         "max_stack": 1
@@ -606,7 +606,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars": 3,
         "title": "Holiday Firework Missile",
         "description": "Festive explosive with extra sparkle (+40 damage, 30% critical)",
-        "emoji": "ðŸŽ†",
+        "emoji": "🎆",
         "level_required": 1,
         "limited_time": True,
         "max_stack": 5
@@ -623,7 +623,7 @@ ITEMS: Dict[str, Dict[str, Any]] = {
         "stars": 5,
         "title": "Anniversary Nuclear Device",
         "description": "Commemorative ultimate weapon (+150 damage, 50% bonus, 40% critical)",
-        "emoji": "ðŸŽŠâ˜¢ï¸",
+        "emoji": "🎊☢️",
         "level_required": 15,
         "achievement_required": "veteran_player",
         "limited_time": True,
@@ -683,53 +683,53 @@ ITEM_NAMES: Dict[str, Dict[str, str]] = {
         "anniversary_nuke": "Anniversary Nuke",
     },
     "fa": {
-        # Ø³Ù„Ø§Ø­â€ŒÙ‡Ø§ÛŒ Ù¾Ø§ÛŒÙ‡
-        "missile": "Ù…ÙˆØ´Ú© Ù¾Ø§ÛŒÙ‡",
-        "f22": "Ø¬Ù†Ú¯Ù†Ø¯Ù‡ Ø§Ù-Û²Û²",
-        "moab": "Ø¨Ù…Ø¨ Ù…ÙˆØ¢Ø¨",
-        "nuclear": "Ú©Ù„Ø§Ù‡Ú© Ù‡Ø³ØªÙ‡â€ŒØ§ÛŒ",
-        "antimatter": "ØªÙˆÙ¾ Ù¾Ø§Ø¯Ù…Ø§Ø¯Ù‡",
+        # سلاح‌های پایه
+        "missile": "موشک پایه",
+        "f22": "جنگنده اف-۲۲",
+        "moab": "بمب موآب",
+        "nuclear": "کلاهک هسته‌ای",
+        "antimatter": "توپ پادماده",
         
-        # Ø³ÛŒØ³ØªÙ…â€ŒÙ‡Ø§ÛŒ Ø¯ÙØ§Ø¹ÛŒ
-        "shield": "Ø³Ù¾Ø± Ù¾Ø§ÛŒÙ‡",
-        "aegis_shield": "Ø³Ù¾Ø± Ø§ÛŒØ¬ÛŒØ³",
-        "intercept": "Ø³ÛŒØ³ØªÙ… Ù¾Ø§ØªØ±ÛŒÙˆØª",
-        "fortress_shield": "Ø³Ù¾Ø± Ù‚Ù„Ø¹Ù‡",
+        # سیستم‌های دفاعی
+        "shield": "سپر پایه",
+        "aegis_shield": "سپر ایجیس",
+        "intercept": "سیستم پاتریوت",
+        "fortress_shield": "سپر قلعه",
         
-        # Ø²Ø±Ø§Ø¯Ø®Ø§Ù†Ù‡
-        "carrier": "Ù†Ø§Ùˆ Ù‡ÙˆØ§Ù¾ÛŒÙ…Ø§Ø¨Ø±",
-        "military_base": "Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ù†Ø¸Ø§Ù…ÛŒ",
+        # زرادخانه
+        "carrier": "ناو هواپیمابر",
+        "military_base": "پایگاه نظامی",
         
-        # Ø§Ø¨Ø²Ø§Ø±Ù‡Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø±Ø¯ÛŒ
-        "first_aid": "Ú©ÛŒØª Ú©Ù…Ú©â€ŒÙ‡Ø§ÛŒ Ø§ÙˆÙ„ÛŒÙ‡",
-        "field_medic": "Ú©ÛŒØª Ù¾Ø²Ø´Ú© Ù…ÛŒØ¯Ø§Ù†",
+        # ابزارهای کاربردی
+        "first_aid": "کیت کمک‌های اولیه",
+        "field_medic": "کیت پزشک میدان",
         
-        # Ø³Ù„Ø§Ø­â€ŒÙ‡Ø§ÛŒ Ù¾Ø±ÛŒÙ…ÛŒÙˆÙ…
-        "stealth_bomber": "Ø¨Ù…Ø¨â€ŒØ§ÙÚ©Ù† Ø±Ø§Ø¯Ø§Ø±Ú¯Ø±ÛŒØ²",
-        "orbital_strike": "Ø­Ù…Ù„Ù‡ Ù…Ø¯Ø§Ø±ÛŒ",
-        "quantum_cannon": "ØªÙˆÙ¾ Ú©ÙˆØ§Ù†ØªÙˆÙ…ÛŒ",
+        # سلاح‌های پریمیوم
+        "stealth_bomber": "بمب‌افکن رادارگریز",
+        "orbital_strike": "حمله مداری",
+        "quantum_cannon": "توپ کوانتومی",
         
-        # Ø¯ÙØ§Ø¹ Ù¾Ø±ÛŒÙ…ÛŒÙˆÙ…
-        "super_aegis": "Ø³Ù¾Ø± Ø§ÛŒØ¬ÛŒØ³ Ù¾ÛŒØ´Ø±ÙØªÙ‡",
-        "quantum_barrier": "Ø³Ø¯ Ú©ÙˆØ§Ù†ØªÙˆÙ…ÛŒ",
+        # دفاع پریمیوم
+        "super_aegis": "سپر ایجیس پیشرفته",
+        "quantum_barrier": "سد کوانتومی",
         
-        # ØªÙ‚ÙˆÛŒØªâ€ŒÚ©Ù†Ù†Ø¯Ù‡â€ŒÙ‡Ø§
-        "medal_boost_small": "ØªÙ‚ÙˆÛŒØª Ú©ÙˆÚ†Ú© Ù…Ø¯Ø§Ù„",
-        "medal_boost": "ØªÙ‚ÙˆÛŒØª Ù…Ø¯Ø§Ù„",
-        "mega_medal_boost": "ØªÙ‚ÙˆÛŒØª Ø¹Ø¸ÛŒÙ… Ù…Ø¯Ø§Ù„",
-        "energy_drink": "Ù†ÙˆØ´ÛŒØ¯Ù†ÛŒ Ø§Ù†Ø±Ú˜ÛŒ",
-        "adrenaline_shot": "ØªØ²Ø±ÛŒÙ‚ Ø¢Ø¯Ø±Ù†Ø§Ù„ÛŒÙ†",
-        "repair_kit": "Ú©ÛŒØª ØªØ¹Ù…ÛŒØ±",
-        "nano_repair": "ØªØ¹Ù…ÛŒØ± Ù†Ø§Ù†Ùˆ",
-        "experience_boost": "ØªÙ‚ÙˆÛŒØª ØªØ¬Ø±Ø¨Ù‡",
+        # تقویت‌کننده‌ها
+        "medal_boost_small": "تقویت کوچک مدال",
+        "medal_boost": "تقویت مدال",
+        "mega_medal_boost": "تقویت عظیم مدال",
+        "energy_drink": "نوشیدنی انرژی",
+        "adrenaline_shot": "تزریق آدرنالین",
+        "repair_kit": "کیت تعمیر",
+        "nano_repair": "تعمیر نانو",
+        "experience_boost": "تقویت تجربه",
         
-        # ÙˆØ¶Ø¹ÛŒØª
-        "vip_status": "ÙˆØ¶Ø¹ÛŒØª VIP",
-        "elite_membership": "Ø¹Ø¶ÙˆÛŒØª Ù†Ø®Ø¨Ú¯Ø§Ù†",
+        # وضعیت
+        "vip_status": "وضعیت VIP",
+        "elite_membership": "عضویت نخبگان",
         
-        # ÙØµÙ„ÛŒ
-        "holiday_missile": "Ù…ÙˆØ´Ú© ØªØ¹Ø·ÛŒÙ„Ø§Øª",
-        "anniversary_nuke": "Ø¨Ù…Ø¨ Ø³Ø§Ù„Ú¯Ø±Ø¯",
+        # فصلی
+        "holiday_missile": "موشک تعطیلات",
+        "anniversary_nuke": "بمب سالگرد",
     }
 }
 
@@ -785,77 +785,77 @@ ITEM_DESCRIPTIONS: Dict[str, Dict[str, str]] = {
         "anniversary_nuke": "Commemorative weapon for special occasions",
     },
     "fa": {
-        # Ø³Ù„Ø§Ø­â€ŒÙ‡Ø§ÛŒ Ù¾Ø§ÛŒÙ‡
-        "missile": "Ù…ÙˆØ´Ú© Ø§Ø³ØªØ§Ù†Ø¯Ø§Ø±Ø¯ Ù†Ø¸Ø§Ù…ÛŒ Ø¨Ø±Ø§ÛŒ Ø­Ù…Ù„Ø§Øª Ù¾Ø§ÛŒÙ‡",
-        "f22": "Ø¬Ù†Ú¯Ù†Ø¯Ù‡ Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ø¨Ø§ Ù‚Ø¯Ø±Øª Ø¢ØªØ´ Ø¨Ø±ØªØ±",
-        "moab": "Ù…Ù‡Ù…Ø§Øª Ø¹Ø¸ÛŒÙ… Ø¨Ø±Ø§ÛŒ Ø®Ø³Ø§Ø±Øª ÙˆÛŒØ±Ø§Ù†Ú¯Ø± Ù…Ù†Ø·Ù‚Ù‡â€ŒØ§ÛŒ",
-        "nuclear": "Ø³Ù„Ø§Ø­ Ù†Ø§Ø¨ÙˆØ¯ÛŒ Ù†Ù‡Ø§ÛŒÛŒ Ø¨Ø§ Ø§Ø«Ø±Ø§Øª ØªØ´Ø¹Ø´Ø¹ÛŒ",
-        "antimatter": "Ø³Ù„Ø§Ø­ Ù†Ù‡Ø§ÛŒÛŒ ØªØ¦ÙˆØ±ÛŒÚ© Ø¨Ø§ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ø§Ø² ÙÛŒØ²ÛŒÚ© Ù¾Ø§Ø¯Ù…Ø§Ø¯Ù‡",
+        # سلاح‌های پایه
+        "missile": "موشک استاندارد نظامی برای حملات پایه",
+        "f22": "جنگنده پیشرفته با قدرت آتش برتر",
+        "moab": "مهمات عظیم برای خسارت ویرانگر منطقه‌ای",
+        "nuclear": "سلاح نابودی نهایی با اثرات تشعشعی",
+        "antimatter": "سلاح نهایی تئوریک با استفاده از فیزیک پادماده",
         
-        # Ø³ÛŒØ³ØªÙ…â€ŒÙ‡Ø§ÛŒ Ø¯ÙØ§Ø¹ÛŒ
-        "shield": "Ø³Ø¯ Ø§Ù†Ø±Ú˜ÛŒ Ù¾Ø§ÛŒÙ‡ Ø¨Ø§ Ø­ÙØ§Ø¸Øª Ù…ØªÙˆØ³Ø·",
-        "aegis_shield": "Ø³ÛŒØ³ØªÙ… Ø¯ÙØ§Ø¹ÛŒ Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ø¨Ø§ Ø§Ø³ØªØ­Ú©Ø§Ù… Ø§ÙØ²Ø§ÛŒØ´ ÛŒØ§ÙØªÙ‡",
-        "intercept": "Ø³ÛŒØ³ØªÙ… Ø¯ÙØ§Ø¹ Ù…ÙˆØ´Ú©ÛŒ Ø¨Ø§ Ù‚Ø§Ø¨Ù„ÛŒØª Ø¶Ø¯Ø­Ù…Ù„Ù‡",
-        "fortress_shield": "Ø§Ø³ØªØ­Ú©Ø§Ù…Ø§Øª Ø³Ù†Ú¯ÛŒÙ† Ø¨Ø§ Ø­Ø¯Ø§Ú©Ø«Ø± Ø­ÙØ§Ø¸Øª",
+        # سیستم‌های دفاعی
+        "shield": "سد انرژی پایه با حفاظت متوسط",
+        "aegis_shield": "سیستم دفاعی پیشرفته با استحکام افزایش یافته",
+        "intercept": "سیستم دفاع موشکی با قابلیت ضدحمله",
+        "fortress_shield": "استحکامات سنگین با حداکثر حفاظت",
         
-        # Ø²Ø±Ø§Ø¯Ø®Ø§Ù†Ù‡
-        "carrier": "Ú©Ø´ØªÛŒ Ø¬Ù†Ú¯ÛŒ Ú©Ù‡ Ø¸Ø±ÙÛŒØª Ø°Ø®ÛŒØ±Ù‡ Ø³Ù„Ø§Ø­ Ø±Ø§ Ø§ÙØ²Ø§ÛŒØ´ Ù…ÛŒâ€ŒØ¯Ù‡Ø¯",
-        "military_base": "ØªØ§Ø³ÛŒØ³Ø§Øª Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ø¨Ø±Ø§ÛŒ Ú¯Ø³ØªØ±Ø´ Ø¹Ø¸ÛŒÙ… Ø²Ø±Ø§Ø¯Ø®Ø§Ù†Ù‡",
+        # زرادخانه
+        "carrier": "کشتی جنگی که ظرفیت ذخیره سلاح را افزایش می‌دهد",
+        "military_base": "تاسیسات پیشرفته برای گسترش عظیم زرادخانه",
         
-        # Ø§Ø¨Ø²Ø§Ø±Ù‡Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø±Ø¯ÛŒ
-        "first_aid": "ØªØ¬Ù‡ÛŒØ²Ø§Øª Ù¾Ø²Ø´Ú©ÛŒ Ù¾Ø§ÛŒÙ‡ Ø¨Ø±Ø§ÛŒ Ø¨Ø§Ø²Ø³Ø§Ø²ÛŒ Ø¬Ø²Ø¦ÛŒ Ø³Ù„Ø§Ù…Øª",
-        "field_medic": "ØªØ¬Ù‡ÛŒØ²Ø§Øª Ù¾Ø²Ø´Ú©ÛŒ Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ø¨Ø±Ø§ÛŒ Ø¯Ø±Ù…Ø§Ù† Ù‚Ø§Ø¨Ù„ ØªÙˆØ¬Ù‡",
+        # ابزارهای کاربردی
+        "first_aid": "تجهیزات پزشکی پایه برای بازسازی جزئی سلامت",
+        "field_medic": "تجهیزات پزشکی پیشرفته برای درمان قابل توجه",
         
-        # Ø³Ù„Ø§Ø­â€ŒÙ‡Ø§ÛŒ Ù¾Ø±ÛŒÙ…ÛŒÙˆÙ…
-        "stealth_bomber": "Ù‡ÙˆØ§Ù¾ÛŒÙ…Ø§ÛŒ ØºÛŒØ±Ù‚Ø§Ø¨Ù„ ØªØ´Ø®ÛŒØµ Ø¨Ø§ Ù‚Ø§Ø¨Ù„ÛŒØª Ø­Ù…Ù„Ù‡ Ø¯Ù‚ÛŒÙ‚",
-        "orbital_strike": "Ù¾Ù„ØªÙØ±Ù… ØªØ³Ù„ÛŒØ­Ø§ØªÛŒ ÙØ¶Ø§ÛŒÛŒ Ø¨Ø±Ø§ÛŒ Ø­Ù…Ù„Ø§Øª ÙˆÛŒØ±Ø§Ù†Ú¯Ø±",
-        "quantum_cannon": "Ø³Ù„Ø§Ø­ ÙÛŒØ²ÛŒÚ© Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ø¨Ø§ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ø§Ø² Ù…Ú©Ø§Ù†ÛŒÚ© Ú©ÙˆØ§Ù†ØªÙˆÙ…",
+        # سلاح‌های پریمیوم
+        "stealth_bomber": "هواپیمای غیرقابل تشخیص با قابلیت حمله دقیق",
+        "orbital_strike": "پلتفرم تسلیحاتی فضایی برای حملات ویرانگر",
+        "quantum_cannon": "سلاح فیزیک پیشرفته با استفاده از مکانیک کوانتوم",
         
-        # Ø¯ÙØ§Ø¹ Ù¾Ø±ÛŒÙ…ÛŒÙˆÙ…
-        "super_aegis": "Ø³ÛŒØ³ØªÙ… Ø¯ÙØ§Ø¹ÛŒ Ù¾Ø±ÛŒÙ…ÛŒÙˆÙ… Ø¨Ø§ Ø­ÙØ§Ø¸Øª Ø¨Ø±ØªØ±",
-        "quantum_barrier": "Ù…ÛŒØ¯Ø§Ù† Ø­ÙØ§Ø¸ØªÛŒ Ù†Ù‡Ø§ÛŒÛŒ Ø¨Ø§ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ø§Ø² ÙÙ†Ø§ÙˆØ±ÛŒ Ú©ÙˆØ§Ù†ØªÙˆÙ…",
+        # دفاع پریمیوم
+        "super_aegis": "سیستم دفاعی پریمیوم با حفاظت برتر",
+        "quantum_barrier": "میدان حفاظتی نهایی با استفاده از فناوری کوانتوم",
         
-        # ØªÙ‚ÙˆÛŒØªâ€ŒÚ©Ù†Ù†Ø¯Ù‡â€ŒÙ‡Ø§
-        "medal_boost_small": "Ù¾Ø§Ø¯Ø§Ø´ ÙÙˆØ±ÛŒ Ú©ÙˆÚ†Ú© Ù…Ø¯Ø§Ù„ Ø¨Ø±Ø§ÛŒ Ù¾ÛŒØ´Ø±ÙØª Ø³Ø±ÛŒØ¹",
-        "medal_boost": "Ù¾Ø§Ø¯Ø§Ø´ Ù‚Ø§Ø¨Ù„ ØªÙˆØ¬Ù‡ Ù…Ø¯Ø§Ù„ Ø¨Ø±Ø§ÛŒ Ù¾ÛŒØ´Ø±ÙØª Ù¾Ø§ÛŒØ¯Ø§Ø±",
-        "mega_medal_boost": "Ù¾Ø§Ø¯Ø§Ø´ Ø¨Ø²Ø±Ú¯ Ù…Ø¯Ø§Ù„ Ø¨Ø±Ø§ÛŒ ØªÙ‚ÙˆÛŒØª Ø¹Ù…Ø¯Ù‡ Ù¾ÛŒØ´Ø±ÙØª",
-        "energy_drink": "Ù…Ø­Ø±Ú© Ú©Ø§Ù‡Ø´ Ø®Ø³ØªÚ¯ÛŒ Ø¬Ù†Ú¯ÛŒ Ùˆ Ø²Ù…Ø§Ù† Ø§Ù†ØªØ¸Ø§Ø±",
-        "adrenaline_shot": "Ù…Ø­Ø±Ú© Ù‚Ø¯Ø±ØªÙ…Ù†Ø¯ Ø¨Ø±Ø§ÛŒ Ø­Ø¯Ø§Ú©Ø«Ø± ØªÙ‚ÙˆÛŒØª Ø¹Ù…Ù„Ú©Ø±Ø¯",
-        "repair_kit": "Ø§Ø¨Ø²Ø§Ø±Ù‡Ø§ÛŒ Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ø¨Ø±Ø§ÛŒ Ø¨Ø§Ø²Ø³Ø§Ø²ÛŒ Ú©Ø§Ù…Ù„ Ø³Ù„Ø§Ù…Øª",
-        "nano_repair": "ÙÙ†Ø§ÙˆØ±ÛŒ Ù†Ø§Ù†Ùˆ Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ø¨Ø±Ø§ÛŒ Ø¯Ø±Ù…Ø§Ù† Ø¨Ø±ØªØ±",
-        "experience_boost": "Ø´ØªØ§Ø¨â€ŒØ¯Ù‡Ù†Ø¯Ù‡ ÛŒØ§Ø¯Ú¯ÛŒØ±ÛŒ Ø¨Ø±Ø§ÛŒ ØªÙˆØ³Ø¹Ù‡ Ù…Ù‡Ø§Ø±Øª Ø¨Ù‡Ø¨ÙˆØ¯ ÛŒØ§ÙØªÙ‡",
+        # تقویت‌کننده‌ها
+        "medal_boost_small": "پاداش فوری کوچک مدال برای پیشرفت سریع",
+        "medal_boost": "پاداش قابل توجه مدال برای پیشرفت پایدار",
+        "mega_medal_boost": "پاداش بزرگ مدال برای تقویت عمده پیشرفت",
+        "energy_drink": "محرک کاهش خستگی جنگی و زمان انتظار",
+        "adrenaline_shot": "محرک قدرتمند برای حداکثر تقویت عملکرد",
+        "repair_kit": "ابزارهای پیشرفته برای بازسازی کامل سلامت",
+        "nano_repair": "فناوری نانو پیشرفته برای درمان برتر",
+        "experience_boost": "شتاب‌دهنده یادگیری برای توسعه مهارت بهبود یافته",
         
-        # ÙˆØ¶Ø¹ÛŒØª
-        "vip_status": "Ø¹Ø¶ÙˆÛŒØª Ù¾Ø±ÛŒÙ…ÛŒÙˆÙ… Ø¨Ø§ Ù…Ø²Ø§ÛŒØ§ Ùˆ Ù¾Ø§Ø¯Ø§Ø´â€ŒÙ‡Ø§ÛŒ Ø§Ù†Ø­ØµØ§Ø±ÛŒ",
-        "elite_membership": "Ø¨Ø§Ù„Ø§ØªØ±ÛŒÙ† Ø³Ø·Ø­ Ø¹Ø¶ÙˆÛŒØª Ø¨Ø§ Ø­Ø¯Ø§Ú©Ø«Ø± Ø§Ù…ØªÛŒØ§Ø²Ø§Øª",
+        # وضعیت
+        "vip_status": "عضویت پریمیوم با مزایا و پاداش‌های انحصاری",
+        "elite_membership": "بالاترین سطح عضویت با حداکثر امتیازات",
         
-        # ÙØµÙ„ÛŒ
-        "holiday_missile": "Ù…ÙˆØ§Ø¯ Ù…Ù†ÙØ¬Ø±Ù‡ Ø¬Ø´Ù†ÙˆØ§Ø±Ù‡â€ŒØ§ÛŒ Ø¨Ø§ Ø§Ø«Ø±Ø§Øª Ø¬Ø´Ù†",
-        "anniversary_nuke": "Ø³Ù„Ø§Ø­ ÛŒØ§Ø¯Ø¨ÙˆØ¯ Ø¨Ø±Ø§ÛŒ Ù…Ù†Ø§Ø³Ø¨Øªâ€ŒÙ‡Ø§ÛŒ ÙˆÛŒÚ˜Ù‡",
+        # فصلی
+        "holiday_missile": "مواد منفجره جشنواره‌ای با اثرات جشن",
+        "anniversary_nuke": "سلاح یادبود برای مناسبت‌های ویژه",
     }
 }
 
 # Item category names in multiple languages
 ITEM_CATEGORY_NAMES: Dict[str, Dict[str, str]] = {
     "en": {
-        "weapons": "âš”ï¸ Weapons",
-        "defense": "ðŸ›¡ï¸ Defense",
-        "utilities": "ðŸ”§ Utilities",
-        "boosts": "âš¡ Boosts",
-        "premium": "ðŸ’Ž Premium",
-        "arsenal": "ðŸ­ Arsenal",
-        "seasonal": "ðŸŽŠ Seasonal",
-        "special": "âœ¨ Special"
+        "weapons": "⚔️ Weapons",
+        "defense": "🛡️ Defense",
+        "utilities": "🔧 Utilities",
+        "boosts": "⚡ Boosts",
+        "premium": "💎 Premium",
+        "arsenal": "🏭 Arsenal",
+        "seasonal": "🎊 Seasonal",
+        "special": "✨ Special"
     },
     "fa": {
-        "weapons": "âš”ï¸ Ø³Ù„Ø§Ø­â€ŒÙ‡Ø§",
-        "defense": "ðŸ›¡ï¸ Ø¯ÙØ§Ø¹",
-        "utilities": "ðŸ”§ Ø§Ø¨Ø²Ø§Ø±Ù‡Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø±Ø¯ÛŒ",
-        "boosts": "âš¡ ØªÙ‚ÙˆÛŒØªâ€ŒÚ©Ù†Ù†Ø¯Ù‡â€ŒÙ‡Ø§",
-        "premium": "ðŸ’Ž Ù¾Ø±ÛŒÙ…ÛŒÙˆÙ…",
-        "arsenal": "ðŸ­ Ø²Ø±Ø§Ø¯Ø®Ø§Ù†Ù‡",
-        "seasonal": "ðŸŽŠ ÙØµÙ„ÛŒ",
-        "special": "âœ¨ ÙˆÛŒÚ˜Ù‡"
+        "weapons": "⚔️ سلاح‌ها",
+        "defense": "🛡️ دفاع",
+        "utilities": "🔧 ابزارهای کاربردی",
+        "boosts": "⚡ تقویت‌کننده‌ها",
+        "premium": "💎 پریمیوم",
+        "arsenal": "🏭 زرادخانه",
+        "seasonal": "🎊 فصلی",
+        "special": "✨ ویژه"
     }
 }
 
@@ -863,39 +863,39 @@ ITEM_CATEGORY_NAMES: Dict[str, Dict[str, str]] = {
 ITEM_RARITY_INFO: Dict[str, Dict[str, str]] = {
     "common": {
         "name_en": "Common",
-        "name_fa": "Ù…Ø¹Ù…ÙˆÙ„ÛŒ",
-        "color": "âšª",
-        "emoji": "ðŸ“¦"
+        "name_fa": "معمولی",
+        "color": "⚪",
+        "emoji": "📦"
     },
     "uncommon": {
         "name_en": "Uncommon", 
-        "name_fa": "ØºÛŒØ±Ù…Ø¹Ù…ÙˆÙ„",
-        "color": "ðŸŸ¢",
-        "emoji": "ðŸ“—"
+        "name_fa": "غیرمعمول",
+        "color": "🟢",
+        "emoji": "📗"
     },
     "rare": {
         "name_en": "Rare",
-        "name_fa": "Ú©Ù…ÛŒØ§Ø¨",
-        "color": "ðŸ”µ",
-        "emoji": "ðŸ“˜"
+        "name_fa": "کمیاب",
+        "color": "🔵",
+        "emoji": "📘"
     },
     "epic": {
         "name_en": "Epic",
-        "name_fa": "Ø­Ù…Ø§Ø³ÛŒ",
-        "color": "ðŸŸ£",
-        "emoji": "ðŸ“œ"
+        "name_fa": "حماسی",
+        "color": "🟣",
+        "emoji": "📜"
     },
     "legendary": {
         "name_en": "Legendary",
-        "name_fa": "Ø§ÙØ³Ø§Ù†Ù‡â€ŒØ§ÛŒ",
-        "color": "ðŸŸ ",
-        "emoji": "â­"
+        "name_fa": "افسانه‌ای",
+        "color": "🟠",
+        "emoji": "⭐"
     },
     "mythic": {
         "name_en": "Mythic",
-        "name_fa": "Ø§Ø³Ø§Ø·ÛŒØ±ÛŒ",
-        "color": "ðŸ”´",
-        "emoji": "ðŸ’«"
+        "name_fa": "اساطیری",
+        "color": "🔴",
+        "emoji": "💫"
     }
 }
 
@@ -1150,7 +1150,7 @@ def get_item_description(item_id: str, lang: str = "en") -> str:
 def get_item_emoji(item_id: str) -> str:
     """Get emoji for an item"""
     item = ITEMS.get(item_id, {})
-    return item.get("emoji", "ðŸ“¦")
+    return item.get("emoji", "📦")
 
 def get_item_rarity_info(item_id: str, lang: str = "en") -> Dict[str, str]:
     """Get rarity information for an item"""
@@ -1307,37 +1307,37 @@ def format_item_display(item_id: str, lang: str = "en", include_price: bool = Tr
         if stats.get("damage"):
             bonus_text = f" (+{int(stats.get('damage_bonus', 0) * 100)}% bonus)" if stats.get("damage_bonus") else ""
             critical_text = f" ({int(stats.get('critical_chance', 0) * 100)}% critical)" if stats.get("critical_chance") else ""
-            display_parts.append(f"âš”ï¸ Damage: {stats['damage']}{bonus_text}{critical_text}")
+            display_parts.append(f"⚔️ Damage: {stats['damage']}{bonus_text}{critical_text}")
         
         if stats.get("effectiveness"):
             duration_text = f" ({stats.get('duration_hours', 0)}h)" if stats.get("duration_hours") else ""
             absorption_text = f" ({stats.get('absorption', 0)} absorption)" if stats.get("absorption") else ""
-            display_parts.append(f"ðŸ›¡ï¸ Defense: {int(stats['effectiveness'] * 100)}%{duration_text}{absorption_text}")
+            display_parts.append(f"🛡️ Defense: {int(stats['effectiveness'] * 100)}%{duration_text}{absorption_text}")
         
         if stats.get("hp_restore"):
-            display_parts.append(f"â¤ï¸ Healing: +{stats['hp_restore']} HP")
+            display_parts.append(f"❤️ Healing: +{stats['hp_restore']} HP")
         
         if stats.get("medals_reward"):
-            display_parts.append(f"ðŸ… Medal Bonus: +{stats['medals_reward']}")
+            display_parts.append(f"🏅 Medal Bonus: +{stats['medals_reward']}")
         
         if stats.get("cooldown_reduction"):
-            display_parts.append(f"âš¡ Cooldown: -{int(stats['cooldown_reduction'] * 100)}%")
+            display_parts.append(f"⚡ Cooldown: -{int(stats['cooldown_reduction'] * 100)}%")
         
         if stats.get("experience_multiplier"):
-            display_parts.append(f"ðŸ“ˆ Experience: x{stats['experience_multiplier']}")
+            display_parts.append(f"📈 Experience: x{stats['experience_multiplier']}")
     
     if include_price and stats["price"] > 0:
-        currency_emoji = "â­" if stats["currency"] == "tg_stars" else "ðŸ…"
-        display_parts.append(f"ðŸ’° Price: {stats['price']} {currency_emoji}")
+        currency_emoji = "⭐" if stats["currency"] == "tg_stars" else "🏅"
+        display_parts.append(f"💰 Price: {stats['price']} {currency_emoji}")
     
     # Add requirements and limitations
     if stats["level_required"] > 1:
-        level_text = "Level" if lang == "en" else "Ø³Ø·Ø­"
-        display_parts.append(f"ðŸ”’ {level_text}: {stats['level_required']}+")
+        level_text = "Level" if lang == "en" else "سطح"
+        display_parts.append(f"🔒 {level_text}: {stats['level_required']}+")
     
     if stats["limited_time"]:
-        limited_text = "Limited Time!" if lang == "en" else "Ø²Ù…Ø§Ù† Ù…Ø­Ø¯ÙˆØ¯!"
-        display_parts.append(f"â° {limited_text}")
+        limited_text = "Limited Time!" if lang == "en" else "زمان محدود!"
+        display_parts.append(f"⏰ {limited_text}")
     
     return "\n".join(display_parts)
 
@@ -1438,7 +1438,7 @@ def get_item_config(item_id: str) -> Optional[ItemConfig]:
         stars=item_data["stars"],
         title=item_data.get("title", ""),
         description=item_data.get("description", ""),
-        emoji=item_data.get("emoji", "ðŸ“¦"),
+        emoji=item_data.get("emoji", "📦"),
         medals_price=item_data.get("medals_price"),
         stars_price=item_data.get("stars_price"),
         damage=item_data.get("damage"),
@@ -1479,4 +1479,3 @@ __all__ = [
     "validate_item_id", "get_all_item_ids", "get_items_summary", "search_items",
     "get_recommended_items_for_level", "get_item_config"
 ]
-

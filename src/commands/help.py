@@ -10,6 +10,7 @@ from typing import Dict, List, Optional
 from telebot import types
 from telebot.async_telebot import AsyncTeleBot
 from src.utils.translations import T
+from src.utils import translations
 from src.utils import helpers
 from src.database.db_manager import DBManager
 from src.config.items import get_weapon_items, get_item_display_name, get_item_emoji, get_item_stats
@@ -42,16 +43,16 @@ class HelpManager:
         recommendations = []
         
         if user_stats["level"] <= 2:
-            recommendations.append("ðŸ“š You're new! Check 'Basic Commands' to get started")
-        
+            recommendations.append("📚 You're new! Check 'Basic Commands' to get started")
+
         if user_stats["score"] < 10:
-            recommendations.append("âš”ï¸ Learn about 'Combat System' to earn medals")
-        
+            recommendations.append("⚔️ Learn about 'Combat System' to earn medals")
+
         if user_stats["items_count"] == 0:
-            recommendations.append("ðŸ›’ Visit 'Shop & Items' to get better weapons")
-        
+            recommendations.append("🛒 Visit 'Shop & Items' to get better weapons")
+
         if user_stats["level"] >= 5:
-            recommendations.append("ðŸ’° Check 'TG Stars' for premium features")
+            recommendations.append("⭐ Check 'TG Stars' for premium features")
         
         return recommendations
 
@@ -168,7 +169,7 @@ async def _show_commands_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_m
     
     keyboard = types.InlineKeyboardMarkup()
     back_btn = types.InlineKeyboardButton(
-        f"ðŸ”™ {T[lang].get('back_to_help', {})}", 
+        f"🔙 {translations.get('back_to_help', lang)}",
         callback_data='help:main'
     )
     keyboard.add(back_btn)
@@ -188,9 +189,9 @@ async def _show_combat_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_man
         weapons = get_weapon_items()
         
         if lang == "fa":
-            help_text = f"âš”ï¸ **{T[lang].get('weapons_guide', {})}**\n\n"
+            help_text = f"⚔️ **{T[lang].get('weapons_guide', {})}**\n\n"
         else:
-            help_text = f"âš”ï¸ **{T[lang].get('weapons_guide', {})}**\n\n"
+            help_text = f"⚔️ **{T[lang].get('weapons_guide', {})}**\n\n"
         
         for weapon_id, weapon_data in weapons.items():
             stats = get_item_stats(weapon_id)
@@ -200,13 +201,13 @@ async def _show_combat_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_man
             
             help_text += f"{emoji} **{name}**: {damage} {T[lang].get('damage', {})}\n"
             if stats.get('description'):
-                help_text += f"   â†³ {stats['description']}\n"
+                help_text += f"   ↳ {stats['description']}\n"
             help_text += "\n"
         
         keyboard = types.InlineKeyboardMarkup()
         keyboard.add(
-            types.InlineKeyboardButton(f"ðŸ”™ {T[lang].get('back_to_combat', {})}", callback_data='help:combat'),
-            types.InlineKeyboardButton(f"ðŸ  {T[lang].get('main_help', {})}", callback_data='help:main')
+            types.InlineKeyboardButton(f"🔙 {T[lang].get('back_to_combat', {})}", callback_data='help:combat'),
+            types.InlineKeyboardButton(f"🏠 {T[lang].get('main_help', {})}", callback_data='help:main')
         )
     else:
         # General combat help
@@ -243,43 +244,43 @@ async def _show_combat_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_man
             """
         else:
             help_text = f"""
-âš”ï¸ **{T[lang].get('combat_system_guide', {})}**
+⚔️ **{T[lang].get('combat_system_guide', {})}**
 
-ðŸŽ¯ **{T[lang].get('how_to_attack', {})}:**
+🎯 **{T[lang].get('how_to_attack', {})}:**
 1. Use `/attack` to open weapon selection
 2. Or `/attack @username weapon` for direct attack
 3. Reply to a message with `/attack` for quick targeting
 
-ðŸ’¥ **{T[lang].get('damage_calculation', {})}:**
-â€¢ Base damage depends on your weapon
-â€¢ Your level affects damage output
-â€¢ Target's level affects damage received
-â€¢ Some weapons have special effects
+💥 **{T[lang].get('damage_calculation', {})}:**
+• Base damage depends on your weapon
+• Your level affects damage output
+• Target's level affects damage received
+• Some weapons have special effects
 
-ðŸ›¡ï¸ **{T[lang].get('defense_system', {})}:**
-â€¢ Defense items reduce incoming damage
-â€¢ Active defense shows in your status
-â€¢ Defense effectiveness varies by item type
+🛡️ **{T[lang].get('defense_system', {})}:**
+• Defense items reduce incoming damage
+• Active defense shows in your status
+• Defense effectiveness varies by item type
 
-ðŸ… **{T[lang].get('rewards_system', {})}:**
-â€¢ Earn medals for successful attacks
-â€¢ Bonus medals for defeating opponents
-â€¢ Premium weapons give extra rewards
-â€¢ Level up to access better content
+🏅 **{T[lang].get('rewards_system', {})}:**
+• Earn medals for successful attacks
+• Bonus medals for defeating opponents
+• Premium weapons give extra rewards
+• Level up to access better content
 
-â° **{T[lang].get('cooldowns', {})}:**
-â€¢ Attack cooldown prevents spam
-â€¢ Some weapons have limited uses
-â€¢ HP regenerates over time
+⏰ **{T[lang].get('cooldowns', {})}:**
+• Attack cooldown prevents spam
+• Some weapons have limited uses
+• HP regenerates over time
             """
         
         keyboard = types.InlineKeyboardMarkup(row_width=2)
         keyboard.add(
-            types.InlineKeyboardButton(f"ðŸ”« {T[lang].get('weapons_detail', {})}", callback_data='help:combat:weapons'),
-            types.InlineKeyboardButton(f"ðŸ“Š {T[lang].get('stats_detail', {})}", callback_data='help:stats')
+            types.InlineKeyboardButton(f"⚔️ {T[lang].get('weapons_detail', {})}", callback_data='help:combat:weapons'),
+            types.InlineKeyboardButton(f"📊 {T[lang].get('stats_detail', {})}", callback_data='help:stats')
         )
         keyboard.add(
-            types.InlineKeyboardButton(f"ðŸ”™ {T[lang].get('back_to_help', {})}", callback_data='help:main')
+            types.InlineKeyboardButton(f"🔙 {translations.get('back_to_help', lang)}", callback_data='help:main')
         )
     
     await bot.edit_message_text(
@@ -293,44 +294,44 @@ async def _show_combat_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_man
 async def _show_items_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_manager: DBManager, lang: str, subsection: Optional[str]):
     """Show items and shop help"""
     help_text = f"""
-ðŸ›’ **{T[lang].get('shop_system_guide', {})}**
+🛒 **{translations.get('shop_system_guide', lang)}**
 
-ðŸ’° **{T[lang].get('currency_types', {})}:**
-â€¢ ðŸ… **Medals**: Earn by attacking and winning battles
-â€¢ â­ **TG Stars**: Premium currency for special items
+💰 **{translations.get('currency_types', lang)}:**
+• 🏅 **{translations.get('medals', lang)}**: Earn by attacking and winning battles
+• ⭐ **{translations.get('tg_stars', lang)}**: Premium currency for special items
 
-ðŸ—‚ï¸ **{T[lang].get('item_categories', {})}:**
-â€¢ âš”ï¸ **Weapons**: Deal damage to opponents
-â€¢ ðŸ›¡ï¸ **Defense**: Reduce incoming damage
-â€¢ ðŸš€ **Boost**: Temporary enhancements
-â€¢ ðŸ’Ž **Premium**: Exclusive TG Stars items
+🧭 **{translations.get('item_categories', lang)}:**
+• ⚔️ **{translations.get('weapons', lang)}**: Deal damage to opponents
+• 🛡️ **{translations.get('defense', lang)}**: Reduce incoming damage
+• 🚀 **{translations.get('boosts', lang)}**: Temporary enhancements
+• 💎 **Premium**: Exclusive TG Stars items
 
-ðŸ›ï¸ **{T[lang].get('shopping_guide', {})}:**
+🛍️ **{translations.get('shopping_guide', lang)}:**
 1. Use `/shop` to browse items
 2. Check item stats before buying
 3. Use `/buy [item_name]` to purchase
 4. View your items with `/inventory`
 
-ðŸ“¦ **{T[lang].get('inventory_management', {})}:**
-â€¢ Items stack when you buy multiples
-â€¢ Some items have usage limits
-â€¢ Premium items never expire
-â€¢ Weapons are consumed when used
+📦 **{translations.get('inventory_management', lang)}:**
+• Items stack when you buy multiples
+• Some items have usage limits
+• Premium items never expire
+• Weapons are consumed when used
 
-ðŸ’¡ **{T[lang].get('shopping_tips', {})}:**
-â€¢ Start with basic weapons like missiles
-â€¢ Invest in defense items for protection
-â€¢ Save TG Stars for premium weapons
-â€¢ Check `/weapons` to compare damage
+💡 **{translations.get('shopping_tips', lang)}:**
+• Start with basic weapons like missiles
+• Invest in defense items for protection
+• Save TG Stars for premium weapons
+• Check `/weapons` to compare damage
     """
     
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(
-        types.InlineKeyboardButton(f"ðŸ›’ {T[lang].get('open_shop', {})}", callback_data='quick:shop'),
-        types.InlineKeyboardButton(f"ðŸ“¦ {T[lang].get('view_inventory', {})}", callback_data='quick:inventory')
+        types.InlineKeyboardButton(f"🛒 {translations.get('open_shop', lang)}", callback_data='quick:shop'),
+        types.InlineKeyboardButton(f"📦 {translations.get('view_inventory', lang)}", callback_data='quick:inventory')
     )
     keyboard.add(
-        types.InlineKeyboardButton(f"ðŸ”™ {T[lang].get('back_to_help', {})}", callback_data='help:main')
+        types.InlineKeyboardButton(f"🔙 {translations.get('back_to_help', lang)}", callback_data='help:main')
     )
     
     await bot.edit_message_text(
@@ -344,46 +345,46 @@ async def _show_items_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_mana
 async def _show_stats_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_manager: DBManager, lang: str):
     """Show statistics and progression help"""
     help_text = f"""
-ðŸ“Š **{T[lang].get('statistics_guide', {})}**
+📊 **{T[lang].get('statistics_guide', {})}**
 
-ðŸ“ˆ **{T[lang].get('player_stats', {})}:**
-â€¢ **Level**: Increases with score, affects damage
-â€¢ **Score**: Total medals earned from battles
-â€¢ **HP**: Health points, reduced by attacks
-â€¢ **Rank**: Your position in the chat leaderboard
+📈 **{T[lang].get('player_stats', {})}:**
+• **Level**: Increases with score, affects damage
+• **Score**: Total medals earned from battles
+• **HP**: Health points, reduced by attacks
+• **Rank**: Your position in the chat leaderboard
 
-âš”ï¸ **{T[lang].get('combat_stats', {})}:**
-â€¢ **Total Attacks**: Number of attacks you've made
-â€¢ **Total Damage**: Cumulative damage dealt
-â€¢ **Times Attacked**: How often you've been targeted
-â€¢ **Damage Taken**: Total damage received
+⚔️ **{T[lang].get('combat_stats', {})}:**
+• **Total Attacks**: Number of attacks you've made
+• **Total Damage**: Cumulative damage dealt
+• **Times Attacked**: How often you've been targeted
+• **Damage Taken**: Total damage received
 
-ðŸ† **{T[lang].get('progression_system', {})}:**
-â€¢ Earn medals by attacking other players
-â€¢ Level up automatically based on score
-â€¢ Higher levels deal more damage
-â€¢ Unlock better weapons as you progress
+🏆 **{T[lang].get('progression_system', {})}:**
+• Earn medals by attacking other players
+• Level up automatically based on score
+• Higher levels deal more damage
+• Unlock better weapons as you progress
 
-ðŸ“‹ **{T[lang].get('available_stats', {})}:**
-â€¢ `/profile` - Detailed personal statistics
-â€¢ `/battle_stats` - Combat-focused statistics
-â€¢ `/leaderboard` - See top players in chat
-â€¢ `/status` - Quick status overview
+📋 **{T[lang].get('available_stats', {})}:**
+• `/profile` - Detailed personal statistics
+• `/battle_stats` - Combat-focused statistics
+• `/leaderboard` - See top players in chat
+• `/status` - Quick status overview
 
-ðŸŽ¯ **{T[lang].get('improvement_tips', {})}:**
-â€¢ Attack regularly to gain experience
-â€¢ Buy better weapons to deal more damage
-â€¢ Use defense items to protect yourself
-â€¢ Study the leaderboard to track progress
+🎯 **{T[lang].get('improvement_tips', {})}:**
+• Attack regularly to gain experience
+• Buy better weapons to deal more damage
+• Use defense items to protect yourself
+• Study the leaderboard to track progress
     """
     
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(
-        types.InlineKeyboardButton(f"ðŸ‘¤ {T[lang].get('view_profile', {})}", callback_data='quick:stats'),
-        types.InlineKeyboardButton(f"ðŸ† {T[lang].get('view_leaderboard', {})}", callback_data='quick:leaderboard')
+        types.InlineKeyboardButton(f"👤 {T[lang].get('view_profile', {})}", callback_data='quick:stats'),
+        types.InlineKeyboardButton(f"🏆 {T[lang].get('view_leaderboard', {})}", callback_data='quick:leaderboard')
     )
     keyboard.add(
-        types.InlineKeyboardButton(f"ðŸ”™ {T[lang].get('back_to_help', {})}", callback_data='help:main')
+        types.InlineKeyboardButton(f"🔙 {translations.get('back_to_help', lang)}", callback_data='help:main')
     )
     
     await bot.edit_message_text(
@@ -396,43 +397,26 @@ async def _show_stats_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_mana
 
 async def _show_faq_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_manager: DBManager, lang: str):
     """Show frequently asked questions"""
-    if lang == "fa":
-        help_text = f"""
-â“ **{T[lang].get('faq_title', {})}**
+    try:
+        if lang == "fa":
+            help_text = f"""
+✓ **{T[lang].get('faq_title', {})}**
 
-**Ø³: Ú†Ú¯ÙˆÙ†Ù‡ Ø¨Ø§Ø²ÛŒ Ø±Ø§ Ø´Ø±ÙˆØ¹ Ú©Ù†Ù…ØŸ**
-Ø¬: Ø§Ø² `/menu` Ø¨Ø±Ø§ÛŒ Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ù‡Ù…Ù‡ Ú¯Ø²ÛŒÙ†Ù‡â€ŒÙ‡Ø§ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ú©Ù†ÛŒØ¯ Ùˆ Ø¨Ø§ `/attack` Ù†Ø¨Ø±Ø¯ Ø±Ø§ Ø¢ØºØ§Ø² Ú©Ù†ÛŒØ¯.
+• چگونه بازی را شروع کنم؟
+با استفاده از `/menu` همه گزینه‌ها را ببینید و با `/attack` نبرد را آغاز کنید.
 
-**Ø³: Ú†Ø±Ø§ Ù†Ù…ÛŒâ€ŒØªÙˆØ§Ù†Ù… Ø¨Ù‡ Ú©Ø³ÛŒ Ø­Ù…Ù„Ù‡ Ú©Ù†Ù…ØŸ**
-Ø¬: Ø¨Ø±Ø±Ø³ÛŒ Ú©Ù†ÛŒØ¯ Ú©Ù‡ Ø¢ÛŒØ§ ØªØ³Ù„ÛŒØ­Ø§Øª Ø¯Ø§Ø±ÛŒØ¯ØŒ Ø¯Ø± Ø²Ù…Ø§Ù† Ø§Ù†ØªØ¸Ø§Ø± Ù‡Ø³ØªÛŒØ¯ØŒ ÛŒØ§ Ù‡Ø¯Ù Ø¯Ø± Ú†Øª ÙˆØ¬ÙˆØ¯ Ø¯Ø§Ø±Ø¯.
+• چرا نمی‌توانم به کسی حمله کنم؟
+بررسی کنید سلاح دارید، در زمان انتظار نیستید، و هدف در چت وجود دارد.
 
-**Ø³: Ú†Ú¯ÙˆÙ†Ù‡ ØªØ³Ù„ÛŒØ­Ø§Øª Ø¨Ù‡ØªØ±ÛŒ Ø¨Ù‡ Ø¯Ø³Øª Ø¢ÙˆØ±Ù…ØŸ**
-Ø¬: Ø§Ø² `/shop` Ø¨Ø±Ø§ÛŒ Ø®Ø±ÛŒØ¯ ØªØ³Ù„ÛŒØ­Ø§Øª Ø¨Ø§ Ù…Ø¯Ø§Ù„ Ø¨Ø§Ø²Ø¯ÛŒØ¯ Ú©Ù†ÛŒØ¯ØŒ ÛŒØ§ Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù… Ø¨Ø±Ø§ÛŒ Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ÛŒ ÙˆÛŒÚ˜Ù‡ Ú©Ø³Ø¨ Ú©Ù†ÛŒØ¯.
+• چگونه سلاح‌های بهتری به دست آورم؟
+به `/shop` بروید و با مدال بخرید، یا برای آیتم‌های ویژه TG Stars کسب کنید.
 
-**Ø³: Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù… Ú†ÛŒØ³ØªØŸ**
-Ø¬: Ø§Ø±Ø² ÙˆÛŒÚ˜Ù‡â€ŒØ§ÛŒ Ú©Ù‡ Ø§Ø² Ø·Ø±ÛŒÙ‚ ØªÙ„Ú¯Ø±Ø§Ù… Ù‚Ø§Ø¨Ù„ Ú©Ø³Ø¨ ÛŒØ§ Ø®Ø±ÛŒØ¯ Ø¨Ø±Ø§ÛŒ Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ÛŒ Ø§Ù†Ø­ØµØ§Ø±ÛŒ Ø§Ø³Øª.
-
-**Ø³: Ú†Ø±Ø§ Ø­Ù…Ù„Ù‡â€ŒØ§Ù… Ø¢Ø³ÛŒØ¨ Ú©Ù…ØªØ±ÛŒ Ø²Ø¯ØŸ**
-Ø¬: Ù‡Ø¯Ù Ù…Ù…Ú©Ù† Ø§Ø³Øª Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ÛŒ Ø¯ÙØ§Ø¹ÛŒ Ø¯Ø§Ø´ØªÙ‡ Ø¨Ø§Ø´Ø¯ØŒ ÛŒØ§ ØªÙØ§ÙˆØª Ø³Ø·Ø­ Ø¨Ø± Ù…Ø­Ø§Ø³Ø¨Ù‡ Ø¢Ø³ÛŒØ¨ ØªØ£Ø«ÛŒØ± Ù…ÛŒâ€ŒÚ¯Ø°Ø§Ø±Ø¯.
-
-**Ø³: Ú†Ú¯ÙˆÙ†Ù‡ HP Ø®ÙˆØ¯ Ø±Ø§ Ø¯Ø±Ù…Ø§Ù† Ú©Ù†Ù…ØŸ**
-Ø¬: HP Ø¨Ù‡ Ø·ÙˆØ± Ø®ÙˆØ¯Ú©Ø§Ø± Ø¯Ø± Ø·ÙˆÙ„ Ø²Ù…Ø§Ù† Ø¨Ø§Ø²Ø³Ø§Ø²ÛŒ Ù…ÛŒâ€ŒØ´ÙˆØ¯ØŒ ÛŒØ§ Ù…ÛŒâ€ŒØªÙˆØ§Ù†ÛŒØ¯ Ø§Ø² Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ÛŒ Ø¯Ø±Ù…Ø§Ù†ÛŒ ÙØ±ÙˆØ´Ú¯Ø§Ù‡ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ú©Ù†ÛŒØ¯.
-
-**Ø³: Ø¢ÛŒØ§ Ù…ÛŒâ€ŒØªÙˆØ§Ù†Ù… Ø²Ø¨Ø§Ù† Ø®ÙˆØ¯ Ø±Ø§ ØªØºÛŒÛŒØ± Ø¯Ù‡Ù…ØŸ**
-Ø¬: Ø¨Ù„Ù‡! Ø§Ø² `/language` Ø¨Ø±Ø§ÛŒ ØªØºÛŒÛŒØ± Ø¨ÛŒÙ† Ø§Ù†Ú¯Ù„ÛŒØ³ÛŒ Ùˆ ÙØ§Ø±Ø³ÛŒ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ú©Ù†ÛŒØ¯.
-
-**Ø³: Ø³ÛŒØ³ØªÙ… Ø±ØªØ¨Ù‡â€ŒØ¨Ù†Ø¯ÛŒ Ú†Ú¯ÙˆÙ†Ù‡ Ú©Ø§Ø± Ù…ÛŒâ€ŒÚ©Ù†Ø¯ØŸ**
-Ø¬: Ø±ØªØ¨Ù‡â€ŒØ¨Ù†Ø¯ÛŒ Ø¨Ø± Ø§Ø³Ø§Ø³ Ø§Ù…ØªÛŒØ§Ø² Ú©Ù„ (Ù…Ø¯Ø§Ù„â€ŒÙ‡Ø§ÛŒ Ú©Ø³Ø¨ Ø´Ø¯Ù‡) Ø§Ø³Øª. Ø§Ø² `/leaderboard` Ø¨Ø±Ø§ÛŒ Ù…Ø´Ø§Ù‡Ø¯Ù‡ Ø±Ø¯Ù‡â€ŒØ¨Ù†Ø¯ÛŒ ÙØ¹Ù„ÛŒ Ø§Ø³ØªÙØ§Ø¯Ù‡ Ú©Ù†ÛŒØ¯.
-
-**Ø³: ÙˆÙ‚ØªÛŒ HP Ù…Ù† Ø¨Ù‡ ØµÙØ± Ù…ÛŒâ€ŒØ±Ø³Ø¯ Ú†Ù‡ Ø§ØªÙØ§Ù‚ÛŒ Ù…ÛŒâ€ŒØ§ÙØªØ¯ØŸ**
-Ø¬: Ø´Ù…Ø§ Ø´Ú©Ø³Øª Ù…ÛŒâ€ŒØ®ÙˆØ±ÛŒØ¯ Ø§Ù…Ø§ Ø®ÙˆØ¯Ú©Ø§Ø± 50 HP Ø¨Ø±Ù…ÛŒâ€ŒÚ¯Ø±Ø¯Ø§Ù†ÛŒØ¯. Ù…Ù‡Ø§Ø¬Ù… Ù…Ø¯Ø§Ù„â€ŒÙ‡Ø§ÛŒ Ø¬Ø§ÛŒØ²Ù‡ Ø¯Ø±ÛŒØ§ÙØª Ù…ÛŒâ€ŒÚ©Ù†Ø¯.
-
-**Ø³: Ø¢ÛŒØ§ Ù…Ø­Ø¯ÙˆØ¯ÛŒØªÛŒ Ø¨Ø±Ø§ÛŒ Ø­Ù…Ù„Ø§Øª ÙˆØ¬ÙˆØ¯ Ø¯Ø§Ø±Ø¯ØŸ**
-Ø¬: Ø¨Ù„Ù‡ØŒ Ø²Ù…Ø§Ù† Ø§Ù†ØªØ¸Ø§Ø± Ø¨ÛŒÙ† Ø­Ù…Ù„Ø§Øª Ø¨Ø±Ø§ÛŒ Ø¬Ù„ÙˆÚ¯ÛŒØ±ÛŒ Ø§Ø² Ù‡Ø±Ø²Ù†Ø§Ù…Ù‡ ÙˆØ¬ÙˆØ¯ Ø¯Ø§Ø±Ø¯.
-        """
-    else:
-        help_text = f"""
-â“ **{T[lang].get('faq_title', {})}**
+• ستاره‌های تلگرام چیست؟
+ارز ویژه‌ای که از طریق تلگرام قابل کسب یا خرید برای آیتم‌های انحصاری است.
+            """
+        else:
+            help_text = f"""
+✓ **{T[lang].get('faq_title', {})}**
 
 **Q: How do I start playing?**
 A: Use `/menu` to see all available options and start with `/attack` to begin combat.
@@ -469,21 +453,24 @@ A: Use `/use` command or browse your `/inventory` for item usage options.
 
 **Q: What's the difference between weapons and defense items?**
 A: Weapons increase attack damage, while defense items reduce incoming damage or provide protection.
-        """
-    
-    keyboard = types.InlineKeyboardMarkup()
-    keyboard.add(
-        types.InlineKeyboardButton(f"ðŸ†˜ {T[lang].get('contact_support', {})}", url="https://t.me/bettercallninja"),
-        types.InlineKeyboardButton(f"ðŸ”™ {T[lang].get('back_to_help', {})}", callback_data='help:main')
-    )
-    
-    await bot.edit_message_text(
-        help_text,
-        call.message.chat.id,
-        call.message.message_id,
-        reply_markup=keyboard,
-        parse_mode='Markdown'
-    )
+            """
+
+        keyboard = types.InlineKeyboardMarkup()
+        keyboard.add(
+            types.InlineKeyboardButton(f"🆘 {T[lang].get('contact_support', {})}", url="https://t.me/bettercallninja"),
+            types.InlineKeyboardButton(f"🔙 {translations.get('back_to_help', lang)}", callback_data='help:main')
+        )
+
+        await bot.edit_message_text(
+            help_text,
+            call.message.chat.id,
+            call.message.message_id,
+            reply_markup=keyboard,
+            parse_mode='Markdown'
+        )
+    except Exception as e:
+        logger.error(f"Error showing FAQ help: {e}")
+        await bot.answer_callback_query(call.id, "Error displaying FAQ.")
 
 async def _show_traditional_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_manager: DBManager, lang: str, help_section: str):
     """Show traditional help sections for backward compatibility"""
@@ -519,64 +506,64 @@ async def _send_main_help_menu(message: types.Message, bot: AsyncTeleBot, db_man
         help_manager = HelpManager(db_manager, bot)
         user_stats = await help_manager.get_user_stats_for_help(message.chat.id, message.from_user.id)
         recommendations = help_manager.get_contextual_help_recommendations(user_stats)
-        
+
         # Build contextual intro
-        intro_text = f"ðŸ“š **{T[lang].get('help_welcome', {})}**\n\n"
-        
+        intro_text = f"📚 **{T[lang].get('help_welcome', {})}**\n\n"
+
         if recommendations:
-            intro_text += f"ðŸ’¡ **{T[lang].get('recommendations_for_you', {})}:**\n"
+            intro_text += f"💡 **{T[lang].get('recommendations_for_you', {})}:**\n"
             for rec in recommendations[:2]:  # Show max 2 recommendations
-                intro_text += f"â€¢ {rec}\n"
+                intro_text += f"• {rec}\n"
             intro_text += "\n"
-        
+
         intro_text += T[lang].get('help_intro', {})
-        
+
         # Create enhanced keyboard with modern categories
         keyboard = types.InlineKeyboardMarkup(row_width=2)
-        
+
         # First row - Core help
         commands_btn = types.InlineKeyboardButton(
-            f"ðŸ¤– {T[lang].get('commands_help', {})}", 
+            f"🧠 {T[lang].get('commands_help', {})}",
             callback_data='help:commands'
         )
         combat_btn = types.InlineKeyboardButton(
-            f"âš”ï¸ {T[lang].get('combat_help', {})}", 
+            f"⚔️ {T[lang].get('combat_help', {})}",
             callback_data='help:combat'
         )
         keyboard.add(commands_btn, combat_btn)
-        
+
         # Second row - Management
         items_btn = types.InlineKeyboardButton(
-            f"ðŸ›’ {T[lang].get('items_help', {})}", 
+            f"🛒 {T[lang].get('items_help', {})}",
             callback_data='help:items'
         )
         stats_btn = types.InlineKeyboardButton(
-            f"ðŸ“Š {T[lang].get('stats_help', {})}", 
+            f"📊 {T[lang].get('stats_help', {})}",
             callback_data='help:stats'
         )
         keyboard.add(items_btn, stats_btn)
-        
+
         # Third row - Additional help
         faq_btn = types.InlineKeyboardButton(
-            f"â“ {T[lang].get('faq_help', {})}", 
+            f"✓ {T[lang].get('faq_help', {})}",
             callback_data='help:faq'
         )
         keyboard.add(faq_btn)
-        
+
         # Fourth row - Quick actions
         menu_btn = types.InlineKeyboardButton(
-            f"ðŸ“‹ {T[lang].get('main_menu', {})}", 
+            f"📋 {T[lang].get('main_menu', {})}",
             callback_data='quick:menu'
         )
         keyboard.add(menu_btn)
-        
+
         await bot.send_message(
             message.chat.id,
             intro_text,
             reply_markup=keyboard,
             parse_mode='Markdown'
         )
-        
+
     except Exception as e:
         logger.error(f"Error sending help menu: {e}")
         # Fallback to simple help
@@ -591,50 +578,50 @@ async def _edit_to_main_help_menu(message: types.Message, bot: AsyncTeleBot, db_
         help_manager = HelpManager(db_manager, bot)
         user_stats = await help_manager.get_user_stats_for_help(message.chat.id, message.from_user.id)
         recommendations = help_manager.get_contextual_help_recommendations(user_stats)
-        
+
         # Build contextual intro
-        intro_text = f"ðŸ“š **{T[lang].get('help_welcome', {})}**\n\n"
-        
+        intro_text = f"📚 **{T[lang].get('help_welcome', {})}**\n\n"
+
         if recommendations:
-            intro_text += f"ðŸ’¡ **{T[lang].get('recommendations_for_you', {})}:**\n"
+            intro_text += f"💡 **{T[lang].get('recommendations_for_you', {})}:**\n"
             for rec in recommendations[:2]:  # Show max 2 recommendations
-                intro_text += f"â€¢ {rec}\n"
+                intro_text += f"• {rec}\n"
             intro_text += "\n"
-        
+
         intro_text += T[lang].get('help_intro', {})
-        
+
         # Create enhanced keyboard
         keyboard = types.InlineKeyboardMarkup(row_width=2)
-        
+
         # First row - Core help
         commands_btn = types.InlineKeyboardButton(
-            f"ðŸ¤– {T[lang].get('commands_help', {})}", 
+            f"🧠 {T[lang].get('commands_help', {})}",
             callback_data='help:commands'
         )
         combat_btn = types.InlineKeyboardButton(
-            f"âš”ï¸ {T[lang].get('combat_help', {})}", 
+            f"⚔️ {T[lang].get('combat_help', {})}",
             callback_data='help:combat'
         )
         keyboard.add(commands_btn, combat_btn)
-        
+
         # Second row - Management
         items_btn = types.InlineKeyboardButton(
-            f"ðŸ›’ {T[lang].get('items_help', {})}", 
+            f"🛒 {T[lang].get('items_help', {})}",
             callback_data='help:items'
         )
         stats_btn = types.InlineKeyboardButton(
-            f"ðŸ“Š {T[lang].get('stats_help', {})}", 
+            f"📊 {T[lang].get('stats_help', {})}",
             callback_data='help:stats'
         )
         keyboard.add(items_btn, stats_btn)
-        
+
         # Third row - Additional help
         faq_btn = types.InlineKeyboardButton(
-            f"â“ {T[lang].get('faq_help', {})}", 
+            f"✓ {T[lang].get('faq_help', {})}",
             callback_data='help:faq'
         )
         keyboard.add(faq_btn)
-        
+
         await bot.edit_message_text(
             intro_text,
             message.chat.id,
@@ -642,7 +629,7 @@ async def _edit_to_main_help_menu(message: types.Message, bot: AsyncTeleBot, db_
             reply_markup=keyboard,
             parse_mode='Markdown'
         )
-        
+
     except Exception as e:
         logger.error(f"Error editing to help menu: {e}")
 
@@ -706,5 +693,5 @@ def register_handlers(bot: AsyncTeleBot, db_manager: DBManager):
             
         except Exception as e:
             logger.error(f"Error handling quick action {call.data}: {e}")
-            await bot.answer_callback_query(call.id, "âŒ Error processing request.")
+            await bot.answer_callback_query(call.id, "❌ Error processing request.")
 

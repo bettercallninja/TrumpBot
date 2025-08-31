@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Ù¾ÛŒØ´Ø±ÙØªÙ‡â€ŒØªØ±ÛŒÙ† Ù…Ø¯ÛŒØ±ÛŒØª Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ø¨Ø§ Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ Ú©Ø§Ù…Ù„ Ø§Ø² Ø²Ø¨Ø§Ù† ÙØ§Ø±Ø³ÛŒ
+پیشرفته‌ترین مدیریت پایگاه داده با پشتیبانی کامل از زبان فارسی
 Enhanced Database Manager with comprehensive Persian language support and advanced functionality
 """
 
@@ -34,19 +34,19 @@ DB_RETRY_ATTEMPTS = int(os.getenv("DB_RETRY_ATTEMPTS", "3"))
 pool: Optional[AsyncConnectionPool] = None
 
 class DatabaseError(Exception):
-    """Ø®Ø·Ø§ÛŒ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ - Database Error"""
+    """خطای پایگاه داده - Database Error"""
     pass
 
 class UserNotFoundError(DatabaseError):
-    """Ú©Ø§Ø±Ø¨Ø± ÛŒØ§ÙØª Ù†Ø´Ø¯ - User Not Found Error"""
+    """کاربر یافت نشد - User Not Found Error"""
     pass
 
 class TransactionError(DatabaseError):
-    """Ø®Ø·Ø§ÛŒ ØªØ±Ø§Ú©Ù†Ø´ - Transaction Error"""
+    """خطای تراکنش - Transaction Error"""
     pass
 
 class QueryType(Enum):
-    """Ø§Ù†ÙˆØ§Ø¹ Ú©ÙˆØ¦Ø±ÛŒ - Query Types"""
+    """انواع کوئری - Query Types"""
     SELECT = "SELECT"
     INSERT = "INSERT" 
     UPDATE = "UPDATE"
@@ -55,7 +55,7 @@ class QueryType(Enum):
 
 @dataclass
 class UserStats:
-    """Ø¢Ù…Ø§Ø± Ú©Ø§Ø±Ø¨Ø± - User Statistics"""
+    """آمار کاربر - User Statistics"""
     user_id: int
     chat_id: int
     level: int
@@ -84,7 +84,7 @@ class UserStats:
 
 @dataclass
 class ChatStats:
-    """Ø¢Ù…Ø§Ø± Ú†Øª - Chat Statistics"""
+    """آمار چت - Chat Statistics"""
     chat_id: int
     total_players: int
     total_attacks: int
@@ -96,7 +96,7 @@ class ChatStats:
     last_active: datetime
 
 async def initialize_pool() -> None:
-    """Ù…Ù‚Ø¯Ø§Ø±Ø¯Ù‡ÛŒ Ø§ÙˆÙ„ÛŒÙ‡ Ø§Ø³ØªØ®Ø± Ø§ØªØµØ§Ù„Ø§Øª - Initialize the database connection pool"""
+    """مقداردهی اولیه استخر اتصالات - Initialize the database connection pool"""
     global pool
     if pool is None:
         try:
@@ -110,15 +110,15 @@ async def initialize_pool() -> None:
             # Open the pool properly using await
             await pool.open()
             logger.info(f"Database connection pool initialized: min={DB_POOL_MIN_SIZE}, max={DB_POOL_MAX_SIZE}")
-            logger.info(f"Ø§Ø³ØªØ®Ø± Ø§ØªØµØ§Ù„Ø§Øª Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ù…Ù‚Ø¯Ø§Ø±Ø¯Ù‡ÛŒ Ø´Ø¯: Ú©Ù…ÛŒÙ†Ù‡={DB_POOL_MIN_SIZE}, Ø¨ÛŒØ´ÛŒÙ†Ù‡={DB_POOL_MAX_SIZE}")
+            logger.info(f"استخر اتصالات پایگاه داده مقداردهی شد: کمینه={DB_POOL_MIN_SIZE}, بیشینه={DB_POOL_MAX_SIZE}")
         except Exception as e:
             logger.error(f"Failed to initialize database pool: {e}")
-            logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ù…Ù‚Ø¯Ø§Ø±Ø¯Ù‡ÛŒ Ø§Ø³ØªØ®Ø± Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡: {e}")
+            logger.error(f"خطا در مقداردهی استخر پایگاه داده: {e}")
             raise DatabaseError(f"Database initialization failed: {e}")
 
 class DBManager:
     """
-    Ù…Ø¯ÛŒØ± Ù¾ÛŒØ´Ø±ÙØªÙ‡ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ø¨Ø§ Ù‚Ø§Ø¨Ù„ÛŒØªâ€ŒÙ‡Ø§ÛŒ Ú©Ø§Ù…Ù„
+    مدیر پیشرفته پایگاه داده با قابلیت‌های کامل
     Advanced Database Manager with comprehensive functionality and Persian support
     """
     
@@ -128,7 +128,7 @@ class DBManager:
         self._cache_ttl = 300  # 5 minutes cache TTL
         
     async def ensure_pool(self) -> None:
-        """Ø§Ø·Ù…ÛŒÙ†Ø§Ù† Ø§Ø² ÙˆØ¬ÙˆØ¯ Ø§Ø³ØªØ®Ø± Ø§ØªØµØ§Ù„Ø§Øª - Ensure connection pool exists"""
+        """اطمینان از وجود استخر اتصالات - Ensure connection pool exists"""
         if not self._pool:
             await initialize_pool()
             self._pool = pool
@@ -136,7 +136,7 @@ class DBManager:
     async def db(self, query: str, params: Optional[Tuple] = None, fetch: Optional[str] = None, 
                 retry_count: int = 0) -> Any:
         """
-        Ø§Ø¬Ø±Ø§ÛŒ Ú©ÙˆØ¦Ø±ÛŒ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ø¨Ø§ Ù…Ø¯ÛŒØ±ÛŒØª Ø®Ø·Ø§ Ùˆ ØªÙ„Ø§Ø´ Ù…Ø¬Ø¯Ø¯
+        اجرای کوئری پایگاه داده با مدیریت خطا و تلاش مجدد
         Execute database query with error handling and retry logic
         
         Args:
@@ -179,23 +179,23 @@ class DBManager:
         except psycopg.OperationalError as e:
             if retry_count < DB_RETRY_ATTEMPTS:
                 logger.warning(f"Database connection error, retrying... ({retry_count + 1}/{DB_RETRY_ATTEMPTS})")
-                logger.warning(f"Ø®Ø·Ø§ÛŒ Ø§ØªØµØ§Ù„ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ØŒ ØªÙ„Ø§Ø´ Ù…Ø¬Ø¯Ø¯... ({retry_count + 1}/{DB_RETRY_ATTEMPTS})")
+                logger.warning(f"خطای اتصال پایگاه داده، تلاش مجدد... ({retry_count + 1}/{DB_RETRY_ATTEMPTS})")
                 await asyncio.sleep(1 * (retry_count + 1))  # Exponential backoff
                 return await self.db(query, params, fetch, retry_count + 1)
             else:
                 logger.error(f"Database connection failed after {DB_RETRY_ATTEMPTS} attempts")
-                logger.error(f"Ø§ØªØµØ§Ù„ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ù¾Ø³ Ø§Ø² {DB_RETRY_ATTEMPTS} ØªÙ„Ø§Ø´ Ù†Ø§Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯")
+                logger.error(f"اتصال پایگاه داده پس از {DB_RETRY_ATTEMPTS} تلاش ناموفق بود")
                 raise DatabaseError(f"Database connection failed: {e}")
         except Exception as e:
             logger.error(f"Database error: {str(e)}")
             logger.error(f"Query: {query}")
             logger.error(f"Params: {params}")
-            logger.error(f"Ø®Ø·Ø§ÛŒ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡: {str(e)}")
+            logger.error(f"خطای پایگاه داده: {str(e)}")
             raise DatabaseError(f"Query execution failed: {e}")
     
     async def transaction(self, queries: List[Tuple[str, Optional[Tuple]]]) -> bool:
         """
-        Ø§Ø¬Ø±Ø§ÛŒ Ú†Ù†Ø¯ÛŒÙ† Ú©ÙˆØ¦Ø±ÛŒ Ø¯Ø± ÛŒÚ© ØªØ±Ø§Ú©Ù†Ø´
+        اجرای چندین کوئری در یک تراکنش
         Execute multiple queries in a transaction
         
         Args:
@@ -212,19 +212,19 @@ class DBManager:
                     for query, params in queries:
                         await conn.execute(query, params)
             logger.info(f"Transaction completed successfully with {len(queries)} queries")
-            logger.info(f"ØªØ±Ø§Ú©Ù†Ø´ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø¨Ø§ {len(queries)} Ú©ÙˆØ¦Ø±ÛŒ Ú©Ø§Ù…Ù„ Ø´Ø¯")
+            logger.info(f"تراکنش با موفقیت با {len(queries)} کوئری کامل شد")
             return True
         except Exception as e:
             logger.error(f"Transaction failed: {e}")
-            logger.error(f"ØªØ±Ø§Ú©Ù†Ø´ Ù†Ø§Ù…ÙˆÙÙ‚ Ø¨ÙˆØ¯: {e}")
+            logger.error(f"تراکنش ناموفق بود: {e}")
             raise TransactionError(f"Transaction failed: {e}")
 
     # =============================================================================
-    # Ù…Ø¯ÛŒØ±ÛŒØª Ú©Ø§Ø±Ø¨Ø±Ø§Ù† - User Management
+    # مدیریت کاربران - User Management
     # =============================================================================
     
     async def get_user(self, chat_id: int, user_id: int) -> Optional[Dict[str, Any]]:
-        """Ø¯Ø±ÛŒØ§ÙØª Ø§Ø·Ù„Ø§Ø¹Ø§Øª Ú©Ø§Ø±Ø¨Ø± - Get user data from the database"""
+        """دریافت اطلاعات کاربر - Get user data from the database"""
         try:
             return await self.db(
                 "SELECT * FROM players WHERE chat_id=%s AND user_id=%s", 
@@ -237,7 +237,7 @@ class DBManager:
     
     async def create_user(self, chat_id: int, user_id: int, first_name: str, 
                          username: Optional[str] = None, language: str = "en") -> bool:
-        """Ø§ÛŒØ¬Ø§Ø¯ Ú©Ø§Ø±Ø¨Ø± Ø¬Ø¯ÛŒØ¯ - Create new user"""
+        """ایجاد کاربر جدید - Create new user"""
         try:
             current_time = int(time.time())
             await self.db("""
@@ -250,15 +250,15 @@ class DBManager:
             """, (chat_id, user_id, first_name, username, language, current_time))
             
             logger.info(f"User created/updated: {first_name} ({user_id}) in chat {chat_id}")
-            logger.info(f"Ú©Ø§Ø±Ø¨Ø± Ø§ÛŒØ¬Ø§Ø¯/Ø¨Ù‡â€ŒØ±ÙˆØ²Ø±Ø³Ø§Ù†ÛŒ Ø´Ø¯: {first_name} ({user_id}) Ø¯Ø± Ú†Øª {chat_id}")
+            logger.info(f"کاربر ایجاد/به‌روزرسانی شد: {first_name} ({user_id}) در چت {chat_id}")
             return True
         except Exception as e:
             logger.error(f"Error creating user: {e}")
-            logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ø§ÛŒØ¬Ø§Ø¯ Ú©Ø§Ø±Ø¨Ø±: {e}")
+            logger.error(f"خطا در ایجاد کاربر: {e}")
             return False
     
     async def get_chat_language(self, chat_id: int) -> str:
-        """Ø¯Ø±ÛŒØ§ÙØª Ø²Ø¨Ø§Ù† Ù¾ÛŒØ´â€ŒÙØ±Ø¶ Ú†Øª - Get chat default language"""
+        """دریافت زبان پیش‌فرض چت - Get chat default language"""
         try:
             result = await self.db(
                 "SELECT language FROM groups WHERE chat_id = %s",
@@ -271,7 +271,7 @@ class DBManager:
             return 'en'
     
     async def update_user_activity(self, chat_id: int = None, user_id: int = None, activity_type: str = None, activity_data: Dict = None, **kwargs) -> bool:
-        """Ø¨Ù‡â€ŒØ±ÙˆØ²Ø±Ø³Ø§Ù†ÛŒ ÙØ¹Ø§Ù„ÛŒØª Ú©Ø§Ø±Ø¨Ø± - Update user activity"""
+        """به‌روزرسانی فعالیت کاربر - Update user activity"""
         try:
             # Handle flexible parameter passing
             if chat_id is None and 'chat_id' in kwargs:
@@ -301,7 +301,7 @@ class DBManager:
             return False
     
     async def get_user_stats(self, chat_id: int, user_id: int) -> Optional[UserStats]:
-        """Ø¯Ø±ÛŒØ§ÙØª Ø¢Ù…Ø§Ø± Ú©Ø§Ù…Ù„ Ú©Ø§Ø±Ø¨Ø± - Get comprehensive user statistics"""
+        """دریافت آمار کامل کاربر - Get comprehensive user statistics"""
         try:
             # Get basic user data
             user_data = await self.get_user(chat_id, user_id)
@@ -360,21 +360,21 @@ class DBManager:
             return None
     
     async def update_user_language(self, chat_id: int, user_id: int, language: str) -> bool:
-        """Ø¨Ù‡â€ŒØ±ÙˆØ²Ø±Ø³Ø§Ù†ÛŒ Ø²Ø¨Ø§Ù† Ú©Ø§Ø±Ø¨Ø± - Update user language preference"""
+        """به‌روزرسانی زبان کاربر - Update user language preference"""
         try:
             await self.db(
                 "UPDATE players SET language = %s WHERE chat_id = %s AND user_id = %s",
                 (language, chat_id, user_id)
             )
             logger.info(f"Language updated for user {user_id}: {language}")
-            logger.info(f"Ø²Ø¨Ø§Ù† Ú©Ø§Ø±Ø¨Ø± {user_id} Ø¨Ù‡â€ŒØ±ÙˆØ²Ø±Ø³Ø§Ù†ÛŒ Ø´Ø¯: {language}")
+            logger.info(f"زبان کاربر {user_id} به‌روزرسانی شد: {language}")
             return True
         except Exception as e:
             logger.error(f"Error updating user language: {e}")
             return False
     
     async def get_user_level(self, chat_id: int, user_id: int) -> int:
-        """Ø¯Ø±ÛŒØ§ÙØª Ø³Ø·Ø­ Ú©Ø§Ø±Ø¨Ø± - Get user level"""
+        """دریافت سطح کاربر - Get user level"""
         try:
             result = await self.db(
                 "SELECT level FROM players WHERE chat_id = %s AND user_id = %s",
@@ -386,7 +386,7 @@ class DBManager:
             return 1
     
     async def update_user_score(self, chat_id: int, user_id: int, score_change: int) -> Optional[int]:
-        """Ø¨Ù‡â€ŒØ±ÙˆØ²Ø±Ø³Ø§Ù†ÛŒ Ø§Ù…ØªÛŒØ§Ø² Ú©Ø§Ø±Ø¨Ø± - Update user score"""
+        """به‌روزرسانی امتیاز کاربر - Update user score"""
         try:
             result = await self.db("""
                 UPDATE players 
@@ -406,7 +406,7 @@ class DBManager:
             return None
     
     async def update_user_hp(self, chat_id: int, user_id: int, hp_change: int) -> Optional[int]:
-        """Ø¨Ù‡â€ŒØ±ÙˆØ²Ø±Ø³Ø§Ù†ÛŒ Ø¬Ø§Ù† Ú©Ø§Ø±Ø¨Ø± - Update user HP"""
+        """به‌روزرسانی جان کاربر - Update user HP"""
         try:
             result = await self.db("""
                 UPDATE players 
@@ -422,7 +422,7 @@ class DBManager:
             return None
     
     async def update_user_tg_stars(self, chat_id: int, user_id: int, stars_change: int) -> Optional[int]:
-        """Ø¨Ù‡â€ŒØ±ÙˆØ²Ø±Ø³Ø§Ù†ÛŒ Ø³ØªØ§Ø±Ù‡â€ŒÙ‡Ø§ÛŒ ØªÙ„Ú¯Ø±Ø§Ù… - Update user TG Stars"""
+        """به‌روزرسانی ستاره‌های تلگرام - Update user TG Stars"""
         try:
             result = await self.db("""
                 UPDATE players 
@@ -438,11 +438,11 @@ class DBManager:
             return None
 
     # =============================================================================
-    # Ù…Ø¯ÛŒØ±ÛŒØª Ù…ÙˆØ¬ÙˆØ¯ÛŒ - Inventory Management
+    # مدیریت موجودی - Inventory Management
     # =============================================================================
     
     async def get_inventory(self, chat_id: int, user_id: int) -> Dict[str, int]:
-        """Ø¯Ø±ÛŒØ§ÙØª Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ú©Ø§Ø±Ø¨Ø± - Get user inventory from the database"""
+        """دریافت موجودی کاربر - Get user inventory from the database"""
         try:
             rows = await self.db(
                 "SELECT item, qty FROM inventories WHERE chat_id=%s AND user_id=%s AND qty > 0", 
@@ -455,7 +455,7 @@ class DBManager:
             return {}
     
     async def get_item_quantity(self, chat_id: int, user_id: int, item: str) -> int:
-        """Ø¯Ø±ÛŒØ§ÙØª ØªØ¹Ø¯Ø§Ø¯ Ø¢ÛŒØªÙ… Ø®Ø§Øµ - Get quantity of specific item"""
+        """دریافت تعداد آیتم خاص - Get quantity of specific item"""
         try:
             result = await self.db(
                 "SELECT qty FROM inventories WHERE chat_id = %s AND user_id = %s AND item = %s",
@@ -467,7 +467,7 @@ class DBManager:
             return 0
     
     async def add_item(self, chat_id: int, user_id: int, item: str, quantity: int = 1) -> bool:
-        """Ø§ÙØ²ÙˆØ¯Ù† Ø¢ÛŒØªÙ… Ø¨Ù‡ Ù…ÙˆØ¬ÙˆØ¯ÛŒ - Add item to inventory"""
+        """افزودن آیتم به موجودی - Add item to inventory"""
         try:
             await self.db("""
                 INSERT INTO inventories (chat_id, user_id, item, qty)
@@ -477,14 +477,14 @@ class DBManager:
             """, (chat_id, user_id, item, quantity))
             
             logger.info(f"Added {quantity}x {item} to user {user_id} inventory")
-            logger.info(f"{quantity} Ø¹Ø¯Ø¯ {item} Ø¨Ù‡ Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ú©Ø§Ø±Ø¨Ø± {user_id} Ø§Ø¶Ø§ÙÙ‡ Ø´Ø¯")
+            logger.info(f"{quantity} عدد {item} به موجودی کاربر {user_id} اضافه شد")
             return True
         except Exception as e:
             logger.error(f"Error adding item to inventory: {e}")
             return False
     
     async def remove_item(self, chat_id: int, user_id: int, item: str, quantity: int = 1) -> bool:
-        """Ø­Ø°Ù Ø¢ÛŒØªÙ… Ø§Ø² Ù…ÙˆØ¬ÙˆØ¯ÛŒ - Remove item from inventory"""
+        """حذف آیتم از موجودی - Remove item from inventory"""
         try:
             # Check if user has enough items
             current_qty = await self.get_item_quantity(chat_id, user_id, item)
@@ -505,14 +505,14 @@ class DBManager:
             )
             
             logger.info(f"Removed {quantity}x {item} from user {user_id} inventory")
-            logger.info(f"{quantity} Ø¹Ø¯Ø¯ {item} Ø§Ø² Ù…ÙˆØ¬ÙˆØ¯ÛŒ Ú©Ø§Ø±Ø¨Ø± {user_id} Ø­Ø°Ù Ø´Ø¯")
+            logger.info(f"{quantity} عدد {item} از موجودی کاربر {user_id} حذف شد")
             return True
         except Exception as e:
             logger.error(f"Error removing item from inventory: {e}")
             return False
     
     async def get_inventory_value(self, chat_id: int, user_id: int) -> Dict[str, int]:
-        """Ù…Ø­Ø§Ø³Ø¨Ù‡ Ø§Ø±Ø²Ø´ Ú©Ù„ Ù…ÙˆØ¬ÙˆØ¯ÛŒ - Calculate total inventory value"""
+        """محاسبه ارزش کل موجودی - Calculate total inventory value"""
         try:
             from src.config.items import ITEMS
             
@@ -540,12 +540,12 @@ class DBManager:
             return {'medals': 0, 'tg_stars': 0, 'total_items': 0}
 
     # =============================================================================
-    # Ù…Ø¯ÛŒØ±ÛŒØª Ø­Ù…Ù„Ø§Øª - Attack Management
+    # مدیریت حملات - Attack Management
     # =============================================================================
     
     async def record_attack(self, chat_id: int, attacker_id: int, victim_id: int, 
                            damage: int, weapon: str) -> bool:
-        """Ø«Ø¨Øª Ø­Ù…Ù„Ù‡ - Record an attack"""
+        """ثبت حمله - Record an attack"""
         try:
             current_time = int(time.time())
             await self.db("""
@@ -554,7 +554,7 @@ class DBManager:
             """, (chat_id, attacker_id, victim_id, damage, current_time, weapon))
             
             logger.info(f"Attack recorded: {attacker_id} -> {victim_id} ({damage} damage with {weapon})")
-            logger.info(f"Ø­Ù…Ù„Ù‡ Ø«Ø¨Øª Ø´Ø¯: {attacker_id} -> {victim_id} ({damage} Ø¢Ø³ÛŒØ¨ Ø¨Ø§ {weapon})")
+            logger.info(f"حمله ثبت شد: {attacker_id} -> {victim_id} ({damage} آسیب با {weapon})")
             return True
         except Exception as e:
             logger.error(f"Error recording attack: {e}")
@@ -562,7 +562,7 @@ class DBManager:
     
     async def get_attack_history(self, chat_id: int, user_id: Optional[int] = None, 
                                 limit: int = 50) -> List[Dict[str, Any]]:
-        """Ø¯Ø±ÛŒØ§ÙØª ØªØ§Ø±ÛŒØ®Ú†Ù‡ Ø­Ù…Ù„Ø§Øª - Get attack history"""
+        """دریافت تاریخچه حملات - Get attack history"""
         try:
             if user_id:
                 # Get attacks involving specific user
@@ -597,7 +597,7 @@ class DBManager:
             return []
     
     async def get_user_combat_stats(self, chat_id: int, user_id: int) -> Dict[str, Any]:
-        """Ø¯Ø±ÛŒØ§ÙØª Ø¢Ù…Ø§Ø± Ø¬Ù†Ú¯ÛŒ Ú©Ø§Ø±Ø¨Ø± - Get user combat statistics"""
+        """دریافت آمار جنگی کاربر - Get user combat statistics"""
         try:
             # Attack stats
             attack_stats = await self.db("""
@@ -653,12 +653,12 @@ class DBManager:
             return {}
 
     # =============================================================================
-    # Ù…Ø¯ÛŒØ±ÛŒØª Ø®Ø±ÛŒØ¯Ù‡Ø§ - Purchase Management  
+    # مدیریت خریدها - Purchase Management  
     # =============================================================================
     
     async def record_purchase(self, chat_id: int, user_id: int, item: str, price: int, 
                              payment_type: str = "medals") -> bool:
-        """Ø«Ø¨Øª Ø®Ø±ÛŒØ¯ - Record a purchase"""
+        """ثبت خرید - Record a purchase"""
         try:
             current_time = int(time.time())
             
@@ -676,7 +676,7 @@ class DBManager:
                 """, (chat_id, user_id, item, price, current_time))
             
             logger.info(f"Purchase recorded: user {user_id} bought {item} for {price} {payment_type}")
-            logger.info(f"Ø®Ø±ÛŒØ¯ Ø«Ø¨Øª Ø´Ø¯: Ú©Ø§Ø±Ø¨Ø± {user_id} Ø¢ÛŒØªÙ… {item} Ø±Ø§ Ø¨Ù‡ Ù‚ÛŒÙ…Øª {price} {payment_type} Ø®Ø±ÛŒØ¯")
+            logger.info(f"خرید ثبت شد: کاربر {user_id} آیتم {item} را به قیمت {price} {payment_type} خرید")
             return True
         except Exception as e:
             logger.error(f"Error recording purchase: {e}")
@@ -684,7 +684,7 @@ class DBManager:
     
     async def get_purchase_history(self, chat_id: int, user_id: Optional[int] = None, 
                                   limit: int = 50) -> List[Dict[str, Any]]:
-        """Ø¯Ø±ÛŒØ§ÙØª ØªØ§Ø±ÛŒØ®Ú†Ù‡ Ø®Ø±ÛŒØ¯Ù‡Ø§ - Get purchase history"""
+        """دریافت تاریخچه خریدها - Get purchase history"""
         try:
             if user_id:
                 # Get purchases for specific user
@@ -713,7 +713,7 @@ class DBManager:
             return []
     
     async def get_spending_stats(self, chat_id: int, user_id: int) -> Dict[str, Any]:
-        """Ø¯Ø±ÛŒØ§ÙØª Ø¢Ù…Ø§Ø± Ø®Ø±Ø¬ Ú©Ø±Ø¯ - Get spending statistics"""
+        """دریافت آمار خرج کرد - Get spending statistics"""
         try:
             # Medal spending
             medal_stats = await self.db("""
@@ -755,12 +755,12 @@ class DBManager:
             return {}
 
     # =============================================================================
-    # Ù…Ø¯ÛŒØ±ÛŒØª Ú©ÙˆÙ„Ø¯Ø§Ù† - Cooldown Management
+    # مدیریت کولدان - Cooldown Management
     # =============================================================================
     
     async def set_cooldown(self, chat_id: int, user_id: int, action: str, 
                           duration: int, data: Optional[str] = None) -> bool:
-        """ØªÙ†Ø¸ÛŒÙ… Ú©ÙˆÙ„Ø¯Ø§Ù† - Set cooldown for an action"""
+        """تنظیم کولدان - Set cooldown for an action"""
         try:
             until_time = int(time.time()) + duration
             await self.db("""
@@ -771,14 +771,14 @@ class DBManager:
             """, (chat_id, user_id, action, until_time, data))
             
             logger.info(f"Cooldown set for user {user_id}: {action} for {duration} seconds")
-            logger.info(f"Ú©ÙˆÙ„Ø¯Ø§Ù† Ø¨Ø±Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø± {user_id} ØªÙ†Ø¸ÛŒÙ… Ø´Ø¯: {action} Ø¨Ø±Ø§ÛŒ {duration} Ø«Ø§Ù†ÛŒÙ‡")
+            logger.info(f"کولدان برای کاربر {user_id} تنظیم شد: {action} برای {duration} ثانیه")
             return True
         except Exception as e:
             logger.error(f"Error setting cooldown: {e}")
             return False
     
     async def get_cooldown(self, chat_id: int, user_id: int, action: str) -> Optional[int]:
-        """Ø¯Ø±ÛŒØ§ÙØª Ø²Ù…Ø§Ù† Ø¨Ø§Ù‚ÛŒÙ…Ø§Ù†Ø¯Ù‡ Ú©ÙˆÙ„Ø¯Ø§Ù† - Get remaining cooldown time"""
+        """دریافت زمان باقیمانده کولدان - Get remaining cooldown time"""
         try:
             result = await self.db(
                 "SELECT until FROM cooldowns WHERE chat_id = %s AND user_id = %s AND action = %s",
@@ -794,7 +794,7 @@ class DBManager:
             return 0
     
     async def clear_cooldown(self, chat_id: int, user_id: int, action: str) -> bool:
-        """Ù¾Ø§Ú© Ú©Ø±Ø¯Ù† Ú©ÙˆÙ„Ø¯Ø§Ù† - Clear cooldown"""
+        """پاک کردن کولدان - Clear cooldown"""
         try:
             await self.db(
                 "DELETE FROM cooldowns WHERE chat_id = %s AND user_id = %s AND action = %s",
@@ -806,7 +806,7 @@ class DBManager:
             return False
     
     async def cleanup_expired_cooldowns(self) -> int:
-        """Ù¾Ø§Ú©â€ŒØ³Ø§Ø²ÛŒ Ú©ÙˆÙ„Ø¯Ø§Ù†â€ŒÙ‡Ø§ÛŒ Ù…Ù†Ù‚Ø¶ÛŒ - Clean up expired cooldowns"""
+        """پاک‌سازی کولدان‌های منقضی - Clean up expired cooldowns"""
         try:
             current_time = int(time.time())
             result = await self.db(
@@ -814,19 +814,19 @@ class DBManager:
                 (current_time,)
             )
             logger.info(f"Cleaned up expired cooldowns")
-            logger.info(f"Ú©ÙˆÙ„Ø¯Ø§Ù†â€ŒÙ‡Ø§ÛŒ Ù…Ù†Ù‚Ø¶ÛŒ Ù¾Ø§Ú©â€ŒØ³Ø§Ø²ÛŒ Ø´Ø¯Ù†Ø¯")
+            logger.info(f"کولدان‌های منقضی پاک‌سازی شدند")
             return True
         except Exception as e:
             logger.error(f"Error cleaning up cooldowns: {e}")
             return False
 
     # =============================================================================
-    # Ù…Ø¯ÛŒØ±ÛŒØª Ø¯ÙØ§Ø¹ ÙØ¹Ø§Ù„ - Active Defense Management
+    # مدیریت دفاع فعال - Active Defense Management
     # =============================================================================
     
     async def set_active_defense(self, chat_id: int, user_id: int, defense_type: str, 
                                 duration: int) -> bool:
-        """ÙØ¹Ø§Ù„â€ŒØ³Ø§Ø²ÛŒ Ø¯ÙØ§Ø¹ - Activate defense"""
+        """فعال‌سازی دفاع - Activate defense"""
         try:
             expires_at = int(time.time()) + duration
             await self.db("""
@@ -837,14 +837,14 @@ class DBManager:
             """, (chat_id, user_id, defense_type, expires_at))
             
             logger.info(f"Active defense set for user {user_id}: {defense_type} for {duration} seconds")
-            logger.info(f"Ø¯ÙØ§Ø¹ ÙØ¹Ø§Ù„ Ø¨Ø±Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø± {user_id} ØªÙ†Ø¸ÛŒÙ… Ø´Ø¯: {defense_type} Ø¨Ø±Ø§ÛŒ {duration} Ø«Ø§Ù†ÛŒÙ‡")
+            logger.info(f"دفاع فعال برای کاربر {user_id} تنظیم شد: {defense_type} برای {duration} ثانیه")
             return True
         except Exception as e:
             logger.error(f"Error setting active defense: {e}")
             return False
     
     async def get_active_defense(self, chat_id: int, user_id: int) -> Optional[Dict[str, Any]]:
-        """Ø¯Ø±ÛŒØ§ÙØª Ø¯ÙØ§Ø¹ ÙØ¹Ø§Ù„ - Get active defense"""
+        """دریافت دفاع فعال - Get active defense"""
         try:
             current_time = int(time.time())
             result = await self.db("""
@@ -858,7 +858,7 @@ class DBManager:
             return None
     
     async def clear_active_defense(self, chat_id: int, user_id: int) -> bool:
-        """Ù¾Ø§Ú© Ú©Ø±Ø¯Ù† Ø¯ÙØ§Ø¹ ÙØ¹Ø§Ù„ - Clear active defense"""
+        """پاک کردن دفاع فعال - Clear active defense"""
         try:
             await self.db(
                 "DELETE FROM active_defenses WHERE chat_id = %s AND user_id = %s",
@@ -870,7 +870,7 @@ class DBManager:
             return False
     
     async def cleanup_expired_defenses(self) -> bool:
-        """Ù¾Ø§Ú©â€ŒØ³Ø§Ø²ÛŒ Ø¯ÙØ§Ø¹â€ŒÙ‡Ø§ÛŒ Ù…Ù†Ù‚Ø¶ÛŒ - Clean up expired defenses"""
+        """پاک‌سازی دفاع‌های منقضی - Clean up expired defenses"""
         try:
             current_time = int(time.time())
             await self.db(
@@ -878,17 +878,17 @@ class DBManager:
                 (current_time,)
             )
             logger.info("Cleaned up expired defenses")
-            logger.info("Ø¯ÙØ§Ø¹â€ŒÙ‡Ø§ÛŒ Ù…Ù†Ù‚Ø¶ÛŒ Ù¾Ø§Ú©â€ŒØ³Ø§Ø²ÛŒ Ø´Ø¯Ù†Ø¯")
+            logger.info("دفاع‌های منقضی پاک‌سازی شدند")
             return True
         except Exception as e:
             logger.error(f"Error cleaning up defenses: {e}")
     # =============================================================================
-    # Ù…Ø¯ÛŒØ±ÛŒØª Ù„ÛŒØ¯Ø±Ø¨ÙˆØ±Ø¯ Ùˆ Ø±ØªØ¨Ù‡â€ŒØ¨Ù†Ø¯ÛŒ - Leaderboard Management
+    # مدیریت لیدربورد و رتبه‌بندی - Leaderboard Management
     # =============================================================================
     
     async def get_leaderboard(self, chat_id: int, limit: int = 10, 
                              order_by: str = "score") -> List[Dict[str, Any]]:
-        """Ø¯Ø±ÛŒØ§ÙØª Ù„ÛŒØ¯Ø±Ø¨ÙˆØ±Ø¯ - Get leaderboard"""
+        """دریافت لیدربورد - Get leaderboard"""
         try:
             valid_orders = {
                 "score": "score DESC",
@@ -941,7 +941,7 @@ class DBManager:
     
     async def get_user_rank(self, chat_id: int, user_id: int, 
                            order_by: str = "score") -> Optional[int]:
-        """Ø¯Ø±ÛŒØ§ÙØª Ø±ØªØ¨Ù‡ Ú©Ø§Ø±Ø¨Ø± - Get user rank"""
+        """دریافت رتبه کاربر - Get user rank"""
         try:
             valid_orders = {
                 "score": "score DESC",
@@ -966,7 +966,7 @@ class DBManager:
             return None
     
     async def get_chat_statistics(self, chat_id: int) -> Optional[ChatStats]:
-        """Ø¯Ø±ÛŒØ§ÙØª Ø¢Ù…Ø§Ø± Ú©Ø§Ù…Ù„ Ú†Øª - Get comprehensive chat statistics"""
+        """دریافت آمار کامل چت - Get comprehensive chat statistics"""
         try:
             # Basic chat info
             chat_info = await self.db(
@@ -1029,11 +1029,11 @@ class DBManager:
             return None
 
     # =============================================================================
-    # Ú¯Ø²Ø§Ø±Ø´â€ŒÚ¯ÛŒØ±ÛŒ Ùˆ ØªØ­Ù„ÛŒÙ„ - Analytics and Reporting
+    # گزارش‌گیری و تحلیل - Analytics and Reporting
     # =============================================================================
     
     async def get_daily_activity(self, chat_id: int, days: int = 7) -> Dict[str, List[int]]:
-        """Ø¯Ø±ÛŒØ§ÙØª ÙØ¹Ø§Ù„ÛŒØª Ø±ÙˆØ²Ø§Ù†Ù‡ - Get daily activity statistics"""
+        """دریافت فعالیت روزانه - Get daily activity statistics"""
         try:
             import asyncio
             
@@ -1078,7 +1078,7 @@ class DBManager:
             return {'attacks': [], 'purchases': [], 'new_users': []}
     
     async def get_weapon_usage_stats(self, chat_id: int, limit: int = 10) -> List[Dict[str, Any]]:
-        """Ø¯Ø±ÛŒØ§ÙØª Ø¢Ù…Ø§Ø± Ø§Ø³ØªÙØ§Ø¯Ù‡ Ø§Ø² Ø³Ù„Ø§Ø­â€ŒÙ‡Ø§ - Get weapon usage statistics"""
+        """دریافت آمار استفاده از سلاح‌ها - Get weapon usage statistics"""
         try:
             weapon_stats = await self.db("""
                 SELECT 
@@ -1101,7 +1101,7 @@ class DBManager:
             return []
     
     async def get_item_popularity(self, chat_id: int, limit: int = 10) -> List[Dict[str, Any]]:
-        """Ø¯Ø±ÛŒØ§ÙØª Ù…Ø­Ø¨ÙˆØ¨ÛŒØª Ø¢ÛŒØªÙ…â€ŒÙ‡Ø§ - Get item popularity statistics"""
+        """دریافت محبوبیت آیتم‌ها - Get item popularity statistics"""
         try:
             item_stats = await self.db("""
                 SELECT 
@@ -1123,7 +1123,7 @@ class DBManager:
             return []
     
     async def export_user_data(self, chat_id: int, user_id: int) -> Dict[str, Any]:
-        """ØµØ§Ø¯Ø±Ø§Øª Ú©Ø§Ù…Ù„ Ø¯Ø§Ø¯Ù‡â€ŒÙ‡Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø± - Export complete user data"""
+        """صادرات کامل داده‌های کاربر - Export complete user data"""
         try:
             # Get all user-related data
             user_data = await self.get_user(chat_id, user_id)
@@ -1146,11 +1146,11 @@ class DBManager:
             return {}
 
     # =============================================================================
-    # Ø¨Ú©Ø§Ù¾ Ùˆ Ø¨Ø§Ø²ÛŒØ§Ø¨ÛŒ - Backup and Recovery  
+    # بکاپ و بازیابی - Backup and Recovery  
     # =============================================================================
     
     async def create_chat_backup(self, chat_id: int) -> Optional[Dict[str, Any]]:
-        """Ø§ÛŒØ¬Ø§Ø¯ Ø¨Ú©Ø§Ù¾ Ú©Ø§Ù…Ù„ Ú†Øª - Create complete chat backup"""
+        """ایجاد بکاپ کامل چت - Create complete chat backup"""
         try:
             backup_data = {
                 'chat_id': chat_id,
@@ -1179,14 +1179,14 @@ class DBManager:
                 backup_data[table_name] = data or []
             
             logger.info(f"Chat backup created for chat {chat_id}")
-            logger.info(f"Ø¨Ú©Ø§Ù¾ Ú†Øª Ø¨Ø±Ø§ÛŒ Ú†Øª {chat_id} Ø§ÛŒØ¬Ø§Ø¯ Ø´Ø¯")
+            logger.info(f"بکاپ چت برای چت {chat_id} ایجاد شد")
             return backup_data
         except Exception as e:
             logger.error(f"Error creating chat backup: {e}")
             return None
     
     async def maintenance_cleanup(self) -> Dict[str, int]:
-        """Ù¾Ø§Ú©â€ŒØ³Ø§Ø²ÛŒ Ø¯ÙˆØ±Ù‡â€ŒØ§ÛŒ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ - Periodic database maintenance"""
+        """پاک‌سازی دوره‌ای پایگاه داده - Periodic database maintenance"""
         try:
             cleanup_stats = {
                 'expired_cooldowns': 0,
@@ -1220,14 +1220,14 @@ class DBManager:
             cleanup_stats['empty_inventories'] = 1
             
             logger.info(f"Database maintenance completed: {cleanup_stats}")
-            logger.info(f"Ù†Ú¯Ù‡Ø¯Ø§Ø±ÛŒ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ú©Ø§Ù…Ù„ Ø´Ø¯: {cleanup_stats}")
+            logger.info(f"نگهداری پایگاه داده کامل شد: {cleanup_stats}")
             return cleanup_stats
         except Exception as e:
             logger.error(f"Error during maintenance cleanup: {e}")
             return {}
     
     async def get_database_stats(self) -> Dict[str, Any]:
-        """Ø¯Ø±ÛŒØ§ÙØª Ø¢Ù…Ø§Ø± Ú©Ù„ÛŒ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ - Get overall database statistics"""
+        """دریافت آمار کلی پایگاه داده - Get overall database statistics"""
         try:
             stats = {}
             
@@ -1264,7 +1264,7 @@ class DBManager:
             return {}
 
     async def log_message_interaction(self, chat_id: int, user_id: int, message_type: str, data: Dict[str, Any] = None) -> bool:
-        """Ø«Ø¨Øª ØªØ¹Ø§Ù…Ù„ Ù¾ÛŒØ§Ù… Ú©Ø§Ø±Ø¨Ø± - Log user message interaction"""
+        """ثبت تعامل پیام کاربر - Log user message interaction"""
         try:
             current_time = int(time.time())
             await self.db("""
@@ -1281,10 +1281,10 @@ class DBManager:
 
 async def setup_database() -> None:
     """
-    Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ø¬Ø¯Ø§ÙˆÙ„ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ø§Ú¯Ø± ÙˆØ¬ÙˆØ¯ Ù†Ø¯Ø§Ø´ØªÙ‡ Ø¨Ø§Ø´Ù†Ø¯
+    راه‌اندازی جداول پایگاه داده اگر وجود نداشته باشند
     Set up the database tables if they don't exist with enhanced schema
     """
-    logger.info("Setting up database - Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡")
+    logger.info("Setting up database - راه‌اندازی پایگاه داده")
     
     await initialize_pool()
     db_manager = DBManager()
@@ -1304,7 +1304,7 @@ async def setup_database() -> None:
                 language TEXT DEFAULT 'en'
             )
         """)
-        logger.info("Groups table created/verified - Ø¬Ø¯ÙˆÙ„ Ú¯Ø±ÙˆÙ‡â€ŒÙ‡Ø§ Ø§ÛŒØ¬Ø§Ø¯/ØªØ§ÛŒÛŒØ¯ Ø´Ø¯")
+        logger.info("Groups table created/verified - جدول گروه‌ها ایجاد/تایید شد")
         
         # Create enhanced players table
         await db_manager.db("""
@@ -1344,7 +1344,7 @@ async def setup_database() -> None:
                 CONSTRAINT positive_activities CHECK (attacks_made >= 0 AND attacks_received >= 0 AND victories >= 0 AND defeats >= 0)
             )
         """)
-        logger.info("Players table created/verified - Ø¬Ø¯ÙˆÙ„ Ø¨Ø§Ø²ÛŒÚ©Ù†Ø§Ù† Ø§ÛŒØ¬Ø§Ø¯/ØªØ§ÛŒÛŒØ¯ Ø´Ø¯")
+        logger.info("Players table created/verified - جدول بازیکنان ایجاد/تایید شد")
         
         # Create enhanced cooldowns table
         await db_manager.db("""
@@ -1359,7 +1359,7 @@ async def setup_database() -> None:
                 CONSTRAINT future_until CHECK (until > created_at)
             )
         """)
-        logger.info("Cooldowns table created/verified - Ø¬Ø¯ÙˆÙ„ Ú©ÙˆÙ„Ø¯Ø§Ù†â€ŒÙ‡Ø§ Ø§ÛŒØ¬Ø§Ø¯/ØªØ§ÛŒÛŒØ¯ Ø´Ø¯")
+        logger.info("Cooldowns table created/verified - جدول کولدان‌ها ایجاد/تایید شد")
         
         # Create enhanced purchases table
         await db_manager.db("""
@@ -1376,7 +1376,7 @@ async def setup_database() -> None:
                 CONSTRAINT positive_quantity CHECK (quantity > 0)
             )
         """)
-        logger.info("Purchases table created/verified - Ø¬Ø¯ÙˆÙ„ Ø®Ø±ÛŒØ¯Ù‡Ø§ Ø§ÛŒØ¬Ø§Ø¯/ØªØ§ÛŒÛŒØ¯ Ø´Ø¯")
+        logger.info("Purchases table created/verified - جدول خریدها ایجاد/تایید شد")
         
         # Create enhanced attacks table
         await db_manager.db("""
@@ -1394,7 +1394,7 @@ async def setup_database() -> None:
                 CONSTRAINT different_users CHECK (attacker_id != victim_id)
             )
         """)
-        logger.info("Attacks table created/verified - Ø¬Ø¯ÙˆÙ„ Ø­Ù…Ù„Ø§Øª Ø§ÛŒØ¬Ø§Ø¯/ØªØ§ÛŒÛŒØ¯ Ø´Ø¯")
+        logger.info("Attacks table created/verified - جدول حملات ایجاد/تایید شد")
         
         # Create enhanced inventories table
         await db_manager.db("""
@@ -1409,7 +1409,7 @@ async def setup_database() -> None:
                 CONSTRAINT non_negative_qty CHECK (qty >= 0)
             )
         """)
-        logger.info("Inventories table created/verified - Ø¬Ø¯ÙˆÙ„ Ù…ÙˆØ¬ÙˆØ¯ÛŒâ€ŒÙ‡Ø§ Ø§ÛŒØ¬Ø§Ø¯/ØªØ§ÛŒÛŒØ¯ Ø´Ø¯")
+        logger.info("Inventories table created/verified - جدول موجودی‌ها ایجاد/تایید شد")
         
         # Create enhanced TG Stars purchases table
         await db_manager.db("""
@@ -1427,7 +1427,7 @@ async def setup_database() -> None:
                 CONSTRAINT valid_status CHECK (status IN ('pending', 'completed', 'failed', 'refunded'))
             )
         """)
-        logger.info("TG Stars purchases table created/verified - Ø¬Ø¯ÙˆÙ„ Ø®Ø±ÛŒØ¯Ù‡Ø§ÛŒ Ø³ØªØ§Ø±Ù‡ ØªÙ„Ú¯Ø±Ø§Ù… Ø§ÛŒØ¬Ø§Ø¯/ØªØ§ÛŒÛŒØ¯ Ø´Ø¯")
+        logger.info("TG Stars purchases table created/verified - جدول خریدهای ستاره تلگرام ایجاد/تایید شد")
 
         # Create enhanced active_defenses table
         await db_manager.db("""
@@ -1443,7 +1443,7 @@ async def setup_database() -> None:
                 CONSTRAINT valid_effectiveness CHECK (effectiveness > 0 AND effectiveness <= 1)
             )
         """)
-        logger.info("Active defenses table created/verified - Ø¬Ø¯ÙˆÙ„ Ø¯ÙØ§Ø¹â€ŒÙ‡Ø§ÛŒ ÙØ¹Ø§Ù„ Ø§ÛŒØ¬Ø§Ø¯/ØªØ§ÛŒÛŒØ¯ Ø´Ø¯")
+        logger.info("Active defenses table created/verified - جدول دفاع‌های فعال ایجاد/تایید شد")
         
         # Create interactions table for logging user interactions
         await db_manager.db("""
@@ -1457,7 +1457,7 @@ async def setup_database() -> None:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
-        logger.info("Interactions table created/verified - Ø¬Ø¯ÙˆÙ„ ØªØ¹Ø§Ù…Ù„Ø§Øª Ø§ÛŒØ¬Ø§Ø¯/ØªØ§ÛŒÛŒØ¯ Ø´Ø¯")
+        logger.info("Interactions table created/verified - جدول تعاملات ایجاد/تایید شد")
         
         # Create player achievements table for tracking player accomplishments
         await db_manager.db("""
@@ -1471,7 +1471,7 @@ async def setup_database() -> None:
                 UNIQUE(chat_id, user_id, achievement_id)
             )
         """)
-        logger.info("Player achievements table created/verified - Ø¬Ø¯ÙˆÙ„ Ø¯Ø³ØªØ§ÙˆØ±Ø¯Ù‡Ø§ÛŒ Ø¨Ø§Ø²ÛŒÚ©Ù† Ø§ÛŒØ¬Ø§Ø¯/ØªØ§ÛŒÛŒØ¯ Ø´Ø¯")
+        logger.info("Player achievements table created/verified - جدول دستاوردهای بازیکن ایجاد/تایید شد")
         
         # Create indexes for better performance
         indexes = [
@@ -1491,7 +1491,7 @@ async def setup_database() -> None:
         for index_query in indexes:
             await db_manager.db(index_query)
         
-        logger.info("Database indexes created/verified - Ø§ÛŒÙ†Ø¯Ú©Ø³â€ŒÙ‡Ø§ÛŒ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ø§ÛŒØ¬Ø§Ø¯/ØªØ§ÛŒÛŒØ¯ Ø´Ø¯Ù†Ø¯")
+        logger.info("Database indexes created/verified - ایندکس‌های پایگاه داده ایجاد/تایید شدند")
         
         # Add triggers for automatic updates (PostgreSQL specific)
         await db_manager.db("""
@@ -1522,48 +1522,48 @@ async def setup_database() -> None:
                 EXECUTE FUNCTION update_player_stats();
         """)
         
-        logger.info("Database triggers created/verified - ØªØ±ÛŒÚ¯Ø±Ù‡Ø§ÛŒ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ø§ÛŒØ¬Ø§Ø¯/ØªØ§ÛŒÛŒØ¯ Ø´Ø¯Ù†Ø¯")
-        logger.info("Database setup complete - Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ú©Ø§Ù…Ù„ Ø´Ø¯")
+        logger.info("Database triggers created/verified - تریگرهای پایگاه داده ایجاد/تایید شدند")
+        logger.info("Database setup complete - راه‌اندازی پایگاه داده کامل شد")
         
     except Exception as e:
         logger.error(f"Error setting up database: {e}")
-        logger.error(f"Ø®Ø·Ø§ Ø¯Ø± Ø±Ø§Ù‡â€ŒØ§Ù†Ø¯Ø§Ø²ÛŒ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡: {e}")
+        logger.error(f"خطا در راه‌اندازی پایگاه داده: {e}")
         raise DatabaseError(f"Database setup failed: {e}")
 
 # =============================================================================
-# ØªÙˆØ§Ø¨Ø¹ Ø³Ø§Ø²Ú¯Ø§Ø±ÛŒ Ùˆ Ú©Ù…Ú©ÛŒ - Legacy Support and Helper Functions
+# توابع سازگاری و کمکی - Legacy Support and Helper Functions
 # =============================================================================
 
 async def db(query: str, params: Optional[Tuple] = None, fetch: Optional[str] = None) -> Any:
     """
-    ØªØ§Ø¨Ø¹ Ù‚Ø¯ÛŒÙ…ÛŒ Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ - Ø¯Ø± Ù†Ø³Ø®Ù‡â€ŒÙ‡Ø§ÛŒ Ø¢ØªÛŒ Ø­Ø°Ù Ø®ÙˆØ§Ù‡Ø¯ Ø´Ø¯
+    تابع قدیمی پایگاه داده - در نسخه‌های آتی حذف خواهد شد
     Legacy database function - will be removed in future versions
     """
     logger.warning("Using legacy db function. Please migrate to DBManager.")
-    logger.warning("Ø§Ø³ØªÙØ§Ø¯Ù‡ Ø§Ø² ØªØ§Ø¨Ø¹ Ù‚Ø¯ÛŒÙ…ÛŒ db. Ù„Ø·ÙØ§Ù‹ Ø¨Ù‡ DBManager Ù…Ù‡Ø§Ø¬Ø±Øª Ú©Ù†ÛŒØ¯.")
+    logger.warning("استفاده از تابع قدیمی db. لطفاً به DBManager مهاجرت کنید.")
     db_manager = DBManager()
     return await db_manager.db(query, params, fetch)
 
 def validate_database_config() -> bool:
-    """Ø§Ø¹ØªØ¨Ø§Ø±Ø³Ù†Ø¬ÛŒ ØªÙ†Ø¸ÛŒÙ…Ø§Øª Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ - Validate database configuration"""
+    """اعتبارسنجی تنظیمات پایگاه داده - Validate database configuration"""
     try:
         required_vars = ['DATABASE_URL']
         missing_vars = [var for var in required_vars if not os.getenv(var)]
         
         if missing_vars:
             logger.error(f"Missing required environment variables: {missing_vars}")
-            logger.error(f"Ù…ØªØºÛŒØ±Ù‡Ø§ÛŒ Ù…Ø­ÛŒØ·ÛŒ Ù…ÙˆØ±Ø¯ Ù†ÛŒØ§Ø² Ù…ÙˆØ¬ÙˆØ¯ Ù†ÛŒØ³ØªÙ†Ø¯: {missing_vars}")
+            logger.error(f"متغیرهای محیطی مورد نیاز موجود نیستند: {missing_vars}")
             return False
         
         # Test database URL format
         db_url = os.getenv('DATABASE_URL')
         if not db_url.startswith(('postgresql://', 'postgres://')):
             logger.error("Invalid DATABASE_URL format. Must start with postgresql:// or postgres://")
-            logger.error("ÙØ±Ù…Øª DATABASE_URL Ù†Ø§Ù…Ø¹ØªØ¨Ø± Ø§Ø³Øª. Ø¨Ø§ÛŒØ¯ Ø¨Ø§ postgresql:// ÛŒØ§ postgres:// Ø´Ø±ÙˆØ¹ Ø´ÙˆØ¯")
+            logger.error("فرمت DATABASE_URL نامعتبر است. باید با postgresql:// یا postgres:// شروع شود")
             return False
         
         logger.info("Database configuration validated successfully")
-        logger.info("ØªÙ†Ø¸ÛŒÙ…Ø§Øª Ù¾Ø§ÛŒÚ¯Ø§Ù‡ Ø¯Ø§Ø¯Ù‡ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø§Ø¹ØªØ¨Ø§Ø±Ø³Ù†Ø¬ÛŒ Ø´Ø¯")
+        logger.info("تنظیمات پایگاه داده با موفقیت اعتبارسنجی شد")
         return True
     except Exception as e:
         logger.error(f"Error validating database config: {e}")
@@ -1582,4 +1582,3 @@ __all__ = [
     'validate_database_config',
     'db'  # Legacy support
 ]
-

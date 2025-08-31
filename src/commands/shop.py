@@ -119,42 +119,42 @@ class ShopManager:
             user_currency = await self.get_user_currency(message.chat.id, message.from_user.id)
             
             # Build shop overview message
-            shop_text = f"ðŸ›ï¸ <b>{T[lang]['shop_welcome'][lang]}</b>\n\n"
-            shop_text += f"ðŸ’° <b>{T[lang]['your_balance'][lang]}:</b>\n"
-            shop_text += f"ðŸ… {T[lang]['medals'][lang]}: <b>{user_currency['medals']}</b>\n"
-            shop_text += f"â­ {T[lang]['tg_stars'][lang]}: <b>{user_currency['tg_stars']}</b>\n\n"
-            shop_text += f"{T[lang]['shop_categories_intro'][lang]}"
+            shop_text = f"🛍️ <b>{T[lang]['shop_welcome']}</b>\n\n"
+            shop_text += f"💰 <b>{T[lang]['your_balance']}:</b>\n"
+            shop_text += f"🏅 {T[lang]['medals']}: <b>{user_currency['medals']}</b>\n"
+            shop_text += f"⭐ {T[lang]['tg_stars']}: <b>{user_currency['tg_stars']}</b>\n\n"
+            shop_text += f"{T[lang]['shop_categories_intro']}"
             
             keyboard = types.InlineKeyboardMarkup(row_width=2)
             
             # Category buttons
             weapons_btn = types.InlineKeyboardButton(
-                f"âš”ï¸ {T[lang]['category_weapons'][lang]}", 
+                f"⚔️ {T[lang]['category_weapons']}", 
                 callback_data="shop:category:weapons"
             )
             defense_btn = types.InlineKeyboardButton(
-                f"ðŸ›¡ï¸ {T[lang]['category_defense'][lang]}", 
+                f"🛡️ {T[lang]['category_defense']}", 
                 callback_data="shop:category:defense"
             )
             keyboard.add(weapons_btn, defense_btn)
             
             other_btn = types.InlineKeyboardButton(
-                f"ðŸ“¦ {T[lang]['category_other'][lang]}", 
+                f"📦 {T[lang]['category_other']}", 
                 callback_data="shop:category:other"
             )
             premium_btn = types.InlineKeyboardButton(
-                f"ðŸ’Ž {T[lang]['premium_items'][lang]}", 
+                f"💎 {T[lang]['premium_items']}", 
                 callback_data="shop:payment:tg_stars"
             )
             keyboard.add(other_btn, premium_btn)
             
             # Quick access buttons
             all_items_btn = types.InlineKeyboardButton(
-                f"ðŸ“‹ {T[lang]['all_items'][lang]}", 
+                f"📋 {T[lang]['all_items']}", 
                 callback_data="shop:all"
             )
             close_btn = types.InlineKeyboardButton(
-                f"âŒ {T[lang]['close_button'][lang]}", 
+                f"❌ {T[lang]['close_button']}", 
                 callback_data="shop:close"
             )
             keyboard.add(all_items_btn, close_btn)
@@ -170,7 +170,7 @@ class ShopManager:
             logger.error(f"Error showing shop overview: {e}")
             await bot.send_message(
                 message.chat.id, 
-                "âŒ Error displaying shop. Please try again."
+                "❌ Error displaying shop. Please try again."
             )
     
     async def show_shop_category(self, bot: AsyncTeleBot, call: types.CallbackQuery, category: str):
@@ -182,23 +182,23 @@ class ShopManager:
             # Get items by category
             if category == "all":
                 items = ITEMS
-                title = T[lang]['all_items'][lang]
+                title = T[lang]['all_items']
             else:
                 items = get_items_by_category(ItemCategory(category))
-                title = T[lang][f'category_{category}'][lang]
+                title = T[lang][f'category_{category}']
             
             if not items:
                 await bot.answer_callback_query(
                     call.id, 
-                    T[lang]['no_items_in_category'][lang], 
+                    T[lang]['no_items_in_category'], 
                     show_alert=True
                 )
                 return
             
             # Build category message
-            shop_text = f"ðŸ›ï¸ <b>{title}</b>\n\n"
-            shop_text += f"ðŸ’° {T[lang]['medals'][lang]}: <b>{user_currency['medals']}</b> | "
-            shop_text += f"â­ {T[lang]['tg_stars'][lang]}: <b>{user_currency['tg_stars']}</b>\n\n"
+            shop_text = f"🛍️ <b>{title}</b>\n\n"
+            shop_text += f"💰 {T[lang]['medals']}: <b>{user_currency['medals']}</b> | "
+            shop_text += f"⭐ {T[lang]['tg_stars']}: <b>{user_currency['tg_stars']}</b>\n\n"
             
             keyboard = types.InlineKeyboardMarkup(row_width=1)
             
@@ -210,13 +210,13 @@ class ShopManager:
                 
                 # Format price with appropriate currency
                 if payment_type == 'medals':
-                    price_text = f"{price} ðŸ…"
+                    price_text = f"{price} 🏅"
                 else:
-                    price_text = f"{price} â­"
+                    price_text = f"{price} ⭐"
                 
                 # Check affordability
                 can_afford = await self.can_afford_item(call.message.chat.id, call.from_user.id, item_id)
-                prefix = "âœ…" if can_afford else "âŒ"
+                prefix = "✅" if can_afford else "❌"
                 
                 button_text = f"{prefix} {emoji} {item_name} - {price_text}"
                 keyboard.add(types.InlineKeyboardButton(
@@ -226,11 +226,11 @@ class ShopManager:
             
             # Navigation buttons
             back_btn = types.InlineKeyboardButton(
-                f"ðŸ”™ {T[lang]['back_to_shop'][lang]}", 
+                f"🔙 {T[lang]['back_to_shop']}", 
                 callback_data="shop:main"
             )
             close_btn = types.InlineKeyboardButton(
-                f"âŒ {T[lang]['close_button'][lang]}", 
+                f"❌ {T[lang]['close_button']}", 
                 callback_data="shop:close"
             )
             keyboard.add(back_btn, close_btn)
@@ -245,7 +245,7 @@ class ShopManager:
             
         except Exception as e:
             logger.error(f"Error showing shop category {category}: {e}")
-            await bot.answer_callback_query(call.id, "âŒ Error loading category.")
+            await bot.answer_callback_query(call.id, "❌ Error loading category.")
     
     async def show_shop_payment_type(self, bot: AsyncTeleBot, call: types.CallbackQuery, payment_type: str):
         """Display items by payment type (medals/TG Stars)"""
@@ -255,23 +255,23 @@ class ShopManager:
             
             # Get items by payment type
             items = get_items_by_payment_type(PaymentType(payment_type))
-            title = T[lang]['premium_items'][lang] if payment_type == 'tg_stars' else T[lang]['medal_items'][lang]
+            title = T[lang]['premium_items'] if payment_type == 'tg_stars' else T[lang]['medal_items']
             
             if not items:
                 await bot.answer_callback_query(
                     call.id, 
-                    T[lang]['no_items_in_category'][lang], 
+                    T[lang]['no_items_in_category'], 
                     show_alert=True
                 )
                 return
             
             # Build message
-            shop_text = f"ðŸ›ï¸ <b>{title}</b>\n\n"
+            shop_text = f"🛍️ <b>{title}</b>\n\n"
             if payment_type == 'tg_stars':
-                shop_text += f"â­ {T[lang]['tg_stars'][lang]}: <b>{user_currency['tg_stars']}</b>\n"
-                shop_text += f"{T[lang]['premium_info'][lang]}\n\n"
+                shop_text += f"⭐ {T[lang]['tg_stars']}: <b>{user_currency['tg_stars']}</b>\n"
+                shop_text += f"{T[lang]['premium_info']}\n\n"
             else:
-                shop_text += f"ðŸ… {T[lang]['medals'][lang]}: <b>{user_currency['medals']}</b>\n\n"
+                shop_text += f"🏅 {T[lang]['medals']}: <b>{user_currency['medals']}</b>\n\n"
             
             keyboard = types.InlineKeyboardMarkup(row_width=1)
             
@@ -283,13 +283,13 @@ class ShopManager:
                 
                 # Format price
                 if payment_type == 'medals':
-                    price_text = f"{price} ðŸ…"
+                    price_text = f"{price} 🏅"
                 else:
-                    price_text = f"{price} â­"
+                    price_text = f"{price} ⭐"
                 
                 # Check affordability
                 can_afford = await self.can_afford_item(call.message.chat.id, call.from_user.id, item_id)
-                prefix = "âœ…" if can_afford else "âŒ"
+                prefix = "✅" if can_afford else "❌"
                 
                 button_text = f"{prefix} {emoji} {item_name} - {price_text}"
                 keyboard.add(types.InlineKeyboardButton(
@@ -299,11 +299,11 @@ class ShopManager:
             
             # Navigation buttons
             back_btn = types.InlineKeyboardButton(
-                f"ðŸ”™ {T[lang]['back_to_shop'][lang]}", 
+                f"🔙 {T[lang]['back_to_shop']}", 
                 callback_data="shop:main"
             )
             close_btn = types.InlineKeyboardButton(
-                f"âŒ {T[lang]['close_button'][lang]}", 
+                f"❌ {T[lang]['close_button']}", 
                 callback_data="shop:close"
             )
             keyboard.add(back_btn, close_btn)
@@ -318,7 +318,7 @@ class ShopManager:
             
         except Exception as e:
             logger.error(f"Error showing shop payment type {payment_type}: {e}")
-            await bot.answer_callback_query(call.id, "âŒ Error loading items.")
+            await bot.answer_callback_query(call.id, "❌ Error loading items.")
     
     async def show_item_details(self, bot: AsyncTeleBot, call: types.CallbackQuery, item_id: str):
         """Display detailed item information with purchase option"""
@@ -327,7 +327,7 @@ class ShopManager:
             user_currency = await self.get_user_currency(call.message.chat.id, call.from_user.id)
             
             if item_id not in ITEMS:
-                await bot.answer_callback_query(call.id, T[lang]['item_not_found'][lang], show_alert=True)
+                await bot.answer_callback_query(call.id, T[lang]['item_not_found'], show_alert=True)
                 return
             
             item_data = ITEMS[item_id]
@@ -339,57 +339,57 @@ class ShopManager:
             
             # Build detailed message
             item_text = f"{emoji} <b>{item_name}</b>\n\n"
-            item_text += f"ðŸ“ <b>{T[lang]['description'][lang]}:</b>\n{description}\n\n"
+            item_text += f"📝 <b>{T[lang]['description']}:</b>\n{description}\n\n"
             
             # Add stats
             if stats.get('damage'):
-                item_text += f"âš”ï¸ {T[lang]['damage'][lang]}: <b>+{stats['damage']}</b>\n"
+                item_text += f"⚔️ {T[lang]['damage']}: <b>+{stats['damage']}</b>\n"
             if stats.get('duration_seconds'):
                 hours = stats['duration_seconds'] // 3600
-                item_text += f"â±ï¸ {T[lang]['duration'][lang]}: <b>{hours} {T[lang]['hours'][lang]}</b>\n"
+                item_text += f"⏱️ {T[lang]['duration']}: <b>{hours} {T[lang]['hours']}</b>\n"
             if stats.get('effectiveness'):
                 effectiveness = int(stats['effectiveness'] * 100)
-                item_text += f"ðŸ›¡ï¸ {T[lang]['effectiveness'][lang]}: <b>{effectiveness}%</b>\n"
+                item_text += f"🛡️ {T[lang]['effectiveness']}: <b>{effectiveness}%</b>\n"
             if stats.get('capacity'):
-                item_text += f"ðŸ“¦ {T[lang]['capacity'][lang]}: <b>+{stats['capacity']}</b>\n"
+                item_text += f"📦 {T[lang]['capacity']}: <b>+{stats['capacity']}</b>\n"
             if stats.get('medals'):
-                item_text += f"ðŸ… {T[lang]['medal_bonus'][lang]}: <b>+{stats['medals']}</b>\n"
+                item_text += f"🏅 {T[lang]['medal_bonus']}: <b>+{stats['medals']}</b>\n"
             
             # Price and affordability
-            item_text += f"\nðŸ’° <b>{T[lang]['price'][lang]}:</b> "
+            item_text += f"\n💰 <b>{T[lang]['price']}:</b> "
             if payment_type == 'medals':
-                item_text += f"{price} ðŸ… {T[lang]['medals'][lang]}\n"
+                item_text += f"{price} 🏅 {T[lang]['medals']}\n"
                 current_balance = user_currency['medals']
             else:
-                item_text += f"{price} â­ {T[lang]['tg_stars'][lang]}\n"
+                item_text += f"{price} ⭐ {T[lang]['tg_stars']}\n"
                 current_balance = user_currency['tg_stars']
             
             can_afford = await self.can_afford_item(call.message.chat.id, call.from_user.id, item_id)
             
             if can_afford:
-                item_text += f"âœ… {T[lang]['you_can_afford'][lang]}"
+                item_text += f"✅ {T[lang]['you_can_afford']}"
             else:
                 needed = price - current_balance
-                currency_name = T[lang]['medals'][lang] if payment_type == 'medals' else T[lang]['tg_stars'][lang]
-                item_text += f"âŒ {T[lang]['need_more_currency'][lang].format(amount=needed, currency=currency_name)}"
+                currency_name = T[lang]['medals'] if payment_type == 'medals' else T[lang]['tg_stars']
+                item_text += f"❌ {T[lang]['need_more_currency'].format(amount=needed, currency=currency_name)}"
             
             keyboard = types.InlineKeyboardMarkup()
             
             # Purchase button
             if can_afford:
                 buy_btn = types.InlineKeyboardButton(
-                    f"ðŸ’³ {T[lang]['buy_item'][lang]}", 
+                    f"💳 {T[lang]['buy_item']}", 
                     callback_data=f"shop:buy:{item_id}"
                 )
                 keyboard.add(buy_btn)
             
             # Navigation buttons
             back_btn = types.InlineKeyboardButton(
-                f"ðŸ”™ {T[lang]['back_to_category'][lang]}", 
+                f"🔙 {T[lang]['back_to_category']}", 
                 callback_data="shop:main"
             )
             close_btn = types.InlineKeyboardButton(
-                f"âŒ {T[lang]['close_button'][lang]}", 
+                f"❌ {T[lang]['close_button']}", 
                 callback_data="shop:close"
             )
             keyboard.add(back_btn, close_btn)
@@ -404,7 +404,7 @@ class ShopManager:
             
         except Exception as e:
             logger.error(f"Error showing item details for {item_id}: {e}")
-            await bot.answer_callback_query(call.id, "âŒ Error loading item details.")
+            await bot.answer_callback_query(call.id, "❌ Error loading item details.")
     
     async def handle_item_purchase(self, bot: AsyncTeleBot, call: types.CallbackQuery, item_id: str):
         """Handle the actual item purchase"""
@@ -417,9 +417,9 @@ class ShopManager:
             if success:
                 item_name = get_item_display_name(item_id, lang)
                 price, payment_type = await self.get_item_price(item_id)
-                currency_name = T[lang]['medals'][lang] if payment_type == 'medals' else T[lang]['tg_stars'][lang]
+                currency_name = T[lang]['medals'] if payment_type == 'medals' else T[lang]['tg_stars']
                 
-                success_msg = T[lang]['purchase_successful'][lang].format(
+                success_msg = T[lang]['purchase_successful'].format(
                     item_name=item_name, 
                     price=price, 
                     currency=currency_name
@@ -431,13 +431,13 @@ class ShopManager:
             else:
                 await bot.answer_callback_query(
                     call.id, 
-                    T[lang]['purchase_failed'][lang], 
+                    T[lang]['purchase_failed'], 
                     show_alert=True
                 )
                 
         except Exception as e:
             logger.error(f"Error handling purchase for {item_id}: {e}")
-            await bot.answer_callback_query(call.id, T[lang]['purchase_error'][lang], show_alert=True)
+            await bot.answer_callback_query(call.id, T[lang]['purchase_error'], show_alert=True)
     
     async def handle_shop_callback(self, bot: AsyncTeleBot, call: types.CallbackQuery):
         """Handle all shop-related callbacks"""
@@ -476,7 +476,7 @@ class ShopManager:
             
         except Exception as e:
             logger.error(f"Error handling shop callback: {e}")
-            await bot.answer_callback_query(call.id, "âŒ Error processing request.")
+            await bot.answer_callback_query(call.id, "❌ Error processing request.")
 
 def register_handlers(bot: AsyncTeleBot, db_manager: DBManager):
     """Register all shop-related handlers"""

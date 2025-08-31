@@ -95,51 +95,51 @@ class StarsManager:
             stars_balance = await self.get_user_stars_balance(message.chat.id, message.from_user.id)
             
             # Build dashboard message
-            dashboard_text = f"ðŸ’Ž <b>{T[lang]['stars_welcome'][lang]}</b>\n\n"
-            dashboard_text += f"â­ <b>{T[lang]['stars_balance_overview'][lang]}</b>\n"
-            dashboard_text += f"{T[lang]['current_stars_balance'][lang].format(stars=stars_balance)}\n\n"
-            dashboard_text += f"ðŸ“ <b>{T[lang]['stars_description'][lang]}</b>\n\n"
+            dashboard_text = f"ðŸ’Ž <b>{T[lang]['stars_welcome']}</b>\n\n"
+            dashboard_text += f"â­ <b>{T[lang]['stars_balance_overview']}</b>\n"
+            dashboard_text += f"{T[lang]['current_stars_balance'].format(stars=stars_balance)}\n\n"
+            dashboard_text += f"ðŸ“ <b>{T[lang]['stars_description']}</b>\n\n"
             
             # Add features section
-            dashboard_text += f"ðŸŒŸ <b>{T[lang]['premium_features'][lang]}</b>\n"
-            dashboard_text += f"{T[lang]['feature_exclusive_weapons'][lang]}\n"
-            dashboard_text += f"{T[lang]['feature_special_abilities'][lang]}\n"
-            dashboard_text += f"{T[lang]['feature_premium_support'][lang]}\n"
-            dashboard_text += f"{T[lang]['feature_advanced_stats'][lang]}\n"
-            dashboard_text += f"{T[lang]['feature_custom_themes'][lang]}\n"
-            dashboard_text += f"{T[lang]['feature_early_access'][lang]}"
+            dashboard_text += f"ðŸŒŸ <b>{T[lang]['premium_features']}</b>\n"
+            dashboard_text += f"{T[lang]['feature_exclusive_weapons']}\n"
+            dashboard_text += f"{T[lang]['feature_special_abilities']}\n"
+            dashboard_text += f"{T[lang]['feature_premium_support']}\n"
+            dashboard_text += f"{T[lang]['feature_advanced_stats']}\n"
+            dashboard_text += f"{T[lang]['feature_custom_themes']}\n"
+            dashboard_text += f"{T[lang]['feature_early_access']}"
             
             keyboard = types.InlineKeyboardMarkup(row_width=2)
             
             # Main action buttons
             premium_shop_btn = types.InlineKeyboardButton(
-                f"ðŸ›’ {T[lang]['view_premium_shop'][lang]}", 
+                f"ðŸ›’ {T[lang]['view_premium_shop']}", 
                 callback_data="stars:premium_shop"
             )
             history_btn = types.InlineKeyboardButton(
-                f"ðŸ“Š {T[lang]['view_history'][lang]}", 
+                f"ðŸ“Š {T[lang]['view_history']}", 
                 callback_data="stars:history"
             )
             keyboard.add(premium_shop_btn, history_btn)
             
             # Additional features
             buy_stars_btn = types.InlineKeyboardButton(
-                f"ðŸ’° {T[lang]['buy_stars'][lang]}", 
+                f"ðŸ’° {T[lang]['buy_stars']}", 
                 callback_data="stars:buy_stars"
             )
             help_btn = types.InlineKeyboardButton(
-                f"ðŸ†˜ {T[lang]['stars_help'][lang]}", 
+                f"ðŸ†˜ {T[lang]['stars_help']}", 
                 callback_data="stars:help"
             )
             keyboard.add(buy_stars_btn, help_btn)
             
             # Utility buttons
             refresh_btn = types.InlineKeyboardButton(
-                f"ðŸ”„ {T[lang]['refresh_balance'][lang]}", 
+                f"ðŸ”„ {T[lang]['refresh_balance']}", 
                 callback_data="stars:refresh"
             )
             close_btn = types.InlineKeyboardButton(
-                f"âŒ {T[lang]['close_stars_menu'][lang]}", 
+                f"âŒ {T[lang]['close_stars_menu']}", 
                 callback_data="stars:close"
             )
             keyboard.add(refresh_btn, close_btn)
@@ -168,15 +168,15 @@ class StarsManager:
             if not premium_items:
                 await bot.answer_callback_query(
                     call.id, 
-                    T[lang]['stars_error_item_unavailable'][lang], 
+                    T[lang]['stars_error_item_unavailable'], 
                     show_alert=True
                 )
                 return
             
             # Build premium shop message
-            shop_text = f"ðŸ›’ <b>{T[lang]['premium_catalog'][lang]}</b>\n\n"
-            shop_text += f"â­ {T[lang]['current_stars_balance'][lang].format(stars=stars_balance)}\n\n"
-            shop_text += f"ðŸ’Ž <b>{T[lang]['exclusive_items'][lang]}</b>:\n\n"
+            shop_text = f"ðŸ›’ <b>{T[lang]['premium_catalog']}</b>\n\n"
+            shop_text += f"â­ {T[lang]['current_stars_balance'].format(stars=stars_balance)}\n\n"
+            shop_text += f"ðŸ’Ž <b>{T[lang]['exclusive_items']}</b>:\n\n"
             
             keyboard = types.InlineKeyboardMarkup(row_width=1)
             
@@ -190,13 +190,13 @@ class StarsManager:
                 # Build item description
                 item_desc = f"{emoji} <b>{item_name}</b>\n"
                 if stats.get('damage'):
-                    item_desc += f"âš”ï¸ {T[lang]['damage'][lang]}: {stats['damage']}\n"
+                    item_desc += f"âš”ï¸ {T[lang]['damage']}: {stats['damage']}\n"
                 if stats.get('duration_seconds'):
                     hours = stats['duration_seconds'] // 3600
-                    item_desc += f"â±ï¸ {T[lang]['duration'][lang]}: {hours} {T[lang]['hours'][lang]}\n"
+                    item_desc += f"â±ï¸ {T[lang]['duration']}: {hours} {T[lang]['hours']}\n"
                 
                 shop_text += item_desc
-                shop_text += f"ðŸ’° {T[lang]['item_requires_stars'][lang].format(price=price)}\n"
+                shop_text += f"ðŸ’° {T[lang]['item_requires_stars'].format(price=price)}\n"
                 
                 # Can afford check
                 can_afford = await self.can_afford_premium_item(call.message.chat.id, call.from_user.id, item_id)
@@ -213,11 +213,11 @@ class StarsManager:
             
             # Navigation buttons
             back_btn = types.InlineKeyboardButton(
-                f"ðŸ”™ {T[lang]['back_btn'][lang]}", 
+                f"ðŸ”™ {T[lang]['back_btn']}", 
                 callback_data="stars:main"
             )
             close_btn = types.InlineKeyboardButton(
-                f"âŒ {T[lang]['close_stars_menu'][lang]}", 
+                f"âŒ {T[lang]['close_stars_menu']}", 
                 callback_data="stars:close"
             )
             keyboard.add(back_btn, close_btn)
@@ -232,7 +232,7 @@ class StarsManager:
             
         except Exception as e:
             logger.error(f"Error showing premium shop: {e}")
-            await bot.answer_callback_query(call.id, T[lang]['stars_error_generic'][lang])
+            await bot.answer_callback_query(call.id, T[lang]['stars_error_generic'])
     
     async def show_transaction_history(self, bot: AsyncTeleBot, call: types.CallbackQuery):
         """Display user's transaction history"""
@@ -240,11 +240,11 @@ class StarsManager:
             lang = await helpers.get_lang(call.message.chat.id, call.from_user.id, self.db_manager)
             transactions = await self.get_transaction_history(call.message.chat.id, call.from_user.id)
             
-            history_text = f"ðŸ“Š <b>{T[lang]['transaction_history'][lang]}</b>\n\n"
+            history_text = f"ðŸ“Š <b>{T[lang]['transaction_history']}</b>\n\n"
             
             if not transactions:
-                history_text += f"{T[lang]['no_transactions'][lang]}\n\n"
-                history_text += f"ðŸ’¡ {T[lang]['stars_purchase_info'][lang]}"
+                history_text += f"{T[lang]['no_transactions']}\n\n"
+                history_text += f"ðŸ’¡ {T[lang]['stars_purchase_info']}"
             else:
                 for tx in transactions:
                     item_name = get_item_display_name(tx['item_id'], lang)
@@ -253,12 +253,12 @@ class StarsManager:
                     
                     history_text += f"{status_emoji} {emoji} <b>{item_name}</b>\n"
                     history_text += f"ðŸ’° {tx['amount']} â­ | {tx['date'].strftime('%Y-%m-%d %H:%M')}\n"
-                    history_text += f"ðŸ“‹ {T[lang][f'transaction_{tx["status"]}'][lang]}\n\n"
+                    history_text += f"ðŸ“‹ {T[lang][f'transaction_{tx["status"]}']}\n\n"
             
             keyboard = types.InlineKeyboardMarkup()
             keyboard.add(
-                types.InlineKeyboardButton(f"ðŸ”™ {T[lang]['back_btn'][lang]}", callback_data="stars:main"),
-                types.InlineKeyboardButton(f"âŒ {T[lang]['close_stars_menu'][lang]}", callback_data="stars:close")
+                types.InlineKeyboardButton(f"ðŸ”™ {T[lang]['back_btn']}", callback_data="stars:main"),
+                types.InlineKeyboardButton(f"âŒ {T[lang]['close_stars_menu']}", callback_data="stars:close")
             )
             
             await bot.edit_message_text(
@@ -271,15 +271,15 @@ class StarsManager:
             
         except Exception as e:
             logger.error(f"Error showing transaction history: {e}")
-            await bot.answer_callback_query(call.id, T[lang]['stars_error_generic'][lang])
+            await bot.answer_callback_query(call.id, T[lang]['stars_error_generic'])
     
     async def show_stars_help(self, bot: AsyncTeleBot, call: types.CallbackQuery):
         """Display TG Stars help and FAQ"""
         try:
             lang = await helpers.get_lang(call.message.chat.id, call.from_user.id, self.db_manager)
             
-            help_text = f"ðŸ†˜ <b>{T[lang]['stars_help'][lang]}</b>\n\n"
-            help_text += f"â“ <b>{T[lang]['stars_faq'][lang]}</b>\n\n"
+            help_text = f"ðŸ†˜ <b>{T[lang]['stars_help']}</b>\n\n"
+            help_text += f"â“ <b>{T[lang]['stars_faq']}</b>\n\n"
             
             if lang == "fa":
                 help_text += """
@@ -318,12 +318,12 @@ TG Stars cannot be transferred to other users.
             
             keyboard = types.InlineKeyboardMarkup()
             keyboard.add(
-                types.InlineKeyboardButton(f"ðŸ“ž {T[lang]['stars_support'][lang]}", url="https://t.me/TrumpBotSupport"),
-                types.InlineKeyboardButton(f"ðŸ“œ {T[lang]['stars_terms'][lang]}", callback_data="stars:terms")
+                types.InlineKeyboardButton(f"ðŸ“ž {T[lang]['stars_support']}", url="https://t.me/TrumpBotSupport"),
+                types.InlineKeyboardButton(f"ðŸ“œ {T[lang]['stars_terms']}", callback_data="stars:terms")
             )
             keyboard.add(
-                types.InlineKeyboardButton(f"ðŸ”™ {T[lang]['back_btn'][lang]}", callback_data="stars:main"),
-                types.InlineKeyboardButton(f"âŒ {T[lang]['close_stars_menu'][lang]}", callback_data="stars:close")
+                types.InlineKeyboardButton(f"ðŸ”™ {T[lang]['back_btn']}", callback_data="stars:main"),
+                types.InlineKeyboardButton(f"âŒ {T[lang]['close_stars_menu']}", callback_data="stars:close")
             )
             
             await bot.edit_message_text(
@@ -336,7 +336,7 @@ TG Stars cannot be transferred to other users.
             
         except Exception as e:
             logger.error(f"Error showing stars help: {e}")
-            await bot.answer_callback_query(call.id, T[lang]['stars_error_generic'][lang])
+            await bot.answer_callback_query(call.id, T[lang]['stars_error_generic'])
     
     async def handle_stars_callback(self, bot: AsyncTeleBot, call: types.CallbackQuery):
         """Handle all TG Stars related callbacks"""
@@ -348,30 +348,30 @@ TG Stars cannot be transferred to other users.
             if action == "main":
                 # Refresh the main dashboard
                 stars_balance = await self.get_user_stars_balance(call.message.chat.id, call.from_user.id)
-                dashboard_text = f"ðŸ’Ž <b>{T[lang]['stars_welcome'][lang]}</b>\n\n"
-                dashboard_text += f"â­ <b>{T[lang]['stars_balance_overview'][lang]}</b>\n"
-                dashboard_text += f"{T[lang]['current_stars_balance'][lang].format(stars=stars_balance)}\n\n"
-                dashboard_text += f"ðŸ“ <b>{T[lang]['stars_description'][lang]}</b>\n\n"
-                dashboard_text += f"ðŸŒŸ <b>{T[lang]['premium_features'][lang]}</b>\n"
-                dashboard_text += f"{T[lang]['feature_exclusive_weapons'][lang]}\n"
-                dashboard_text += f"{T[lang]['feature_special_abilities'][lang]}\n"
-                dashboard_text += f"{T[lang]['feature_premium_support'][lang]}\n"
-                dashboard_text += f"{T[lang]['feature_advanced_stats'][lang]}\n"
-                dashboard_text += f"{T[lang]['feature_custom_themes'][lang]}\n"
-                dashboard_text += f"{T[lang]['feature_early_access'][lang]}"
+                dashboard_text = f"ðŸ’Ž <b>{T[lang]['stars_welcome']}</b>\n\n"
+                dashboard_text += f"â­ <b>{T[lang]['stars_balance_overview']}</b>\n"
+                dashboard_text += f"{T[lang]['current_stars_balance'].format(stars=stars_balance)}\n\n"
+                dashboard_text += f"ðŸ“ <b>{T[lang]['stars_description']}</b>\n\n"
+                dashboard_text += f"ðŸŒŸ <b>{T[lang]['premium_features']}</b>\n"
+                dashboard_text += f"{T[lang]['feature_exclusive_weapons']}\n"
+                dashboard_text += f"{T[lang]['feature_special_abilities']}\n"
+                dashboard_text += f"{T[lang]['feature_premium_support']}\n"
+                dashboard_text += f"{T[lang]['feature_advanced_stats']}\n"
+                dashboard_text += f"{T[lang]['feature_custom_themes']}\n"
+                dashboard_text += f"{T[lang]['feature_early_access']}"
 
                 keyboard = types.InlineKeyboardMarkup(row_width=2)
                 keyboard.add(
-                    types.InlineKeyboardButton(f"ðŸ›’ {T[lang]['view_premium_shop'][lang]}", callback_data="stars:premium_shop"),
-                    types.InlineKeyboardButton(f"ðŸ“Š {T[lang]['view_history'][lang]}", callback_data="stars:history")
+                    types.InlineKeyboardButton(f"ðŸ›’ {T[lang]['view_premium_shop']}", callback_data="stars:premium_shop"),
+                    types.InlineKeyboardButton(f"ðŸ“Š {T[lang]['view_history']}", callback_data="stars:history")
                 )
                 keyboard.add(
-                    types.InlineKeyboardButton(f"ðŸ’° {T[lang]['buy_stars'][lang]}", callback_data="stars:buy_stars"),
-                    types.InlineKeyboardButton(f"ðŸ†˜ {T[lang]['stars_help'][lang]}", callback_data="stars:help")
+                    types.InlineKeyboardButton(f"ðŸ’° {T[lang]['buy_stars']}", callback_data="stars:buy_stars"),
+                    types.InlineKeyboardButton(f"ðŸ†˜ {T[lang]['stars_help']}", callback_data="stars:help")
                 )
                 keyboard.add(
-                    types.InlineKeyboardButton(f"ðŸ”„ {T[lang]['refresh_balance'][lang]}", callback_data="stars:refresh"),
-                    types.InlineKeyboardButton(f"âŒ {T[lang]['close_stars_menu'][lang]}", callback_data="stars:close")
+                    types.InlineKeyboardButton(f"ðŸ”„ {T[lang]['refresh_balance']}", callback_data="stars:refresh"),
+                    types.InlineKeyboardButton(f"âŒ {T[lang]['close_stars_menu']}", callback_data="stars:close")
                 )
 
                 await bot.edit_message_text(
@@ -404,14 +404,14 @@ TG Stars cannot be transferred to other users.
                 
                 await bot.answer_callback_query(
                     call.id,
-                    T[lang]['insufficient_stars'][lang].format(required=needed),
+                    T[lang]['insufficient_stars'].format(required=needed),
                     show_alert=True
                 )
             
             elif action == "buy_stars":
                 await bot.answer_callback_query(
                     call.id,
-                    T[lang]['stars_purchase_info'][lang],
+                    T[lang]['stars_purchase_info'],
                     show_alert=True
                 )
             
@@ -441,7 +441,7 @@ TG Stars cannot be transferred to other users.
             if not item or item.get('payment') != 'tg_stars':
                 await bot.answer_callback_query(
                     call.id, 
-                    T[lang]['item_not_found'][lang] if lang == 'fa' else "âŒ Item not found or not available for TG Stars purchase.",
+                    T[lang]['item_not_found'] if lang == 'fa' else "âŒ Item not found or not available for TG Stars purchase.",
                     show_alert=True
                 )
                 return
@@ -450,7 +450,7 @@ TG Stars cannot be transferred to other users.
             if price <= 0:
                 await bot.answer_callback_query(
                     call.id, 
-                    T[lang]['item_not_for_sale'][lang] if lang == 'fa' else "âŒ This item is not for sale.",
+                    T[lang]['item_not_for_sale'] if lang == 'fa' else "âŒ This item is not for sale.",
                     show_alert=True
                 )
                 return
@@ -482,10 +482,10 @@ TG Stars cannot be transferred to other users.
             
             # Send confirmation message
             confirmation_msg = (
-                f"âœ¨ {T[lang]['invoice_sent'][lang] if lang == 'fa' else 'Invoice sent successfully!'}\n\n"
-                f"ðŸ’° {T[lang]['total_cost'][lang] if lang == 'fa' else 'Total cost'}: {price} â­\n"
-                f"ðŸ›’ {T[lang]['item'][lang] if lang == 'fa' else 'Item'}: {item_name}\n\n"
-                f"ðŸ“‹ {T[lang]['payment_instructions'][lang] if lang == 'fa' else 'Click the invoice above to complete your purchase.'}"
+                f"âœ¨ {T[lang]['invoice_sent'] if lang == 'fa' else 'Invoice sent successfully!'}\n\n"
+                f"ðŸ’° {T[lang]['total_cost'] if lang == 'fa' else 'Total cost'}: {price} â­\n"
+                f"ðŸ›’ {T[lang]['item'] if lang == 'fa' else 'Item'}: {item_name}\n\n"
+                f"ðŸ“‹ {T[lang]['payment_instructions'] if lang == 'fa' else 'Click the invoice above to complete your purchase.'}"
             )
             
             await bot.answer_callback_query(call.id, "âœ… Invoice created!")

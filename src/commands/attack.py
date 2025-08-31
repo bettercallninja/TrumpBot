@@ -391,7 +391,7 @@ async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: 
         
         # Add weapon stats for premium weapons
         if weapon_stats.get('stars', 0) >= 4:
-            msg += f"\nðŸ’Ž *Premium weapon used*"
+            msg += f"\n💎 *Premium weapon used*"
         
         if has_defense and defense_type:
             defense_name = T[lang].get('defense_items', {}).get(defense_type, defense_type)

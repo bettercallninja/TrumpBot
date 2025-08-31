@@ -165,7 +165,7 @@ async def show_inventory_overview(message: types.Message, bot: AsyncTeleBot, db_
             # Empty inventory message
             text = f"📦 **{T[lang].get('inventory_empty_title', {})}**\n\n"
             text += T[lang].get('inventory_empty_message', {})
-            text += f"\n\nðŸ’¡ {T[lang].get('inventory_tip', {})}"
+            text += f"\n\n💡 {T[lang].get('inventory_tip', {})}"
             
             markup = types.InlineKeyboardMarkup()
             shop_btn = types.InlineKeyboardButton(
@@ -186,10 +186,10 @@ async def show_inventory_overview(message: types.Message, bot: AsyncTeleBot, db_
         text += f"• {T[lang].get('total_items', {})}: {stats['total_items']}\n"
         text += f"• {T[lang].get('total_quantity', {})}: {stats['total_quantity']}\n"
         text += f"• {T[lang].get('total_value', {})}: {stats['total_value']} 🏅\n"
-            
+        
         if stats['most_valuable']:
             valuable_name = get_item_display_name(stats['most_valuable'], lang)
-            text += f"â€¢ {T[lang].get('most_valuable', {})}: {valuable_name}\n"
+            text += f"• {T[lang].get('most_valuable', {})}: {valuable_name}\n"
         text += "\n"
         
         # Category breakdown
@@ -197,7 +197,7 @@ async def show_inventory_overview(message: types.Message, bot: AsyncTeleBot, db_
         for category, count in stats['categories'].items():
             if count > 0:
                 category_name = T[lang].get(f'category_{category}', {})
-                text += f"â€¢ {category_name}: {count}\n"
+                text += f"• {category_name}: {count}\n"
         text += "\n"
         
         # Create navigation keyboard
@@ -287,7 +287,7 @@ async def show_inventory_category(call: types.CallbackQuery, bot: AsyncTeleBot, 
                 
                 text += f"{emoji} **{name}** x{qty}\n"
                 if description:
-                    text += f"   â†³ {description[:50]}{'...' if len(description) > 50 else ''}\n"
+                    text += f"   ↳ {description[:50]}{'...' if len(description) > 50 else ''}\n"
                 
                 # Add item stats for weapons/defense
                 if category == "weapons" or category == "all":
@@ -528,7 +528,7 @@ def register_handlers(bot: AsyncTeleBot, db_manager: DBManager) -> None:
         level_info = await helpers.get_player_level_info(message.chat.id, message.from_user.id, db_manager)
 
         if not inventory_rows:
-            msg = T['inventory_empty'][lang].format(first_name=message.from_user.first_name)
+            msg = T['inventory_empty'].format(first_name=message.from_user.first_name)
         else:
             inventory_map = {item['item']: item['qty'] for item in inventory_rows}
             
@@ -538,18 +538,18 @@ def register_handlers(bot: AsyncTeleBot, db_manager: DBManager) -> None:
                 category = item_details.get('category', 'other')
                 categories[category].append((item_id, qty))
 
-            msg = T['inventory_title'][lang].format(first_name=message.from_user.first_name, level=level_info['level'])
+            msg = T['inventory_title'].format(first_name=message.from_user.first_name, level=level_info['level'])
             
             for category, items in categories.items():
                 if items:
-                    msg += f"\n<b>{T['inventory_categories'][category][lang]}</b>\n"
+                    msg += f"\n<b>{T['inventory_categories'][category]}</b>\n"
                     for item_id, qty in sorted(items):
-                        item_name = T['items'][item_id][lang]
+                        item_name = T['items'][item_id]
                         emoji = T['item_emojis'].get(item_id, 'ðŸ“¦')
                         msg += f"â€¢ {emoji} {item_name}: <b>x{qty}</b>\n"
 
         keyboard = types.InlineKeyboardMarkup()
-        keyboard.add(types.InlineKeyboardButton(T['close_button'][lang], callback_data="inventory:close"))
+        keyboard.add(types.InlineKeyboardButton(T['close_button'], callback_data="inventory:close"))
         
         await bot.send_message(message.chat.id, msg, reply_markup=keyboard, parse_mode="HTML")
 
