@@ -663,3 +663,16 @@ def register_handlers(bot: AsyncTeleBot, db_manager: DBManager) -> None:
     async def weapon_info_callback_handler(call: types.CallbackQuery) -> None:
         await handle_attack_callback(call, bot, db_manager)
 
+    # --- NEW: Text trigger for attack ---
+    @bot.message_handler(
+        func=lambda m: (
+            m.text and (
+                m.text.strip().lower() in ['شلیک', 'حمله', 'attack', 'shoot']
+            )
+        ),
+        content_types=['text']
+    )
+    @group_only
+    async def attack_text_trigger_handler(message: types.Message) -> None:
+        await attack_command(message, bot, db_manager)
+
