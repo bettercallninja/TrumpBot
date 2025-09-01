@@ -260,6 +260,7 @@ CMD ["python", "main.py"]
 5. Submit pull request with detailed description
 
 ## 📞 Support
+@bettercallninja
 
 ### Common Issues
 - **Import Errors**: Ensure all `__init__.py` files exist
