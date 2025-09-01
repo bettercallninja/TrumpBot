@@ -1,4 +1,4 @@
-📋 TrumpBot v2.0.0 Enterprise - BotFather Commands Setup
+📋 TrumpBot v2.1.0 - BotFather Commands Setup
 =====================================================
 
 Copy and paste these commands into BotFather when setting up your bot:
@@ -7,37 +7,44 @@ Copy and paste these commands into BotFather when setting up your bot:
 
 🎮 CORE GAME COMMANDS / دستورات اصلی بازی:
 
-start - Start the bot and show welcome menu / شروع ربات و نمایش منوی خوش‌آمدگویی
+start - Begin your battle journey and get main menu
 menu - Show main game menu / نمایش منوی اصلی بازی
 main - Show main game menu / نمایش منوی اصلی بازی
-help - Show comprehensive help system / نمایش سیستم راهنمای جامع
+help - Get detailed help and instructions
 
 ⚔️ COMBAT COMMANDS / دستورات نبرد:
 
-attack - Attack another player / حمله به بازیکن دیگر
-weapons - Show weapons comparison and stats / نمایش مقایسه و آمار تسلیحات
-battle_stats - Show your combat statistics / نمایش آمارهای نبرد شما
+attack - Attack another player or select your weapon
+weapons - Compare all available weapons
+battle_stats - View your combat statistics
 
-📊 INFORMATION COMMANDS / دستورات اطلاعاتی:
+�️ DEFENSE COMMANDS / دستورات دفاعی:
 
-profile - Show detailed user profile / نمایش پروفایل تفصیلی کاربر
+shield - Activate a shield to block incoming attacks
+defend - Activate intercept system to reduce hit chance
+status - Check your HP, medals and active defenses
+
+�📊 INFORMATION COMMANDS / دستورات اطلاعاتی:
+
+profile - View your detailed profile
 me - Show detailed user profile / نمایش پروفایل تفصیلی کاربر
-status - Check your current game status / بررسی وضعیت فعلی بازی شما
-stats - Show quick statistics overview / نمایش خلاصه سریع آمار
-leaderboard - Show chat rankings / نمایش رده‌بندی چت
+stats - View your combat statistics and performance
+leaderboard - See top players in the chat
 top - Show chat rankings / نمایش رده‌بندی چت
 chat_stats - Show chat-wide statistics / نمایش آمارهای کلی چت
 
 🛒 SHOP & INVENTORY COMMANDS / دستورات فروشگاه و موجودی:
 
-shop - Browse available items for purchase / مرور آیتم‌های موجود برای خرید
+shop - Browse and buy weapons and items
 store - Browse available items for purchase / مرور آیتم‌های موجود برای خرید
-inventory - View your items and equipment / مشاهده آیتم‌ها و تجهیزات شما
+inventory - View your weapons and items
 inv - View your items and equipment / مشاهده آیتم‌ها و تجهیزات شما
+use - Use items like shields and boosters
 
 ⭐ PREMIUM COMMANDS / دستورات ویژه:
 
-stars - Manage TG Stars and premium features / مدیریت ستاره‌های تلگرام و ویژگی‌های ویژه
+stars - View Telegram Stars balance and premium shop
+bonus - Claim your daily bonus medals
 
 ⚙️ UTILITY COMMANDS / دستورات کاربردی:
 
@@ -81,27 +88,26 @@ lang
 
 If BotFather asks for command descriptions, use these:
 
-start - Start bot and show welcome menu
-menu - Show main game menu
-main - Show main game menu  
-help - Show comprehensive help system
-attack - Attack another player
-weapons - Show weapons comparison and stats
-battle_stats - Show your combat statistics
-profile - Show detailed user profile
-me - Show detailed user profile
-status - Check your current game status
-stats - Show quick statistics overview
-leaderboard - Show chat rankings
-top - Show chat rankings
+start - Start the bot and get welcome message / شروع ربات و دریافت پیام خوش‌آمدگویی
+menu - Show main game menu / نمایش منوی اصلی بازی
+main - Show main game menu / نمایش منوی اصلی بازی 
+help - Get detailed help and instructions / دریافت راهنمای تفصیلی و دستورالعمل‌ها
+attack - Attack another player or select your weapon / حمله به کاربر دیگر یا انتخاب سلاح
+shield - Activate a shield to block incoming attacks / فعال‌سازی سپر برای محافظت در برابر حملات
+defend - Activate intercept system to reduce hit chance / فعال‌سازی سیستم رهگیری برای کاهش شانس ضربه
+status - Check your HP, medals and active defenses / بررسی سلامتی، مدال‌ها و دفاع فعال خود
+stats - View your combat statistics and performance / مشاهده آمار نبرد و عملکرد خود
+inventory - View your weapons and items / مشاهده سلاح‌ها و آیتم‌های خود
+inv - Quick access to your inventory / دسترسی سریع به انبار خود
+shop - Buy items using medals / خرید آیتم‌ها با استفاده از مدال‌ها
+stars - View and manage your Telegram Stars / مشاهده و مدیریت ستاره‌های تلگرام خود
+top - View the group leaderboard / مشاهده جدول رده‌بندی گروه
+bonus - Claim your daily bonus medals / دریافت پاداش روزانه مدال‌های خود
+language - Switch between English and Persian / تغییر بین زبان انگلیسی و فارسی
+lang - Quick language switcher / تغییر سریع زبان
+leaderboard - See top players in the chat
 chat_stats - Show chat-wide statistics
-shop - Browse available items for purchase
 store - Browse available items for purchase
-inventory - View your items and equipment
-inv - View your items and equipment
-stars - Manage TG Stars and premium features
-language - Change bot language (English/Persian)
-lang - Change bot language (English/Persian)
 
 =====================================================
 

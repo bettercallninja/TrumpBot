@@ -29,7 +29,7 @@ from datetime import datetime
 from pathlib import Path
 
 from src.config.bot_config import BotConfig, create_bot
-from src.database.db_manager import initialize_pool, DBManager, setup_database
+from src.database.db_manager import initialize_pool, refresh_pool, DBManager, setup_database
 from src.utils.translations import load_translations, get, validate_translation_completeness
 from src.utils.localization import get_localized_text, detect_user_language, set_default_language
 
@@ -194,6 +194,21 @@ class BotApplication:
             logger.info("Setting up database tables...")
             logger.info("راه‌اندازی جداول پایگاه داده...")
             await setup_database()
+            
+            # Repair any issues with the cooldowns table
+            logger.info("Repairing cooldowns table if needed...")
+            try:
+                await self.db_manager.repair_cooldowns_table()
+                logger.info("Cooldowns table repair completed")
+            except Exception as repair_error:
+                logger.warning(f"Cooldowns table repair encountered an issue: {repair_error}")
+            
+            # Clean up expired cooldowns
+            try:
+                removed_count = await self.db_manager.cleanup_expired_cooldowns()
+                logger.info(f"Cleaned up {removed_count} expired cooldowns")
+            except Exception as cleanup_error:
+                logger.warning(f"Expired cooldowns cleanup encountered an issue: {cleanup_error}")
             
             # Test database connection
             await self._test_database_connection()
@@ -417,13 +432,24 @@ class BotApplication:
             }
             
             # Schedule periodic health checks
-            def periodic_health_check():
+            async def periodic_health_check():
                 """Perform periodic health checks"""
                 try:
                     # Check database connection
                     if self.db_manager:
-                        # This would be an async call in real implementation
-                        self.health_status['database'] = 'healthy'
+                        # Perform a real database health check
+                        db_healthy = await self.check_database_health()
+                        self.health_status['database'] = 'healthy' if db_healthy else 'unhealthy'
+                        
+                        # Run database maintenance tasks periodically (every ~30 minutes)
+                        if db_healthy and time.time() % 1800 < 60:  # Run in a 60-second window every 30 minutes
+                            try:
+                                # Clean up expired cooldowns
+                                removed = await self.db_manager.cleanup_expired_cooldowns()
+                                if removed > 0:
+                                    logger.info(f"Health check maintenance: Removed {removed} expired cooldowns")
+                            except Exception as maintenance_error:
+                                logger.warning(f"Health check maintenance task failed: {maintenance_error}")
                     else:
                         self.health_status['database'] = 'disconnected'
                     
@@ -446,14 +472,99 @@ class BotApplication:
                     uptime_hours = self.metrics.get_uptime() / 3600
                     if uptime_hours > 0 and int(uptime_hours) % 6 == 0:  # Every 6 hours
                         stats = self.metrics.get_stats()
-                        logger.info(f"Health Check - Uptime: {uptime_hours:.1f}h, "
-                                   f"Messages: {stats['total_messages']}, "
-                                   f"Errors: {stats['error_count']}")
+                        logger.info(
+                            f"Health Check - Uptime: {uptime_hours:.1f}h, "
+                            f"Messages: {stats['total_messages']}, "
+                            f"DB: {self.health_status['database']}"
+                        )
                 
                 except Exception as e:
-                    logger.error(f"Health check failed: {e}")
-                    self.health_status['status'] = 'unhealthy'
+                    logger.error(f"Health check error: {e}")
+                    self.health_status['status'] = 'error'
                     self.metrics.record_error()
+            
+            # Create asyncio task for periodic health check
+            async def health_check_scheduler():
+                while self.is_running and not self.shutdown_requested:
+                    await periodic_health_check()
+                    await asyncio.sleep(300)  # Check every 5 minutes
+            
+            # Run initial health check and schedule future checks
+            asyncio.create_task(periodic_health_check())
+            asyncio.create_task(health_check_scheduler())
+            
+            logger.info("Health monitoring activated - سیستم نظارت سلامت فعال شد")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to setup health monitoring: {e}")
+            logger.error(f"خطا در راه‌اندازی نظارت سلامت: {e}")
+            self.metrics.record_error()
+            return False
+            
+    async def check_database_health(self) -> bool:
+        """
+        بررسی سلامت پایگاه داده و تازه‌سازی اتصال در صورت نیاز
+        Check database health and refresh connection if needed
+        """
+        try:
+            if not self.db_manager:
+                logger.warning("Database manager not initialized during health check")
+                return False
+                
+            # First, ensure pool exists and is healthy
+            await self.db_manager.ensure_pool()
+            
+            # Try a simple query to verify connection
+            result = await self.db_manager.db("SELECT 1 as test", fetch="one")
+            
+            if result and result[0] == 1:
+                # Connection is good
+                
+                # Clean up expired cooldowns periodically
+                # This helps prevent the cooldowns table from growing too large
+                try:
+                    removed = await self.db_manager.cleanup_expired_cooldowns()
+                    if removed > 0:
+                        logger.info(f"Health check: Cleaned up {removed} expired cooldowns")
+                except Exception as cleanup_error:
+                    logger.warning(f"Failed to clean up cooldowns during health check: {cleanup_error}")
+                
+                return True
+            else:
+                # Try to refresh the pool
+                logger.warning("Database health check failed, refreshing connection pool...")
+                await refresh_pool()
+                # Get the global pool reference
+                from src.database.db_manager import pool
+                self.db_manager._pool = pool
+                self.db_manager._last_pool_refresh = time.time()
+                
+                # Test the connection again
+                result = await self.db_manager.db("SELECT 1 as test", fetch="one")
+                return result and result[0] == 1
+                
+        except Exception as e:
+            logger.error(f"Database health check failed: {e}")
+            
+            # Try to refresh the pool as a recovery measure
+            try:
+                logger.info("Attempting database connection pool refresh after health check failure")
+                await refresh_pool()
+                # Re-initialize DB manager
+                from src.database.db_manager import pool
+                self.db_manager._pool = pool
+                self.db_manager._last_pool_refresh = time.time()
+                
+                # Try a final verification query
+                result = await self.db_manager.db("SELECT 1 as recovery_test", fetch="one")
+                if result and result[0] == 1:
+                    logger.info("Database connection recovered after error")
+                    return True
+            except Exception as recovery_error:
+                logger.error(f"Database recovery failed: {recovery_error}")
+                
+            return False
             
             # Run initial health check
             periodic_health_check()

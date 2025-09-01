@@ -30,20 +30,19 @@ class ShopManager:
     async def get_user_currency(self, chat_id: int, user_id: int) -> Dict[str, int]:
         """Get user's available currencies"""
         try:
-            # Get medals from helpers
-            medals = await helpers.medals(user_id, chat_id, self.db_manager)
-            
-            # Get TG Stars from database
-            tg_stars = await self.db_manager.db(
-                "SELECT tg_stars FROM players WHERE chat_id=%s AND user_id=%s",
+            # Get medals from database
+            result = await self.db_manager.db(
+                "SELECT score, tg_stars FROM players WHERE chat_id=%s AND user_id=%s",
                 (chat_id, user_id),
-                fetch="one"
+                fetch="one_dict"
             )
             
-            return {
-                'medals': medals,
-                'tg_stars': tg_stars[0] if tg_stars else 0
-            }
+            if result:
+                return {
+                    'medals': result.get('score', 0),
+                    'tg_stars': result.get('tg_stars', 0)
+                }
+            return {'medals': 0, 'tg_stars': 0}
         except Exception as e:
             logger.error(f"Error getting user currency: {e}")
             return {'medals': 0, 'tg_stars': 0}
@@ -58,10 +57,16 @@ class ShopManager:
                 price = item.get('stars_price', 1)
                 return price, 'tg_stars'
             else:
-                # Calculate medal price based on stars
-                stars = item.get('stars', 1)
-                base_price = 50
-                price = base_price * (2 ** (stars - 1))
+                # Calculate medal price - prefer medals_price over stars calculation
+                if 'medals_price' in item:
+                    price = item['medals_price']
+                elif 'price' in item:
+                    price = item['price']
+                else:
+                    # Fallback calculation based on stars
+                    stars = item.get('stars', 1)
+                    base_price = 50
+                    price = base_price * (2 ** (stars - 1))
                 return price, 'medals'
         except Exception as e:
             logger.error(f"Error getting item price for {item_id}: {e}")
@@ -79,35 +84,178 @@ class ShopManager:
             return False
     
     async def purchase_item(self, chat_id: int, user_id: int, item_id: str) -> bool:
-        """Purchase an item and add to inventory"""
+        """Purchase an item and add to inventory or auto-use if it's a boost"""
         try:
             price, payment_type = await self.get_item_price(item_id)
             
             # Check if user can afford it
             if not await self.can_afford_item(chat_id, user_id, item_id):
+                logger.warning(f"User {user_id} cannot afford item {item_id}")
                 return False
             
-            # Start transaction
-            async with self.db_manager.get_connection() as conn:
-                async with conn.transaction():
-                    # Deduct currency
-                    if payment_type == 'medals':
-                        await helpers.add_medals(chat_id, user_id, -price, self.db_manager)
-                    else:  # TG Stars
-                        await conn.execute(
-                            "UPDATE players SET tg_stars = tg_stars - $1 WHERE chat_id=$2 AND user_id=$3",
-                            price, chat_id, user_id
-                        )
-                    
-                    # Add item to inventory
-                    await conn.execute("""
-                        INSERT INTO inventories (chat_id, user_id, item, qty)
-                        VALUES ($1, $2, $3, 1)
-                        ON CONFLICT (chat_id, user_id, item) DO UPDATE
-                        SET qty = inventories.qty + 1
-                    """, chat_id, user_id, item_id)
+            # Check if the item exists
+            if item_id not in ITEMS:
+                logger.warning(f"Item {item_id} does not exist")
+                return False
             
-            return True
+            item_data = ITEMS[item_id]
+            item_type = item_data.get('type', '')
+            
+            # Check if this is an auto-use item (medal boosts, instant utility items)
+            auto_use_items = [
+                'medal_boost_small', 'medal_boost', 'mega_medal_boost',  # Medal boost items
+                'energy_drink', 'adrenaline_shot',  # Cooldown reduction items  
+                'experience_boost',  # Experience multiplier
+                'repair_kit', 'nano_repair',  # HP restoration items
+                'first_aid', 'field_medic',  # Basic healing items
+                'vip_status', 'elite_membership'  # Status items - activate immediately
+            ]
+            
+            # Start transaction
+            queries = []
+            
+            # Deduct currency
+            if payment_type == 'medals':
+                queries.append((
+                    "UPDATE players SET score = score - %s WHERE chat_id=%s AND user_id=%s AND score >= %s",
+                    (price, chat_id, user_id, price)
+                ))
+            else:  # TG Stars
+                queries.append((
+                    "UPDATE players SET tg_stars = tg_stars - %s WHERE chat_id=%s AND user_id=%s AND tg_stars >= %s",
+                    (price, chat_id, user_id, price)
+                ))
+            
+            # Apply immediate effects for auto-use items
+            if item_id in auto_use_items:
+                # Apply the item's effect immediately without adding to inventory
+                
+                if item_id in ['medal_boost_small', 'medal_boost', 'mega_medal_boost']:
+                    # Medal boost items - instant medal reward
+                    medal_reward = item_data.get('medals_reward', 250)
+                    queries.append((
+                        "UPDATE players SET score = score + %s WHERE chat_id=%s AND user_id=%s",
+                        (medal_reward, chat_id, user_id)
+                    ))
+                    
+                elif item_id in ['energy_drink', 'adrenaline_shot']:
+                    # Cooldown reduction items - add to active boosts table
+                    duration = item_data.get('duration_seconds', 3600)
+                    expires_at = helpers.now() + duration
+                    cooldown_reduction = item_data.get('cooldown_reduction', 0.5)
+                    
+                    # Remove existing cooldown boost
+                    queries.append((
+                        "DELETE FROM active_boosts WHERE chat_id=%s AND user_id=%s AND boost_type='cooldown_reduction'",
+                        (chat_id, user_id)
+                    ))
+                    
+                    # Add new cooldown boost
+                    queries.append((
+                        """INSERT INTO active_boosts (chat_id, user_id, boost_type, boost_value, expires_at, activated_at) 
+                           VALUES (%s, %s, 'cooldown_reduction', %s, %s, %s)""",
+                        (chat_id, user_id, cooldown_reduction, expires_at, helpers.now())
+                    ))
+                    
+                elif item_id == 'experience_boost':
+                    # Experience multiplier boost
+                    duration = item_data.get('duration_seconds', 14400)  # 4 hours
+                    expires_at = helpers.now() + duration
+                    multiplier = item_data.get('experience_multiplier', 2.0)
+                    
+                    # Remove existing experience boost
+                    queries.append((
+                        "DELETE FROM active_boosts WHERE chat_id=%s AND user_id=%s AND boost_type='experience_multiplier'",
+                        (chat_id, user_id)
+                    ))
+                    
+                    queries.append((
+                        """INSERT INTO active_boosts (chat_id, user_id, boost_type, boost_value, expires_at, activated_at) 
+                           VALUES (%s, %s, 'experience_multiplier', %s, %s, %s)""",
+                        (chat_id, user_id, multiplier, expires_at, helpers.now())
+                    ))
+                    
+                elif item_id in ['repair_kit', 'nano_repair', 'first_aid', 'field_medic']:
+                    # HP restoration items
+                    hp_restore = item_data.get('hp_restore', 100)
+                    
+                    if item_id == 'nano_repair':
+                        # Nano repair can overheal beyond max_hp
+                        queries.append((
+                            "UPDATE players SET hp = LEAST(hp + %s, max_hp + 50) WHERE chat_id=%s AND user_id=%s",
+                            (hp_restore, chat_id, user_id)
+                        ))
+                    else:
+                        # Regular repair items restore to max_hp
+                        queries.append((
+                            "UPDATE players SET hp = LEAST(hp + %s, max_hp) WHERE chat_id=%s AND user_id=%s",
+                            (hp_restore, chat_id, user_id)
+                        ))
+                        
+                elif item_id in ['vip_status', 'elite_membership']:
+                    # VIP/Elite membership activation
+                    days = item_data.get('days', 30)
+                    expires_at = helpers.now() + (days * 24 * 60 * 60)  # Convert days to seconds
+                    
+                    # Remove existing VIP status
+                    queries.append((
+                        "DELETE FROM active_boosts WHERE chat_id=%s AND user_id=%s AND boost_type IN ('vip_experience', 'vip_damage', 'vip_cooldown')",
+                        (chat_id, user_id)
+                    ))
+                    
+                    # Add VIP/Elite status
+                    experience_mult = item_data.get('experience_multiplier', 1.5)
+                    damage_bonus = item_data.get('damage_bonus', 0.2)
+                    
+                    # Add experience multiplier
+                    queries.append((
+                        """INSERT INTO active_boosts (chat_id, user_id, boost_type, boost_value, expires_at, activated_at) 
+                           VALUES (%s, %s, 'vip_experience', %s, %s, %s)""",
+                        (chat_id, user_id, experience_mult, expires_at, helpers.now())
+                    ))
+                    
+                    # Add damage bonus
+                    queries.append((
+                        """INSERT INTO active_boosts (chat_id, user_id, boost_type, boost_value, expires_at, activated_at) 
+                           VALUES (%s, %s, 'vip_damage', %s, %s, %s)""",
+                        (chat_id, user_id, damage_bonus, expires_at, helpers.now())
+                    ))
+                    
+                    # Add cooldown reduction if elite
+                    if item_id == 'elite_membership':
+                        cooldown_reduction = item_data.get('cooldown_reduction', 0.25)
+                        queries.append((
+                            """INSERT INTO active_boosts (chat_id, user_id, boost_type, boost_value, expires_at, activated_at) 
+                               VALUES (%s, %s, 'vip_cooldown', %s, %s, %s)""",
+                            (chat_id, user_id, cooldown_reduction, expires_at, helpers.now())
+                        ))
+            else:
+                # For non-auto-use items (weapons, shields, status items), add to inventory
+                queries.append((
+                    """INSERT INTO inventories (chat_id, user_id, item, qty)
+                       VALUES (%s, %s, %s, 1)
+                       ON CONFLICT (chat_id, user_id, item) 
+                       DO UPDATE SET qty = inventories.qty + 1""",
+                    (chat_id, user_id, item_id)
+                ))
+            
+            # Record purchase in purchase history
+            current_time = helpers.now()
+            queries.append((
+                "INSERT INTO purchases (chat_id, user_id, item, price, purchase_time) VALUES (%s, %s, %s, %s, %s)",
+                (chat_id, user_id, item_id, price, current_time)
+            ))
+            
+            # Execute transaction
+            success = await self.db_manager.transaction(queries)
+            
+            if success:
+                logger.info(f"User {user_id} purchased item {item_id} for {price} {payment_type}")
+                return True
+            else:
+                logger.error(f"Transaction failed for user {user_id} purchasing item {item_id}")
+                return False
+                
         except Exception as e:
             logger.error(f"Error purchasing item {item_id}: {e}")
             return False
@@ -115,46 +263,49 @@ class ShopManager:
     async def show_shop_overview(self, bot: AsyncTeleBot, message: types.Message):
         """Display comprehensive shop overview with categories"""
         try:
+            # Ensure user exists
+            await helpers.ensure_player(message.chat.id, message.from_user, self.db_manager)
+            
             lang = await helpers.get_lang(message.chat.id, message.from_user.id, self.db_manager)
             user_currency = await self.get_user_currency(message.chat.id, message.from_user.id)
             
             # Build shop overview message
-            shop_text = f"🛍️ <b>{T[lang]['shop_welcome']}</b>\n\n"
-            shop_text += f"💰 <b>{T[lang]['your_balance']}:</b>\n"
-            shop_text += f"🏅 {T[lang]['medals']}: <b>{user_currency['medals']}</b>\n"
-            shop_text += f"⭐ {T[lang]['tg_stars']}: <b>{user_currency['tg_stars']}</b>\n\n"
-            shop_text += f"{T[lang]['shop_categories_intro']}"
+            shop_text = f"🛍️ <b>{T[lang].get('shop_welcome', 'Welcome to the Shop!')}</b>\n\n"
+            shop_text += f"💰 <b>{T[lang].get('your_balance', 'Your Balance')}:</b>\n"
+            shop_text += f"🏅 {T[lang].get('medals', 'Medals')}: <b>{user_currency['medals']}</b>\n"
+            shop_text += f"⭐ {T[lang].get('tg_stars', 'TG Stars')}: <b>{user_currency['tg_stars']}</b>\n\n"
+            shop_text += f"{T[lang].get('shop_categories_intro', 'Choose a category to browse items:')}"
             
             keyboard = types.InlineKeyboardMarkup(row_width=2)
             
             # Category buttons
             weapons_btn = types.InlineKeyboardButton(
-                f"⚔️ {T[lang]['category_weapons']}", 
+                f"⚔️ {T[lang].get('category_weapons', 'Weapons')}", 
                 callback_data="shop:category:weapons"
             )
             defense_btn = types.InlineKeyboardButton(
-                f"🛡️ {T[lang]['category_defense']}", 
+                f"🛡️ {T[lang].get('category_defense', 'Defense')}", 
                 callback_data="shop:category:defense"
             )
             keyboard.add(weapons_btn, defense_btn)
             
             other_btn = types.InlineKeyboardButton(
-                f"📦 {T[lang]['category_other']}", 
-                callback_data="shop:category:other"
+                f"📦 {T[lang].get('category_utilities', 'Utilities')}", 
+                callback_data="shop:category:utilities"
             )
             premium_btn = types.InlineKeyboardButton(
-                f"💎 {T[lang]['premium_items']}", 
+                f"💎 {T[lang].get('premium_items', 'Premium')}", 
                 callback_data="shop:payment:tg_stars"
             )
             keyboard.add(other_btn, premium_btn)
             
             # Quick access buttons
             all_items_btn = types.InlineKeyboardButton(
-                f"📋 {T[lang]['all_items']}", 
+                f"📋 {T[lang].get('all_items', 'All Items')}", 
                 callback_data="shop:all"
             )
             close_btn = types.InlineKeyboardButton(
-                f"❌ {T[lang]['close_button']}", 
+                f"❌ {T[lang].get('close_button', 'Close')}", 
                 callback_data="shop:close"
             )
             keyboard.add(all_items_btn, close_btn)
@@ -182,23 +333,23 @@ class ShopManager:
             # Get items by category
             if category == "all":
                 items = ITEMS
-                title = T[lang]['all_items']
+                title = T[lang].get('all_items', 'All Items')
             else:
-                items = get_items_by_category(ItemCategory(category))
-                title = T[lang][f'category_{category}']
+                items = get_items_by_category(category)  # Pass string directly, not enum
+                title = T[lang].get(f'category_{category}', category.capitalize())
             
             if not items:
                 await bot.answer_callback_query(
                     call.id, 
-                    T[lang]['no_items_in_category'], 
+                    T[lang].get('no_items_in_category', 'No items in this category'), 
                     show_alert=True
                 )
                 return
             
             # Build category message
             shop_text = f"🛍️ <b>{title}</b>\n\n"
-            shop_text += f"💰 {T[lang]['medals']}: <b>{user_currency['medals']}</b> | "
-            shop_text += f"⭐ {T[lang]['tg_stars']}: <b>{user_currency['tg_stars']}</b>\n\n"
+            shop_text += f"💰 {T[lang].get('medals', 'Medals')}: <b>{user_currency['medals']}</b> | "
+            shop_text += f"⭐ {T[lang].get('tg_stars', 'TG Stars')}: <b>{user_currency['tg_stars']}</b>\n\n"
             
             keyboard = types.InlineKeyboardMarkup(row_width=1)
             
@@ -226,11 +377,11 @@ class ShopManager:
             
             # Navigation buttons
             back_btn = types.InlineKeyboardButton(
-                f"🔙 {T[lang]['back_to_shop']}", 
+                f"🔙 {T[lang].get('back_to_shop', 'Back to Shop')}", 
                 callback_data="shop:main"
             )
             close_btn = types.InlineKeyboardButton(
-                f"❌ {T[lang]['close_button']}", 
+                f"❌ {T[lang].get('close_button', 'Close')}", 
                 callback_data="shop:close"
             )
             keyboard.add(back_btn, close_btn)
@@ -255,12 +406,12 @@ class ShopManager:
             
             # Get items by payment type
             items = get_items_by_payment_type(PaymentType(payment_type))
-            title = T[lang]['premium_items'] if payment_type == 'tg_stars' else T[lang]['medal_items']
+            title = T[lang].get('premium_items', 'Premium Items') if payment_type == 'tg_stars' else T[lang].get('medal_items', 'Medal Items')
             
             if not items:
                 await bot.answer_callback_query(
                     call.id, 
-                    T[lang]['no_items_in_category'], 
+                    T[lang].get('no_items_in_category', 'No items in this category'), 
                     show_alert=True
                 )
                 return
@@ -268,10 +419,10 @@ class ShopManager:
             # Build message
             shop_text = f"🛍️ <b>{title}</b>\n\n"
             if payment_type == 'tg_stars':
-                shop_text += f"⭐ {T[lang]['tg_stars']}: <b>{user_currency['tg_stars']}</b>\n"
-                shop_text += f"{T[lang]['premium_info']}\n\n"
+                shop_text += f"⭐ {T[lang].get('tg_stars', 'TG Stars')}: <b>{user_currency['tg_stars']}</b>\n"
+                shop_text += f"{T[lang].get('premium_info', 'Premium items offer unique advantages')}\n\n"
             else:
-                shop_text += f"🏅 {T[lang]['medals']}: <b>{user_currency['medals']}</b>\n\n"
+                shop_text += f"🏅 {T[lang].get('medals', 'Medals')}: <b>{user_currency['medals']}</b>\n\n"
             
             keyboard = types.InlineKeyboardMarkup(row_width=1)
             
@@ -299,11 +450,11 @@ class ShopManager:
             
             # Navigation buttons
             back_btn = types.InlineKeyboardButton(
-                f"🔙 {T[lang]['back_to_shop']}", 
+                f"🔙 {T[lang].get('back_to_shop', 'Back to Shop')}", 
                 callback_data="shop:main"
             )
             close_btn = types.InlineKeyboardButton(
-                f"❌ {T[lang]['close_button']}", 
+                f"❌ {T[lang].get('close_button', 'Close')}", 
                 callback_data="shop:close"
             )
             keyboard.add(back_btn, close_btn)
@@ -327,7 +478,7 @@ class ShopManager:
             user_currency = await self.get_user_currency(call.message.chat.id, call.from_user.id)
             
             if item_id not in ITEMS:
-                await bot.answer_callback_query(call.id, T[lang]['item_not_found'], show_alert=True)
+                await bot.answer_callback_query(call.id, T[lang].get('item_not_found', 'Item not found'), show_alert=True)
                 return
             
             item_data = ITEMS[item_id]
@@ -339,57 +490,57 @@ class ShopManager:
             
             # Build detailed message
             item_text = f"{emoji} <b>{item_name}</b>\n\n"
-            item_text += f"📝 <b>{T[lang]['description']}:</b>\n{description}\n\n"
+            item_text += f"📝 <b>{T[lang].get('description', 'Description')}:</b>\n{description}\n\n"
             
             # Add stats
             if stats.get('damage'):
-                item_text += f"⚔️ {T[lang]['damage']}: <b>+{stats['damage']}</b>\n"
+                item_text += f"⚔️ {T[lang].get('damage', 'Damage')}: <b>+{stats['damage']}</b>\n"
             if stats.get('duration_seconds'):
                 hours = stats['duration_seconds'] // 3600
-                item_text += f"⏱️ {T[lang]['duration']}: <b>{hours} {T[lang]['hours']}</b>\n"
+                item_text += f"⏱️ {T[lang].get('duration', 'Duration')}: <b>{hours} {T[lang].get('hours', 'hours')}</b>\n"
             if stats.get('effectiveness'):
                 effectiveness = int(stats['effectiveness'] * 100)
-                item_text += f"🛡️ {T[lang]['effectiveness']}: <b>{effectiveness}%</b>\n"
+                item_text += f"🛡️ {T[lang].get('effectiveness', 'Effectiveness')}: <b>{effectiveness}%</b>\n"
             if stats.get('capacity'):
-                item_text += f"📦 {T[lang]['capacity']}: <b>+{stats['capacity']}</b>\n"
+                item_text += f"📦 {T[lang].get('capacity', 'Capacity')}: <b>+{stats['capacity']}</b>\n"
             if stats.get('medals'):
-                item_text += f"🏅 {T[lang]['medal_bonus']}: <b>+{stats['medals']}</b>\n"
+                item_text += f"🏅 {T[lang].get('medal_bonus', 'Medal Bonus')}: <b>+{stats['medals']}</b>\n"
             
             # Price and affordability
-            item_text += f"\n💰 <b>{T[lang]['price']}:</b> "
+            item_text += f"\n💰 <b>{T[lang].get('price', 'Price')}:</b> "
             if payment_type == 'medals':
-                item_text += f"{price} 🏅 {T[lang]['medals']}\n"
+                item_text += f"{price} 🏅 {T[lang].get('medals', 'Medals')}\n"
                 current_balance = user_currency['medals']
             else:
-                item_text += f"{price} ⭐ {T[lang]['tg_stars']}\n"
+                item_text += f"{price} ⭐ {T[lang].get('tg_stars', 'TG Stars')}\n"
                 current_balance = user_currency['tg_stars']
             
             can_afford = await self.can_afford_item(call.message.chat.id, call.from_user.id, item_id)
             
             if can_afford:
-                item_text += f"✅ {T[lang]['you_can_afford']}"
+                item_text += f"✅ {T[lang].get('you_can_afford', 'You can afford this item')}"
             else:
                 needed = price - current_balance
-                currency_name = T[lang]['medals'] if payment_type == 'medals' else T[lang]['tg_stars']
-                item_text += f"❌ {T[lang]['need_more_currency'].format(amount=needed, currency=currency_name)}"
+                currency_name = T[lang].get('medals', 'Medals') if payment_type == 'medals' else T[lang].get('tg_stars', 'TG Stars')
+                item_text += f"❌ {T[lang].get('need_more_currency', 'You need {amount} more {currency').format(amount=needed, currency=currency_name)}"
             
             keyboard = types.InlineKeyboardMarkup()
             
             # Purchase button
             if can_afford:
                 buy_btn = types.InlineKeyboardButton(
-                    f"💳 {T[lang]['buy_item']}", 
+                    f"💳 {T[lang].get('buy_item', 'Buy Item')}", 
                     callback_data=f"shop:buy:{item_id}"
                 )
                 keyboard.add(buy_btn)
             
             # Navigation buttons
             back_btn = types.InlineKeyboardButton(
-                f"🔙 {T[lang]['back_to_category']}", 
+                f"🔙 {T[lang].get('back_to_category', 'Back')}", 
                 callback_data="shop:main"
             )
             close_btn = types.InlineKeyboardButton(
-                f"❌ {T[lang]['close_button']}", 
+                f"❌ {T[lang].get('close_button', 'Close')}", 
                 callback_data="shop:close"
             )
             keyboard.add(back_btn, close_btn)
@@ -416,28 +567,104 @@ class ShopManager:
             
             if success:
                 item_name = get_item_display_name(item_id, lang)
+                emoji = get_item_emoji(item_id)
                 price, payment_type = await self.get_item_price(item_id)
-                currency_name = T[lang]['medals'] if payment_type == 'medals' else T[lang]['tg_stars']
+                currency_name = T[lang].get('medals', 'Medals') if payment_type == 'medals' else T[lang].get('tg_stars', 'TG Stars')
                 
-                success_msg = T[lang]['purchase_successful'].format(
-                    item_name=item_name, 
-                    price=price, 
-                    currency=currency_name
-                )
+                # Check if this was an auto-use item
+                auto_use_items = [
+                    'medal_boost_small', 'medal_boost', 'mega_medal_boost',
+                    'energy_drink', 'adrenaline_shot', 'experience_boost',
+                    'repair_kit', 'nano_repair', 'first_aid', 'field_medic',
+                    'vip_status', 'elite_membership'
+                ]
+                
+                is_auto_use = item_id in auto_use_items
+                
+                # Create success message with appropriate effect description
+                if is_auto_use:
+                    if item_id in ['medal_boost_small', 'medal_boost', 'mega_medal_boost']:
+                        item_data = ITEMS[item_id]
+                        medal_reward = item_data.get('medals_reward', 250)
+                        effect_text = f"💰 +{medal_reward} medals added to your balance!"
+                    elif item_id in ['energy_drink', 'adrenaline_shot']:
+                        item_data = ITEMS[item_id]
+                        reduction = int(item_data.get('cooldown_reduction', 0.5) * 100)
+                        duration = item_data.get('duration_seconds', 3600) // 3600
+                        effect_text = f"⚡ Attack cooldown reduced by {reduction}% for {duration} hour(s)!"
+                    elif item_id == 'experience_boost':
+                        effect_text = f"📈 Experience gain doubled for 4 hours!"
+                    elif item_id in ['repair_kit', 'nano_repair', 'first_aid', 'field_medic']:
+                        item_data = ITEMS[item_id]
+                        hp_restore = item_data.get('hp_restore', 100)
+                        effect_text = f"❤️ +{hp_restore} HP restored!"
+                    elif item_id == 'vip_status':
+                        effect_text = f"👑 VIP Status activated for 30 days! (+50% XP, +20% damage)"
+                    elif item_id == 'elite_membership':
+                        effect_text = f"💎 Elite Membership activated for 90 days! (+100% XP, +35% damage, +25% faster cooldowns)"
+                    else:
+                        effect_text = f"✨ Item effect applied immediately!"
+                        
+                    success_msg = f"✅ {item_name} purchased and used! {effect_text}"
+                else:
+                    success_msg = f"✅ {item_name} purchased and added to inventory!"
+                
+                # Show success popup
                 await bot.answer_callback_query(call.id, success_msg, show_alert=True)
                 
-                # Return to shop main
-                await self.show_shop_overview(bot, call.message)
-            else:
-                await bot.answer_callback_query(
-                    call.id, 
-                    T[lang]['purchase_failed'], 
-                    show_alert=True
+                # Update message with purchase confirmation
+                purchase_text = f"🛍️ <b>{T[lang].get('purchase_complete', 'Purchase Complete')}</b>\n\n"
+                purchase_text += f"{emoji} <b>{item_name}</b>\n"
+                purchase_text += f"💰 {T[lang].get('price_paid', 'Price Paid')}: {price} "
+                purchase_text += f"{'🏅' if payment_type == 'medals' else '⭐'}\n\n"
+                
+                if is_auto_use:
+                    purchase_text += f"⚡ <b>Effect Applied:</b>\n{effect_text}"
+                else:
+                    purchase_text += f"✅ {T[lang].get('added_to_inventory', 'Added to your inventory!')}"
+                
+                # Show options after purchase
+                keyboard = types.InlineKeyboardMarkup(row_width=2)
+                
+                shop_btn = types.InlineKeyboardButton(
+                    f"🛒 {T[lang].get('continue_shopping', 'Continue Shopping')}", 
+                    callback_data="shop:main"
                 )
+                inventory_btn = types.InlineKeyboardButton(
+                    f"🎒 {T[lang].get('view_inventory', 'View Inventory')}", 
+                    callback_data="inventory:overview"
+                )
+                keyboard.add(shop_btn, inventory_btn)
+                
+                # Show what category the item was from
+                category = ITEMS.get(item_id, {}).get('category', 'other')
+                category_btn = types.InlineKeyboardButton(
+                    f"📂 {T[lang].get(f'category_{category}', category.capitalize())}", 
+                    callback_data=f"shop:category:{category}"
+                )
+                close_btn = types.InlineKeyboardButton(
+                    f"❌ {T[lang].get('close_button', 'Close')}", 
+                    callback_data="shop:close"
+                )
+                keyboard.add(category_btn, close_btn)
+                
+                await bot.edit_message_text(
+                    purchase_text,
+                    call.message.chat.id,
+                    call.message.message_id,
+                    reply_markup=keyboard,
+                    parse_mode="HTML"
+                )
+            else:
+                error_msg = T[lang].get('purchase_failed', '❌ Purchase failed. Please try again.')
+                await bot.answer_callback_query(call.id, error_msg, show_alert=True)
+                
+                # Return to item details to try again
+                await self.show_item_details(bot, call, item_id)
                 
         except Exception as e:
             logger.error(f"Error handling purchase for {item_id}: {e}")
-            await bot.answer_callback_query(call.id, T[lang]['purchase_error'], show_alert=True)
+            await bot.answer_callback_query(call.id, T[lang].get('purchase_error', '❌ Error processing purchase'), show_alert=True)
     
     async def handle_shop_callback(self, bot: AsyncTeleBot, call: types.CallbackQuery):
         """Handle all shop-related callbacks"""
@@ -451,7 +678,17 @@ class ShopManager:
                 return
             
             elif action == "main":
-                await self.show_shop_overview(bot, call.message)
+                # Convert callback to message for overview
+                fake_message = types.Message(
+                    message_id=call.message.message_id,
+                    from_user=call.from_user,
+                    date=call.message.date,
+                    chat=call.message.chat,
+                    content_type='text',
+                    options={},
+                    json_string=""
+                )
+                await self.show_shop_overview(bot, fake_message)
             
             elif action == "category":
                 category = data_parts[2] if len(data_parts) > 2 else "weapons"

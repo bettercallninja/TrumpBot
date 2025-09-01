@@ -8,6 +8,7 @@ Handles combat mechanics, weapon usage, and damage calculations
 import asyncio
 import logging
 import random
+import re
 from typing import Optional, Tuple, Dict, Any
 from telebot import types
 from telebot.async_telebot import AsyncTeleBot
@@ -20,6 +21,13 @@ from src.utils.translations import T
 # Set up logging
 logger = logging.getLogger(__name__)
 
+def escape_markdown(text: str) -> str:
+    """Escape special characters for Telegram markdown"""
+    if not text:
+        return ""
+    # Escape markdown special characters
+    return re.sub(r'([*_\[\]()~`>#+\-=|{}.!])', r'\\\1', str(text))
+
 class AttackManager:
     """Manages attack mechanics and damage calculations"""
     
@@ -27,8 +35,8 @@ class AttackManager:
         self.db_manager = db_manager
         self.config = BotConfig
         
-    def calculate_damage(self, weapon: str, attacker_level: int, target_level: int) -> int:
-        """Calculate damage based on weapon and level difference"""
+    async def calculate_damage(self, weapon: str, attacker_level: int, target_level: int, chat_id: int, user_id: int) -> int:
+        """Calculate damage based on weapon and level difference, including boosts"""
         # Get weapon info from items configuration
         weapon_data = ITEMS.get(weapon)
         if not weapon_data or not is_weapon(weapon):
@@ -46,7 +54,66 @@ class AttackManager:
         level_diff = attacker_level - target_level
         level_modifier = max(0.5, min(1.0 + (level_diff * 0.1), 2.0))
         
-        return max(1, int(damage * level_modifier))
+        base_final_damage = max(1, int(damage * level_modifier))
+        
+        # Apply VIP damage bonuses
+        damage_bonus = await self._get_active_damage_bonus(chat_id, user_id)
+        final_damage = int(base_final_damage * (1 + damage_bonus))
+        
+        return max(1, final_damage)
+    
+    async def _get_active_damage_bonus(self, chat_id: int, user_id: int) -> float:
+        """Get current damage bonus from active boosts"""
+        try:
+            boosts = await self.db_manager.db(
+                """SELECT boost_value FROM active_boosts 
+                   WHERE chat_id=%s AND user_id=%s 
+                   AND boost_type = 'vip_damage' 
+                   AND expires_at > %s""",
+                (chat_id, user_id, helpers.now()),
+                fetch="all_dict"
+            )
+            
+            # Handle None result and sum all damage bonuses (cap at 100% bonus)
+            if boosts:
+                total_bonus = sum(boost['boost_value'] for boost in boosts)
+                return min(total_bonus, 1.0)
+            return 0.0
+            
+        except Exception as e:
+            logger.error(f"Error getting damage bonus: {e}")
+            return 0.0
+    
+    async def cleanup_expired_boosts(self, chat_id: int) -> None:
+        """Clean up expired boosts from the database"""
+        try:
+            await self.db_manager.db(
+                "DELETE FROM active_boosts WHERE chat_id=%s AND expires_at <= %s",
+                (chat_id, helpers.now())
+            )
+        except Exception as e:
+            logger.error(f"Error cleaning up expired boosts: {e}")
+    
+    async def _get_active_experience_multiplier(self, chat_id: int, user_id: int) -> float:
+        """Get current experience multiplier from active boosts"""
+        try:
+            boosts = await self.db_manager.db(
+                """SELECT boost_value FROM active_boosts 
+                   WHERE chat_id=%s AND user_id=%s 
+                   AND boost_type IN ('experience_multiplier', 'vip_experience') 
+                   AND expires_at > %s""",
+                (chat_id, user_id, helpers.now()),
+                fetch="all_dict"
+            )
+            
+            # Use the highest multiplier (don't stack)
+            if boosts:
+                return max(boost['boost_value'] for boost in boosts)
+            return 1.0
+            
+        except Exception as e:
+            logger.error(f"Error getting experience multiplier: {e}")
+            return 1.0
     
     async def check_defense(self, target_chat_id: int, target_user_id: int) -> Tuple[bool, Optional[str]]:
         """Check if target has active defense"""
@@ -62,7 +129,7 @@ class AttackManager:
             return False, None
     
     async def check_cooldown(self, chat_id: int, user_id: int) -> Optional[int]:
-        """Check if user is in attack cooldown"""
+        """Check if user is in attack cooldown, considering cooldown reduction boosts"""
         try:
             last_attack = await self.db_manager.db(
                 "SELECT MAX(attack_time) as last_attack FROM attacks WHERE chat_id=%s AND attacker_id=%s",
@@ -72,12 +139,40 @@ class AttackManager:
             
             if last_attack and last_attack['last_attack']:
                 time_since = helpers.now() - last_attack['last_attack']
-                if time_since < self.config.game_mechanics.attack_cooldown:
-                    return self.config.game_mechanics.attack_cooldown - time_since
+                base_cooldown = self.config.game_mechanics.attack_cooldown
+                
+                # Check for active cooldown reduction boosts
+                cooldown_reduction = await self._get_active_cooldown_reduction(chat_id, user_id)
+                effective_cooldown = max(5, int(base_cooldown * (1 - cooldown_reduction)))  # Minimum 5 seconds
+                
+                if time_since < effective_cooldown:
+                    return effective_cooldown - time_since
             return None
         except Exception as e:
             logger.error(f"Error checking cooldown: {e}")
             return None
+    
+    async def _get_active_cooldown_reduction(self, chat_id: int, user_id: int) -> float:
+        """Get current cooldown reduction from active boosts"""
+        try:
+            boosts = await self.db_manager.db(
+                """SELECT boost_value FROM active_boosts 
+                   WHERE chat_id=%s AND user_id=%s 
+                   AND boost_type IN ('cooldown_reduction', 'vip_cooldown') 
+                   AND expires_at > %s""",
+                (chat_id, user_id, helpers.now()),
+                fetch="all_dict"
+            )
+            
+            # Handle None result and sum all cooldown reductions (cap at 80% total reduction)
+            if boosts:
+                total_reduction = sum(boost['boost_value'] for boost in boosts)
+                return min(total_reduction, 0.8)
+            return 0.0
+            
+        except Exception as e:
+            logger.error(f"Error getting cooldown reduction: {e}")
+            return 0.0
     
     async def check_weapon_availability(self, chat_id: int, user_id: int, weapon: str) -> bool:
         """Check if user has the specified weapon"""
@@ -324,7 +419,7 @@ async def show_attack_menu(message: types.Message, bot: AsyncTeleBot, db_manager
 
 async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: DBManager, 
                        target_user: types.User, weapon: str, lang: str) -> None:
-    """Execute the actual attack"""
+    """Execute the actual attack with enhanced reporting"""
     attack_manager = AttackManager(db_manager)
     
     try:
@@ -333,14 +428,16 @@ async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: 
         target_level = await attack_manager.get_user_level(message.chat.id, target_user.id)
         
         # Calculate damage
-        damage = attack_manager.calculate_damage(weapon, attacker_level, target_level)
+        damage = await attack_manager.calculate_damage(weapon, attacker_level, target_level, message.chat.id, message.from_user.id)
         has_defense, defense_type = await attack_manager.check_defense(message.chat.id, target_user.id)
         
         # Apply defense reduction
         final_damage = damage
+        defense_reduced = 0
         if has_defense and defense_type:
             defense_effectiveness = attack_manager.config.DEFENSE_EFFECTIVENESS.get(defense_type, 0)
-            final_damage = int(damage * (1 - defense_effectiveness))
+            defense_reduced = int(damage * defense_effectiveness)
+            final_damage = damage - defense_reduced
         
         # Update target HP
         await db_manager.db(
@@ -370,10 +467,28 @@ async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: 
             )
         
         # Award medals with improved calculation
-        medal_reward = attack_manager.calculate_medal_reward(weapon, remaining_hp <= 0)
+        is_defeat = remaining_hp <= 0
+        medal_reward = attack_manager.calculate_medal_reward(weapon, is_defeat)
+        
+        # Apply level difference bonus/penalty for medals (max ±50%)
+        level_diff = attacker_level - target_level
+        level_medal_modifier = max(0.5, min(1.5, 1.0 + (level_diff * 0.05)))
+        adjusted_medal_reward = max(1, round(medal_reward * level_medal_modifier))
+        
+        # Apply the medal reward
         await db_manager.db(
             "UPDATE players SET score = score + %s WHERE chat_id=%s AND user_id=%s",
-            (medal_reward, message.chat.id, message.from_user.id)
+            (adjusted_medal_reward, message.chat.id, message.from_user.id)
+        )
+        
+        # Award experience with boosts
+        base_exp = 10 + (5 if is_defeat else 0)  # Base 10 exp, +5 for defeats
+        experience_multiplier = await attack_manager._get_active_experience_multiplier(message.chat.id, message.from_user.id)
+        final_exp = int(base_exp * experience_multiplier)
+        
+        await db_manager.db(
+            "UPDATE players SET experience = experience + %s WHERE chat_id=%s AND user_id=%s",
+            (final_exp, message.chat.id, message.from_user.id)
         )
         
         # Generate attack report with improved formatting
@@ -381,37 +496,95 @@ async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: 
         weapon_name = get_item_display_name(weapon, lang)
         weapon_stats = get_item_stats(weapon)
         
-        # Create comprehensive attack report
-        msg = T[lang].get('attack_report', {}).format(
-            attacker=message.from_user.first_name or "Unknown",
-            target=target_user.first_name or "Unknown",
-            emoji=weapon_emoji,
-            weapon=weapon_name
-        )
+        # Create comprehensive attack report with better formatting
+        attacker_name = escape_markdown(message.from_user.first_name)
+        target_name = escape_markdown(target_user.first_name)
         
-        # Add weapon stats for premium weapons
-        if weapon_stats.get('stars', 0) >= 4:
-            msg += f"\n💎 *Premium weapon used*"
-        
-        if has_defense and defense_type:
-            defense_name = T[lang].get('defense_items', {}).get(defense_type, defense_type)
-            msg += T[lang].get('attack_defended_report', {}).format(
-                target=target_user.first_name or "Unknown", 
-                defense=defense_name, 
-                original=damage,
-                final=final_damage
-            )
-        else:
-            msg += T[lang].get('attack_damage_report', {}).format(final=final_damage)
+        if lang == "fa":
+            # Persian attack report with enhanced formatting
+            msg = f"🎯 **گزارش حمله**\n\n"
             
-        msg += T[lang].get('attack_hp_report', {}).format(
-            target=target_user.first_name or "Unknown", 
-            hp=remaining_hp
-        )
-        msg += T[lang].get('attack_medals_report', {}).format(
-            attacker=message.from_user.first_name or "Unknown", 
-            medals=medal_reward
-        )
+            # Attack info section
+            msg += f"👤 **مهاجم**: {attacker_name}\n"
+            msg += f"🎯 **هدف**: {target_name}\n"
+            msg += f"{weapon_emoji} **سلاح**: {weapon_name}\n"
+            
+            # Damage section
+            msg += f"\n💥 **آسیب**:\n"
+            if has_defense and defense_type:
+                defense_name = T[lang].get('defense_items', {}).get(defense_type, defense_type)
+                msg += f"• آسیب اولیه: `{damage}`\n"
+                msg += f"• 🛡️ دفاع با {defense_name}: `-{defense_reduced}`\n"
+                msg += f"• **آسیب نهایی**: `{final_damage}`\n"
+            else:
+                msg += f"• **آسیب وارد شده**: `{final_damage}`\n"
+            
+            # Health status
+            msg += f"\n❤️ **وضعیت**:\n"
+            hp_percent = int((remaining_hp / 100) * 10)  # Assuming max HP is 100
+            hp_bar = "🟥" * hp_percent + "⬜" * (10 - hp_percent)
+            
+            if remaining_hp <= 0:
+                msg += f"• {target_name} شکست خورد! 💀\n"
+                msg += f"• 50HP بازیابی شد ♻️\n"
+            else:
+                msg += f"• HP باقیمانده: `{remaining_hp}/100`\n"
+                msg += f"• {hp_bar}\n"
+            
+            # Rewards section
+            msg += f"\n🏅 **پاداش**:\n"
+            if is_defeat:
+                msg += f"• مدال‌های پایه: `{medal_reward}`\n"
+                msg += f"• پاداش شکست: `+5`\n"
+            else:
+                msg += f"• مدال‌های کسب شده: `{adjusted_medal_reward}`\n"
+            
+            # Special weapon bonus
+            if weapon_stats.get('stars', 0) >= 4:
+                msg += f"\n💎 سلاح ویژه استفاده شده!"
+                
+        else:
+            # English attack report with enhanced formatting
+            msg = f"🎯 **ATTACK REPORT**\n\n"
+            
+            # Attack info section
+            msg += f"👤 **Attacker**: {attacker_name}\n"
+            msg += f"🎯 **Target**: {target_name}\n"
+            msg += f"{weapon_emoji} **Weapon**: {weapon_name}\n"
+            
+            # Damage section
+            msg += f"\n💥 **Damage**:\n"
+            if has_defense and defense_type:
+                defense_name = T[lang].get('defense_items', {}).get(defense_type, defense_type)
+                msg += f"• Initial damage: `{damage}`\n"
+                msg += f"• 🛡️ {defense_name} defense: `-{defense_reduced}`\n"
+                msg += f"• **Final damage**: `{final_damage}`\n"
+            else:
+                msg += f"• **Damage dealt**: `{final_damage}`\n"
+            
+            # Health status
+            msg += f"\n❤️ **Status**:\n"
+            hp_percent = int((remaining_hp / 100) * 10)  # Assuming max HP is 100
+            hp_bar = "🟥" * hp_percent + "⬜" * (10 - hp_percent)
+            
+            if remaining_hp <= 0:
+                msg += f"• {target_name} was defeated! 💀\n"
+                msg += f"• 50HP restored ♻️\n"
+            else:
+                msg += f"• Remaining HP: `{remaining_hp}/100`\n"
+                msg += f"• {hp_bar}\n"
+            
+            # Rewards section
+            msg += f"\n🏅 **Rewards**:\n"
+            if is_defeat:
+                msg += f"• Base medals: `{medal_reward}`\n"
+                msg += f"• Defeat bonus: `+5`\n"
+            else:
+                msg += f"• Medals earned: `{adjusted_medal_reward}`\n"
+            
+            # Special weapon bonus
+            if weapon_stats.get('stars', 0) >= 4:
+                msg += f"\n💎 Premium weapon used!"
         
         # Handle defeat with bonus rewards
         if remaining_hp <= 0:
@@ -419,23 +592,20 @@ async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: 
                 "UPDATE players SET hp = 50 WHERE chat_id=%s AND user_id=%s",
                 (message.chat.id, target_user.id)
             )
-            msg += T[lang].get('attack_defeat_report', {}).format(
-                target=target_user.first_name or "Unknown"
-            )
 
         # Create enhanced keyboard with multiple options
         keyboard = types.InlineKeyboardMarkup(row_width=2)
         
         # Revenge button
         revenge_btn = types.InlineKeyboardButton(
-            T[lang].get('revenge_button', {}), 
+            T[lang].get('revenge_button', '⚔️ Revenge'), 
             callback_data=f"attack:revenge:{message.from_user.id}"
         )
         
-        # Show stats button
+        # Show stats button - Fix this to correctly link to stats
         stats_btn = types.InlineKeyboardButton(
-            T[lang].get('show_stats_button', {}),
-            callback_data=f"stats:{target_user.id}"
+            T[lang].get('show_stats_button', '📊 Stats'),
+            callback_data=f"quick:stats"
         )
         
         keyboard.add(revenge_btn, stats_btn)
@@ -448,7 +618,18 @@ async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: 
             )
             keyboard.add(weapon_info_btn)
         
-        await bot.send_message(message.chat.id, msg, reply_markup=keyboard, parse_mode="Markdown")
+        try:
+            await bot.send_message(message.chat.id, msg, reply_markup=keyboard, parse_mode="Markdown")
+        except Exception as parse_error:
+            # If markdown parsing fails, try without markdown
+            logger.warning(f"Markdown parsing failed, sending as plain text: {parse_error}")
+            try:
+                # Remove markdown formatting and send as plain text
+                plain_msg = re.sub(r'[*_`]', '', msg)
+                await bot.send_message(message.chat.id, plain_msg, reply_markup=keyboard)
+            except Exception as plain_error:
+                logger.error(f"Failed to send attack message: {plain_error}")
+                await bot.send_message(message.chat.id, "Attack completed successfully! Use /stats to see your progress.")
         
     except Exception as e:
         logger.error(f"Error executing attack: {e}")
@@ -463,10 +644,30 @@ async def attack_command(message: types.Message, bot: AsyncTeleBot, db_manager: 
         
         attack_manager = AttackManager(db_manager)
         target_user = None
-        weapon = "moab"
+        weapon = None
 
-        # Show menu if no arguments
+        # Get the user's selected weapon if available
+        user_data = await db_manager.db(
+            "SELECT preferred_weapon FROM players WHERE chat_id=%s AND user_id=%s",
+            (message.chat.id, message.from_user.id),
+            fetch="one_dict"
+        )
+        
+        if user_data and user_data['preferred_weapon']:
+            weapon = user_data['preferred_weapon']
+        else:
+            # Default weapon
+            weapon = "moab"
+            
+        # Show menu if no arguments and no reply - let user select a weapon
         if not message.reply_to_message and not args:
+            # Show selected weapon in menu title
+            weapon_name = get_item_display_name(weapon, lang) if weapon else T[lang].get('no_weapon_selected', 'No weapon selected')
+            await bot.send_message(
+                message.chat.id,
+                T[lang].get('current_weapon_message', 'Your current weapon is: {weapon}').format(weapon=weapon_name),
+                parse_mode="Markdown"
+            )
             await show_attack_menu(message, bot, db_manager, lang)
             return
 
@@ -550,6 +751,12 @@ async def attack_command(message: types.Message, bot: AsyncTeleBot, db_manager: 
         # Execute attack
         await execute_attack(message, bot, db_manager, target_user, weapon, lang)
         
+        # Reset selected weapon after use
+        await db_manager.db(
+            "UPDATE players SET preferred_weapon = NULL WHERE chat_id = %s AND user_id = %s",
+            (message.chat.id, message.from_user.id)
+        )
+        
     except Exception as e:
         logger.error(f"Error in attack command: {e}")
         await bot.send_message(message.chat.id, "An error occurred while processing your attack.")
@@ -613,6 +820,58 @@ async def handle_attack_callback(call: types.CallbackQuery, bot: AsyncTeleBot, d
                         show_alert=True
                     )
                     return
+        
+        # Handle weapon selection from attack menu
+        elif is_weapon(action):
+            # User selected a weapon from the attack menu
+            weapon_id = action
+            
+            # Check if user has the weapon
+            attack_manager = AttackManager(db_manager)
+            has_weapon = await attack_manager.check_weapon_availability(
+                call.message.chat.id, 
+                call.from_user.id, 
+                weapon_id
+            )
+            
+            if not has_weapon:
+                weapon_name = get_item_display_name(weapon_id, lang)
+                await bot.answer_callback_query(
+                    call.id,
+                    T[lang].get('no_weapon_error', {}).format(weapon_name=weapon_name),
+                    show_alert=True
+                )
+                return
+            
+            # If there's a target, proceed with attack
+            if len(data_parts) > 2 and data_parts[2] == "inventory":
+                # This is just a weapon selection from inventory, wait for target
+                # Store selected weapon in user's session
+                await db_manager.db(
+                    "UPDATE players SET preferred_weapon = %s WHERE chat_id = %s AND user_id = %s",
+                    (weapon_id, call.message.chat.id, call.from_user.id)
+                )
+                
+                # Let user know weapon was selected
+                weapon_name = get_item_display_name(weapon_id, lang)
+                weapon_emoji = get_item_emoji(weapon_id)
+                
+                success_text = f"{weapon_emoji} {T[lang].get('weapon_selected', 'Weapon selected')}: **{weapon_name}**\n\n"
+                success_text += T[lang].get('reply_to_attack', 'Now reply to a message with /attack to target that user.')
+                success_text += "\n\n" + T[lang].get('direct_attack_instructions', 'You can also use /attack @username to attack someone directly.')
+                
+                await bot.edit_message_text(
+                    success_text,
+                    call.message.chat.id,
+                    call.message.message_id,
+                    parse_mode="Markdown"
+                )
+                
+                await bot.answer_callback_query(
+                    call.id,
+                    T[lang].get('weapon_selection_confirmed', 'Weapon selected! Now choose a target.'),
+                )
+                return
         
         elif action == "weapon_info":
             if len(data_parts) > 2:

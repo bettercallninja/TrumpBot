@@ -14,6 +14,7 @@ from src.utils import helpers
 from src.utils.translations import T
 from src.database.db_manager import DBManager
 from src.config.items import ITEMS, ItemType, get_item_display_name, get_item_emoji
+from src.config.bot_config import BotConfig
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -132,9 +133,11 @@ class StatusManager:
             )
             
             if player_data and player_data['created_at']:
-                days_since_join = (helpers.now() - player_data['created_at']).days
+                # Calculate days since join (timestamps are in seconds)
+                seconds_since_join = helpers.now() - player_data['created_at']
+                days_since_join = max(1, seconds_since_join // 86400)  # 86400 seconds in a day
             else:
-                days_since_join = 0
+                days_since_join = 1
             
             # Get last activity (most recent attack)
             last_activity = await self.db_manager.db(
@@ -157,7 +160,7 @@ class StatusManager:
         """Get active defense information with enhanced details"""
         try:
             defense = await self.db_manager.db(
-                "SELECT defense_type, expires_at, created_at FROM active_defenses WHERE chat_id=%s AND user_id=%s AND expires_at > %s ORDER BY expires_at DESC LIMIT 1",
+                "SELECT defense_type, expires_at, activated_at FROM active_defenses WHERE chat_id=%s AND user_id=%s AND expires_at > %s ORDER BY expires_at DESC LIMIT 1",
                 (chat_id, user_id, helpers.now()), 
                 fetch="one_dict"
             )
@@ -171,6 +174,43 @@ class StatusManager:
         except Exception as e:
             logger.error(f"Error getting active defense: {e}")
             return None
+    
+    async def get_active_boosts(self, chat_id: int, user_id: int) -> List[Dict[str, Any]]:
+        """Get active temporary boosts"""
+        try:
+            boosts = await self.db_manager.db(
+                """SELECT boost_type, boost_value, expires_at, activated_at 
+                   FROM active_boosts 
+                   WHERE chat_id=%s AND user_id=%s AND expires_at > %s 
+                   ORDER BY expires_at DESC""",
+                (chat_id, user_id, helpers.now()),
+                fetch="all_dicts"
+            )
+            
+            enhanced_boosts = []
+            for boost in (boosts or []):
+                remaining_seconds = max(0, boost['expires_at'] - helpers.now())
+                boost_name = {
+                    'cooldown_reduction': '⚡ Cooldown Reduction',
+                    'experience_multiplier': '📈 Experience Boost',
+                    'vip_experience': '⭐ VIP Experience',
+                    'vip_damage': '⚔️ VIP Damage',
+                    'vip_cooldown': '🔥 VIP Cooldown'
+                }.get(boost['boost_type'], boost['boost_type'])
+                
+                enhanced_boosts.append({
+                    'type': boost['boost_type'],
+                    'name': boost_name,
+                    'value': boost['boost_value'],
+                    'remaining_minutes': remaining_seconds // 60,
+                    'remaining_hours': remaining_seconds // 3600,
+                    'expires_at': boost['expires_at']
+                })
+            
+            return enhanced_boosts
+        except Exception as e:
+            logger.error(f"Error getting active boosts: {e}")
+            return []
     
     async def get_defense_items(self, chat_id: int, user_id: int) -> List[Dict[str, Any]]:
         """Get available defense items with detailed information"""
@@ -279,7 +319,7 @@ class StatusManager:
             
             # Activate defense
             await self.db_manager.db(
-                "INSERT INTO active_defenses (chat_id, user_id, defense_type, expires_at, created_at) VALUES (%s, %s, %s, %s, %s)",
+                "INSERT INTO active_defenses (chat_id, user_id, defense_type, expires_at, activated_at) VALUES (%s, %s, %s, %s, %s)",
                 (chat_id, user_id, item_id, expires_at, helpers.now())
             )
             
@@ -409,6 +449,9 @@ async def send_status_message(message: types.Message, bot: AsyncTeleBot, db_mana
         # Get active defense
         active_defense = await status_manager.get_active_defense(message.chat.id, user.id)
         
+        # Get active boosts
+        active_boosts = await status_manager.get_active_boosts(message.chat.id, user.id)
+        
         # Get inventory summary
         inventory_summary = await status_manager.get_inventory_summary(message.chat.id, user.id)
         
@@ -443,6 +486,26 @@ async def send_status_message(message: types.Message, bot: AsyncTeleBot, db_mana
         
     # Add analytics section
         if lang == "fa":
+            # Format active boosts
+            boosts_text = ""
+            if active_boosts:
+                boosts_text = "\n🚀 <b>تقویت‌های فعال:</b>\n"
+                for boost in active_boosts:
+                    hours = boost['remaining_hours']
+                    minutes = boost['remaining_minutes'] % 60
+                    time_str = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
+                    
+                    if boost['type'] in ['cooldown_reduction', 'vip_cooldown']:
+                        value_str = f"{int(boost['value'] * 100)}% کاهش"
+                    elif boost['type'] in ['experience_multiplier', 'vip_experience']:
+                        value_str = f"x{boost['value']:.1f}"
+                    elif boost['type'] == 'vip_damage':
+                        value_str = f"+{int(boost['value'] * 100)}% آسیب"
+                    else:
+                        value_str = f"{boost['value']:.1f}"
+                    
+                    boosts_text += f"• {boost['name']}: {value_str} ({time_str})\n"
+                    
             analytics_text = f"""
 📊 <b>تحلیل‌های عملکرد:</b>
 • رتبه در چت: #{rank_info.get('rank', 0)} از {rank_info.get('total_players', 0)}
@@ -456,9 +519,29 @@ async def send_status_message(message: types.Message, bot: AsyncTeleBot, db_mana
 • کل آیتم‌ها: {inventory_summary.get('total_items', 0)}
 
 ⏱️ <b>فعالیت:</b>
-• روزهای بازی: {activity_stats.get('days_active', 0)}
+• روزهای بازی: {activity_stats.get('days_active', 0)}{boosts_text}
             """
         else:
+            # Format active boosts for English
+            boosts_text = ""
+            if active_boosts:
+                boosts_text = "\n🚀 <b>Active Boosts:</b>\n"
+                for boost in active_boosts:
+                    hours = boost['remaining_hours']
+                    minutes = boost['remaining_minutes'] % 60
+                    time_str = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
+                    
+                    if boost['type'] in ['cooldown_reduction', 'vip_cooldown']:
+                        value_str = f"{int(boost['value'] * 100)}% reduction"
+                    elif boost['type'] in ['experience_multiplier', 'vip_experience']:
+                        value_str = f"x{boost['value']:.1f}"
+                    elif boost['type'] == 'vip_damage':
+                        value_str = f"+{int(boost['value'] * 100)}% damage"
+                    else:
+                        value_str = f"{boost['value']:.1f}"
+                    
+                    boosts_text += f"• {boost['name']}: {value_str} ({time_str})\n"
+                    
             analytics_text = f"""
 📊 <b>Performance Analytics:</b>
 • Chat Rank: #{rank_info.get('rank', 0)} of {rank_info.get('total_players', 0)}
@@ -472,7 +555,7 @@ async def send_status_message(message: types.Message, bot: AsyncTeleBot, db_mana
 • Total Items: {inventory_summary.get('total_items', 0)}
 
 ⏱️ <b>Activity:</b>
-• Days Playing: {activity_stats.get('days_active', 0)}
+• Days Playing: {activity_stats.get('days_active', 0)}{boosts_text}
             """
         
         full_status_text = status_text + analytics_text
@@ -482,30 +565,51 @@ async def send_status_message(message: types.Message, bot: AsyncTeleBot, db_mana
         
         # Defense activation buttons
         defense_items = await status_manager.get_defense_items(message.chat.id, user.id)
-        for item in defense_items:
-            if not await status_manager.has_active_defense(message.chat.id, user.id):
-                button_text = T[lang].get('activate_button', {}).format(
+        if defense_items and not await status_manager.has_active_defense(message.chat.id, user.id):
+            # Add a header for defense items
+            defense_header = T[lang].get('activate_defense_header', '🛡️ Activate Defense:')
+            full_status_text += f"\n\n<b>{defense_header}</b>"
+            
+            for item in defense_items:
+                button_text = T[lang].get('activate_button', 'Use {item_name}').format(
                     item_name=item['name']
                 )
                 keyboard.add(types.InlineKeyboardButton(
                     f"{item['emoji']} {button_text} ({item['quantity']})", 
                     callback_data=f"status:{item['id']}"
                 ))
+        elif await status_manager.has_active_defense(message.chat.id, user.id):
+            # Add info about active defense
+            full_status_text += f"\n\n<b>🛡️ {T[lang].get('active_defense_info', 'You have an active defense!')}</b>"
+        else:
+            # No defense items available
+            full_status_text += f"\n\n<b>⚠️ {T[lang].get('no_defense_items', 'You have no defense items. Buy some in the shop!')}</b>"
         
         # Navigation buttons
         detailed_btn = types.InlineKeyboardButton(
-            f"📊 {T[lang].get('view_detailed_status', {})}", 
+            f"📊 {T[lang].get('view_detailed_status', 'Detailed')}", 
             callback_data="status:detailed"
         )
         refresh_btn = types.InlineKeyboardButton(
-            f"🔄 {T[lang].get('refresh_status', {})}", 
+            f"🔄 {T[lang].get('refresh_status', 'Refresh')}", 
             callback_data="status:refresh"
         )
         keyboard.add(detailed_btn, refresh_btn)
         
+        # Add shop button for buying defenses
+        shop_btn = types.InlineKeyboardButton(
+            f"🛒 {T[lang].get('shop_button', 'Shop')}", 
+            callback_data="shop:defense"
+        )
+        inventory_btn = types.InlineKeyboardButton(
+            f"📦 {T[lang].get('inventory_button', 'Inventory')}", 
+            callback_data="inventory:main"
+        )
+        keyboard.add(shop_btn, inventory_btn)
+        
         # Close button
         keyboard.add(types.InlineKeyboardButton(
-            T[lang].get('close_button', {}), 
+            T[lang].get('close_button', 'Close'), 
             callback_data="status:close"
         ))
 
@@ -680,6 +784,69 @@ def register_handlers(bot: AsyncTeleBot, db_manager: DBManager) -> None:
         except Exception as e:
             logger.error(f"Error in status command: {e}")
             await bot.send_message(message.chat.id, "Error displaying status. Please try again.")
+    
+    @bot.message_handler(commands=['shield', 'defense'])
+    @group_only
+    async def shield_command(message: types.Message) -> None:
+        """Shortcut command to activate shields"""
+        try:
+            await helpers.ensure_player(message.chat.id, message.from_user, db_manager)
+            lang = await helpers.get_lang(message.chat.id, message.from_user.id, db_manager)
+            
+            # Check if user already has an active defense
+            status_manager = StatusManager(db_manager)
+            if await status_manager.has_active_defense(message.chat.id, message.from_user.id):
+                await bot.send_message(
+                    message.chat.id,
+                    T[lang].get('defense_already_active', 'You already have an active defense system!')
+                )
+                return
+                
+            # Get available defense items
+            defense_items = await status_manager.get_defense_items(message.chat.id, message.from_user.id)
+            
+            if not defense_items:
+                # No defense items - show message with shop link
+                keyboard = types.InlineKeyboardMarkup(row_width=1)
+                keyboard.add(types.InlineKeyboardButton(
+                    f"🛒 {T[lang].get('shop_defense_items', 'Buy defense items')}",
+                    callback_data="shop:defense"
+                ))
+                
+                await bot.send_message(
+                    message.chat.id,
+                    T[lang].get('no_defense_items', 'You have no defense items. Buy some in the shop!'),
+                    reply_markup=keyboard
+                )
+                return
+                
+            # Show defense activation menu
+            text = T[lang].get('select_defense_activation', 'Select a defense item to activate:')
+            keyboard = types.InlineKeyboardMarkup(row_width=1)
+            
+            for item in defense_items:
+                button_text = T[lang].get('activate_button', 'Use {item_name}').format(
+                    item_name=item['name']
+                )
+                keyboard.add(types.InlineKeyboardButton(
+                    f"{item['emoji']} {button_text} ({item['quantity']})", 
+                    callback_data=f"status:{item['id']}"
+                ))
+                
+            keyboard.add(types.InlineKeyboardButton(
+                T[lang].get('cancel_button', 'Cancel'),
+                callback_data="status:close"
+            ))
+            
+            await bot.send_message(
+                message.chat.id,
+                text,
+                reply_markup=keyboard
+            )
+            
+        except Exception as e:
+            logger.error(f"Error in shield command: {e}")
+            await bot.send_message(message.chat.id, "Error processing defense activation. Please try again.")
     
     @bot.callback_query_handler(func=lambda call: call.data.startswith('status:'))
     async def status_callback_handler(call: types.CallbackQuery):

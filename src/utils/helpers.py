@@ -2010,6 +2010,123 @@ async def get_group_analytics(chat_id: int, db_manager: DBManager,
         logger.error(f"Error getting group analytics: {e}")
         return {}
 
+# 🕒 Cooldown and Timer Management | مدیریت کولداون و تایمر
+
+async def check_cooldown(chat_id: int, user_id: int, cooldown_type: str, db_manager: DBManager) -> int:
+    """
+    Check if a cooldown is active and return remaining time in seconds
+    Returns 0 if no cooldown is active
+    """
+    try:
+        cooldown_data = await db_manager.db(
+            "SELECT expires_at FROM cooldowns WHERE chat_id=%s AND user_id=%s AND cooldown_type=%s AND expires_at > %s",
+            (chat_id, user_id, cooldown_type, now()),
+            fetch="one_dict"
+        )
+        
+        if cooldown_data and cooldown_data.get("expires_at"):
+            # Return remaining seconds
+            return cooldown_data["expires_at"] - now()
+        return 0
+    except Exception as e:
+        logger.error(f"Error checking cooldown: {e}")
+        return 0
+
+async def set_cooldown(chat_id: int, user_id: int, cooldown_type: str, duration: int, db_manager: DBManager) -> bool:
+    """
+    Set a cooldown timer for a specific action
+    Returns True if successful, False otherwise
+    """
+    try:
+        expires_at = now() + duration
+        
+        # First remove any existing cooldown of this type
+        await db_manager.db(
+            "DELETE FROM cooldowns WHERE chat_id=%s AND user_id=%s AND cooldown_type=%s",
+            (chat_id, user_id, cooldown_type)
+        )
+        
+        # Then add the new cooldown
+        await db_manager.db(
+            "INSERT INTO cooldowns (chat_id, user_id, cooldown_type, expires_at, created_at) VALUES (%s, %s, %s, %s, %s)",
+            (chat_id, user_id, cooldown_type, expires_at, now())
+        )
+        
+        return True
+    except Exception as e:
+        logger.error(f"Error setting cooldown: {e}")
+        return False
+
+async def check_user_item(chat_id: int, user_id: int, item_id: str, db_manager: DBManager) -> bool:
+    """
+    Check if a user owns an item
+    Returns True if user has at least one of the item, False otherwise
+    """
+    try:
+        item_data = await db_manager.db(
+            "SELECT qty FROM inventories WHERE chat_id=%s AND user_id=%s AND item_id=%s",
+            (chat_id, user_id, item_id),
+            fetch="one_dict"
+        )
+        
+        return item_data and item_data.get("qty", 0) > 0
+    except Exception as e:
+        logger.error(f"Error checking user item: {e}")
+        return False
+
+async def update_activity_score(chat_id: int, user_id: int, activity_type: str, db_manager: DBManager) -> None:
+    """
+    Update user's activity score based on action type
+    Different actions award different activity points
+    """
+    try:
+        # Activity point values for different actions
+        activity_points = {
+            "attack": 5,
+            "defense": 3,
+            "daily_bonus": 2,
+            "shop_purchase": 1,
+            "chat_message": 1
+        }
+        
+        # Get points for this activity type
+        points = activity_points.get(activity_type, 1)
+        
+        # Update activity points and last active timestamp
+        await db_manager.db(
+            "UPDATE players SET activity_points = activity_points + %s, last_active = %s WHERE chat_id=%s AND user_id=%s",
+            (points, now(), chat_id, user_id)
+        )
+    except Exception as e:
+        logger.error(f"Error updating activity score: {e}")
+        
+async def add_medals(user_id: int, chat_id: int, amount: int, db_manager: DBManager) -> bool:
+    """
+    Add or remove medals from a user
+    Returns True if successful, False otherwise
+    """
+    try:
+        # Update user's score (medals)
+        await db_manager.db(
+            "UPDATE players SET score = score + %s WHERE chat_id=%s AND user_id=%s",
+            (amount, chat_id, user_id)
+        )
+        
+        # Log transaction if significant amount
+        if abs(amount) >= 50:
+            transaction_type = "bonus" if amount > 0 else "purchase"
+            await db_manager.db(
+                "INSERT INTO transactions (chat_id, user_id, amount, transaction_type, created_at) VALUES (%s, %s, %s, %s, %s)",
+                (chat_id, user_id, amount, transaction_type, now())
+            )
+        
+        return True
+    except Exception as e:
+        logger.error(f"Error adding medals: {e}")
+        return False
+        
+    
+
 # Export enhanced classes and instances
 __all__ = [
     # Enhanced core classes

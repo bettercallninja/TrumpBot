@@ -117,13 +117,14 @@ class StatsManager:
         """Get comprehensive group statistics"""
         try:
             # Basic group stats
+            seven_days_ago = helpers.now() - (7 * 24 * 60 * 60)  # 7 days in seconds
             group_stats = await self.db_manager.db(
                 """SELECT COUNT(*) as total_players,
-                          SUM(CASE WHEN last_attack > NOW() - INTERVAL '7 days' THEN 1 ELSE 0 END) as active_players,
+                          SUM(CASE WHEN last_attack > %s THEN 1 ELSE 0 END) as active_players,
                           MAX(score) as highest_score,
                           AVG(score) as avg_score
                    FROM players WHERE chat_id=%s""",
-                (chat_id,),
+                (seven_days_ago, chat_id),
                 fetch="one_dict"
             )
             
@@ -446,12 +447,12 @@ class StatsManager:
             
             keyboard = types.InlineKeyboardMarkup()
             keyboard.add(
-                types.InlineKeyboardButton(f"👤 {T[lang]['view_personal']}", callback_data="stats:personal"),
-                types.InlineKeyboardButton(f"👥 {T[lang]['view_group']}", callback_data="stats:group")
+                types.InlineKeyboardButton(f"👤 {T[lang].get('view_personal', 'Personal')}", callback_data="stats:personal"),
+                types.InlineKeyboardButton(f"👥 {T[lang].get('view_group', 'Group')}", callback_data="stats:group")
             )
             keyboard.add(
-                types.InlineKeyboardButton(f"🔙 {T[lang]['back_btn']}", callback_data="stats:main"),
-                types.InlineKeyboardButton(f"❌ {T[lang]['close_stats']}", callback_data="stats:close")
+                types.InlineKeyboardButton(f"🔙 {T[lang].get('back_btn', 'Back')}", callback_data="stats:main"),
+                types.InlineKeyboardButton(f"❌ {T[lang].get('close_stats', 'Close')}", callback_data="stats:close")
             )
             
             await bot.edit_message_text(
@@ -518,22 +519,94 @@ class StatsManager:
                 await self.show_leaderboard(bot, call)
             
             elif action == "weapons":
-                # Show weapon statistics (placeholder for future enhancement)
-                await bot.answer_callback_query(call.id, f"🔫 {T[lang].get('coming_soon', {})}")
+                # Redirect to the weapons comparison
+                try:
+                    # Create a fake message to simulate a weapons command
+                    fake_message = types.Message(
+                        message_id=call.message.message_id,
+                        from_user=call.from_user,
+                        date=datetime.now(),
+                        chat=call.message.chat,
+                        content_type="text",
+                        options={},
+                        json_string=""
+                    )
+                    fake_message.text = "/weapons"
+                    
+                    from src.commands.attack import show_weapon_comparison
+                    await show_weapon_comparison(fake_message, bot, self.db_manager, lang)
+                    await bot.answer_callback_query(call.id, T[lang].get('weapons_loaded', 'Weapons comparison loaded'))
+                except Exception as e:
+                    logger.error(f"Error showing weapons comparison: {e}")
+                    await bot.answer_callback_query(call.id, "Error loading weapons comparison")
             
             elif action == "trends":
-                # Show trend analysis (placeholder for future enhancement)
-                await bot.answer_callback_query(call.id, f"📈 {T[lang].get('coming_soon', {})}")
+                # Show trend analysis - implement basic trend analytics
+                try:
+                    user_id = call.from_user.id
+                    chat_id = call.message.chat.id
+                    
+                    # Get attack history for trends
+                    attack_history = await self.db_manager.db(
+                        """SELECT DATE(to_timestamp(attack_time)) as date, COUNT(*) as count, SUM(damage) as damage
+                           FROM attacks WHERE chat_id=%s AND attacker_id=%s
+                           GROUP BY DATE(to_timestamp(attack_time)) ORDER BY date DESC LIMIT 7""",
+                        (chat_id, user_id),
+                        fetch="all_dicts"
+                    )
+                    
+                    if not attack_history:
+                        await bot.answer_callback_query(call.id, "No attack history to analyze", show_alert=True)
+                        return
+                    
+                    # Create trend analysis text
+                    trend_text = f"📈 <b>{T[lang].get('trend_analysis', 'Your 7-Day Trend Analysis')}</b>\n\n"
+                    
+                    # Calculate daily averages
+                    total_attacks = sum(day['count'] for day in attack_history)
+                    total_damage = sum(day['damage'] for day in attack_history)
+                    total_days = len(attack_history)
+                    
+                    if total_days > 0:
+                        avg_attacks = total_attacks / total_days
+                        avg_damage = total_damage / total_days
+                        
+                        trend_text += f"<b>📊 {T[lang].get('daily_averages', 'Daily Averages')}:</b>\n"
+                        trend_text += f"• {T[lang].get('attacks', 'Attacks')}: {avg_attacks:.1f}\n"
+                        trend_text += f"• {T[lang].get('damage', 'Damage')}: {avg_damage:.1f}\n\n"
+                    
+                    # Show day-by-day breakdown
+                    trend_text += f"<b>📅 {T[lang].get('daily_breakdown', 'Daily Breakdown')}:</b>\n"
+                    for day in attack_history:
+                        date_str = day['date'].strftime("%Y-%m-%d")
+                        trend_text += f"• {date_str}: {day['count']} {T[lang].get('attacks', 'attacks')}, {day['damage']} {T[lang].get('damage', 'damage')}\n"
+                    
+                    # Create keyboard for returning
+                    keyboard = types.InlineKeyboardMarkup(row_width=2)
+                    keyboard.add(
+                        types.InlineKeyboardButton(f"🔙 {T[lang].get('back_btn', 'Back')}", callback_data="stats:main"),
+                        types.InlineKeyboardButton(f"❌ {T[lang].get('close_stats', 'Close')}", callback_data="stats:close")
+                    )
+                    
+                    await bot.edit_message_text(
+                        trend_text,
+                        call.message.chat.id,
+                        call.message.message_id,
+                        reply_markup=keyboard,
+                        parse_mode="HTML"
+                    )
+                    
+                    await bot.answer_callback_query(call.id, T[lang].get('trends_loaded', 'Trends loaded'))
+                except Exception as e:
+                    logger.error(f"Error showing trend analysis: {e}")
+                    await bot.answer_callback_query(call.id, "Error loading trend analysis", show_alert=True)
             
             elif action == "refresh":
                 await bot.answer_callback_query(call.id, T[lang]['stats_updated'])
                 # Trigger main dashboard refresh
-                await self.handle_stats_callback(bot, types.CallbackQuery(
-                    id=call.id,
-                    from_user=call.from_user,
-                    message=call.message,
-                    data="stats:main"
-                ))
+                main_call = call
+                main_call.data = "stats:main"
+                await self.handle_stats_callback(bot, main_call)
             
             elif action == "close":
                 await bot.delete_message(call.message.chat.id, call.message.message_id)
@@ -556,12 +629,37 @@ def register_handlers(bot: AsyncTeleBot, db_manager: DBManager):
     @group_only
     async def handle_stats_command(message):
         """Handle /stats command to show statistics dashboard"""
-        await stats_manager.show_stats_dashboard(bot, message)
+        try:
+            await helpers.ensure_player(message.chat.id, message.from_user, db_manager)
+            await stats_manager.show_stats_dashboard(bot, message)
+        except Exception as e:
+            logger.error(f"Error in stats command: {e}")
+            lang = await helpers.get_lang(message.chat.id, message.from_user.id, db_manager)
+            await bot.send_message(message.chat.id, T[lang].get('stats_error', 'Error displaying stats'))
     
     @bot.callback_query_handler(func=lambda call: call.data.startswith('stats:'))
     async def handle_stats_callbacks(call):
         """Handle all statistics related callback queries"""
-        await stats_manager.handle_stats_callback(bot, call)
+        try:
+            await stats_manager.handle_stats_callback(bot, call)
+        except Exception as e:
+            logger.error(f"Error in stats callback: {e}")
+            lang = await helpers.get_lang(call.message.chat.id, call.from_user.id, db_manager)
+            await bot.answer_callback_query(call.id, T[lang].get('stats_error', 'Error processing stats request'))
+            
+    # Add support for 'quick:stats' callback to support the button from attack reports
+    @bot.callback_query_handler(func=lambda call: call.data == 'quick:stats')
+    async def handle_quick_stats_callback(call):
+        """Handle quick stats button from attack reports"""
+        try:
+            # Create a modified callback to route to personal stats
+            modified_call = call
+            modified_call.data = "stats:personal"
+            await stats_manager.handle_stats_callback(bot, modified_call)
+        except Exception as e:
+            logger.error(f"Error in quick stats callback: {e}")
+            lang = await helpers.get_lang(call.message.chat.id, call.from_user.id, db_manager)
+            await bot.answer_callback_query(call.id, T[lang].get('stats_error', 'Error processing stats request'))
 
 
 # Legacy compatibility functions

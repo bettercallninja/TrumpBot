@@ -403,6 +403,7 @@ async def handle_quick_callback(call: types.CallbackQuery, bot: AsyncTeleBot, db
             await show_attack_menu(fake_message, bot, db_manager, lang)
             
         elif action == 'stats':
+            # Show user stats/profile
             fake_message = types.Message(
                 message_id=call.message.message_id,
                 from_user=call.from_user,
@@ -415,18 +416,40 @@ async def handle_quick_callback(call: types.CallbackQuery, bot: AsyncTeleBot, db
             await show_user_profile(fake_message, bot, db_manager, lang)
             
         elif action == 'shop':
-            await bot.answer_callback_query(
-                call.id, 
-                T[lang].get('shop_coming_soon', {}),
-                show_alert=True
+            # Import shop functionality and show shop
+            from src.commands.shop import ShopManager
+            shop_manager = ShopManager(db_manager)
+            
+            fake_message = types.Message(
+                message_id=call.message.message_id,
+                from_user=call.from_user,
+                date=call.message.date,
+                chat=call.message.chat,
+                content_type='text',
+                options={},
+                json_string=""
             )
             
+            await shop_manager.show_shop_overview(bot, fake_message)
+            
         elif action == 'inventory':
-            await bot.answer_callback_query(
-                call.id, 
-                T[lang].get('inventory_coming_soon', {}),
-                show_alert=True
+            # Import inventory functionality and show inventory
+            from src.commands.inventory import InventoryManager
+            inventory_manager = InventoryManager(db_manager)
+            
+            fake_message = types.Message(
+                message_id=call.message.message_id,
+                from_user=call.from_user,
+                date=call.message.date,
+                chat=call.message.chat,
+                content_type='text',
+                options={},
+                json_string=""
             )
+            
+            # First delete the current message, then show inventory
+            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            await inventory_manager.show_inventory_overview(bot, fake_message)
             
         elif action == 'menu':
             # Show main menu
@@ -452,18 +475,6 @@ async def handle_quick_callback(call: types.CallbackQuery, bot: AsyncTeleBot, db
                 json_string=""
             )
             await show_leaderboard(fake_message, bot, db_manager, lang)
-        
-        elif action == 'menu':
-            fake_message = types.Message(
-                message_id=call.message.message_id,
-                from_user=call.from_user,
-                date=call.message.date,
-                chat=call.message.chat,
-                content_type='text',
-                options={},
-                json_string=""
-            )
-            await show_main_menu(fake_message, bot, db_manager, lang)
         
         await bot.answer_callback_query(call.id)
         
@@ -638,6 +649,58 @@ def register_handlers(bot: AsyncTeleBot, db_manager: DBManager) -> None:
                 "Error setting language. Please try again."
             )
     
+    @bot.message_handler(commands=['bonus'])
+    async def bonus_command(message: types.Message) -> None:
+        """Daily bonus command to receive medals"""
+        try:
+            general_manager = GeneralManager(db_manager, bot)
+            await general_manager.ensure_user_exists(message.chat.id, message.from_user)
+            
+            user_id = message.from_user.id
+            chat_id = message.chat.id
+            lang = await helpers.get_lang(chat_id, user_id, db_manager)
+            
+            # Check if user has already claimed bonus today
+            cooldown = await helpers.check_cooldown(chat_id, user_id, 'daily_bonus', db_manager)
+            
+            if cooldown > 0:
+                # Calculate remaining hours
+                hours_left = cooldown // 3600 + 1
+                await bot.reply_to(
+                    message,
+                    T[lang].get("bonus_already", "⏳ You already claimed your daily bonus. Try again tomorrow!"),
+                    parse_mode='HTML'
+                )
+                return
+            
+            # Award bonus medals
+            bonus_amount = 60  # Standard daily bonus
+            
+            # Check if user has VIP status for bonus boost
+            has_vip = await helpers.check_user_item(chat_id, user_id, 'vip_status', db_manager)
+            if has_vip:
+                bonus_amount = 120  # Double bonus for VIP users
+            
+            # Add medals to user account
+            await helpers.add_medals(user_id, chat_id, bonus_amount, db_manager)
+            
+            # Set cooldown for 23 hours
+            await helpers.set_cooldown(chat_id, user_id, 'daily_bonus', 23 * 3600, db_manager)
+            
+            # Update activity score
+            await helpers.update_activity_score(chat_id, user_id, "daily_bonus", db_manager)
+            
+            # Send confirmation message
+            await bot.reply_to(
+                message,
+                T[lang].get("bonus_received", "🎁 You received your daily bonus: <b>{amount}</b> medals!").format(amount=bonus_amount),
+                parse_mode='HTML'
+            )
+            
+        except Exception as e:
+            logger.error(f"Error in bonus command: {e}")
+            await bot.reply_to(message, T[lang].get("error_generic", "Sorry, an error occurred while processing your request."))
+            
     # Callback query handlers
     @bot.callback_query_handler(func=lambda call: call.data.startswith('quick:'))
     async def quick_callback_handler(call: types.CallbackQuery) -> None:

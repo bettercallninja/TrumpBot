@@ -25,6 +25,13 @@ A sophisticated Telegram bot for group-based PvP missile combat with modern Pyth
 - **Error Handling**: Robust exception handling with logging and user feedback
 - **Modular Design**: Clean separation of concerns with organized modules
 
+### Recent Enhancements
+- **Improved Weapon Selection**: Select weapons with `/attack` command without reply
+- **Enhanced Defense System**: New `/shield` command for quick shield activation
+- **Cross-Linked Features**: Inventory and Status screens now link to each other
+- **Enhanced Stats System**: Fixed stats buttons with new weapon stats and trends views
+- **Comprehensive Help**: Updated help system with clear instructions for all features
+
 ## 🏗️ Architecture
 
 ### Modern Code Structure
@@ -113,17 +120,26 @@ python main.py > bot.log 2>&1 &
 - `/help` - Comprehensive help system
 - `/language` - Switch between English/Persian
 - `/status` - Current player status and defenses
+- `/shield` - Quickly activate a shield
+- `/stats` - View detailed player statistics
 
 ### Combat System
 - `/attack [user] [weapon]` - Attack another player
-- Reply to a message + `/attack` - Quick attack
+- Reply to a message + `/attack` - Quick attack with current weapon
+- Use `/attack` without reply to select your weapon first
 - Weapon types: `moab`, `f22`, `nuclear`, `mega_nuke`, `stealth_bomber`
+
+### Defense System
+- `/shield` - Quick command to activate your shield
+- `/status` - View and activate your defense systems
+- Defense types: `shield` (blocks attacks), `intercept` (reduces hit chance)
 
 ### Economy & Inventory
 - `/shop` - Browse and purchase items
-- `/inventory` - View owned items
+- `/inventory` or `/inv` - View and manage owned items
 - `/stars` - Telegram Stars premium shop
 - `/top` - Leaderboard system
+- `/stats` - View your combat statistics
 
 ## 🔧 Advanced Configuration
 

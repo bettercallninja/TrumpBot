@@ -102,19 +102,22 @@ async def _show_commands_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_m
 
 ⚔️ **{T[lang].get('combat_commands', {})}:**
 • `/attack [کاربر] [تسلیحات]` - حمله به بازیکن
+• `/shield` - فعال‌سازی سپر محافظ
+• `/defend` - فعال‌سازی سیستم رهگیری
 • `/weapons` - مقایسه همه تسلیحات
 • `/battle_stats` - مشاهده آمار نبرد شما
 
 📊 **{T[lang].get('info_commands', {})}:**
 • `/profile` یا `/me` - مشاهده پروفایل تفصیلی
 • `/leaderboard` یا `/top` - رتبه‌بندی چت
-• `/stats` - نمای کلی آمارها
+• `/stats` - مشاهده آمار نبرد
 • `/status` - بررسی وضعیت فعلی
 
 🛒 **{T[lang].get('shop_commands', {})}:**
 • `/shop` - مرور آیتم‌های موجود
 • `/inventory` یا `/inv` - مشاهده آیتم‌های شما
 • `/use` - استفاده از آیتم‌ها
+• `/bonus` - دریافت پاداش روزانه مدال‌ها
 
 ⚙️ **{T[lang].get('utility_commands', {})}:**
 • `/menu` یا `/main` - منوی اصلی
@@ -137,19 +140,22 @@ async def _show_commands_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_m
 
 ⚔️ **{T[lang].get('combat_commands', {})}:**
 • `/attack [user] [weapon]` - Attack a player
+• `/shield` - Activate protection shield
+• `/defend` - Activate intercept system
 • `/weapons` - Compare all weapons
 • `/battle_stats` - View your combat statistics
 
 📊 **{T[lang].get('info_commands', {})}:**
 • `/profile` or `/me` - View detailed profile
 • `/leaderboard` or `/top` - Chat rankings
-• `/stats` - Quick statistics overview
+• `/stats` - View combat statistics
 • `/status` - Check your current status
 
 🛒 **{T[lang].get('shop_commands', {})}:**
 • `/shop` - Browse available items
 • `/inventory` or `/inv` - View your items
 • `/use` - Use items from inventory
+• `/bonus` - Claim daily medal rewards
 
 ⚙️ **{T[lang].get('utility_commands', {})}:**
 • `/menu` or `/main` - Main menu
@@ -169,7 +175,7 @@ async def _show_commands_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_m
     
     keyboard = types.InlineKeyboardMarkup()
     back_btn = types.InlineKeyboardButton(
-        f"🔙 {translations.get('back_to_help', lang)}",
+        f"🔙 {T[lang].get('back_to_help', lang)}",
         callback_data='help:main'
     )
     keyboard.add(back_btn)
@@ -279,7 +285,7 @@ async def _show_combat_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_man
             types.InlineKeyboardButton(f"📊 {T[lang].get('stats_detail', {})}", callback_data='help:stats')
         )
         keyboard.add(
-            types.InlineKeyboardButton(f"🔙 {translations.get('back_to_help', lang)}", callback_data='help:main')
+            types.InlineKeyboardButton(f"🔙 {T[lang].get('back_to_help', lang)}", callback_data='help:main')
         )
     
     await bot.edit_message_text(
@@ -293,31 +299,31 @@ async def _show_combat_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_man
 async def _show_items_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_manager: DBManager, lang: str, subsection: Optional[str]):
     """Show items and shop help"""
     help_text = f"""
-🛒 **{translations.get('shop_system_guide', lang)}**
+🛒 **{T[lang].get('shop_system_guide', lang)}**
 
-💰 **{translations.get('currency_types', lang)}:**
-• 🏅 **{translations.get('medals', lang)}**: Earn by attacking and winning battles
-• ⭐ **{translations.get('tg_stars', lang)}**: Premium currency for special items
+💰 **{T[lang].get('currency_types', lang)}:**
+• 🏅 **{T[lang].get('medals', lang)}**: Earn by attacking and winning battles
+• ⭐ **{T[lang].get('tg_stars', lang)}**: Premium currency for special items
 
-🧭 **{translations.get('item_categories', lang)}:**
-• ⚔️ **{translations.get('weapons', lang)}**: Deal damage to opponents
-• 🛡️ **{translations.get('defense', lang)}**: Reduce incoming damage
-• 🚀 **{translations.get('boosts', lang)}**: Temporary enhancements
+🧭 **{T[lang].get('item_categories', lang)}:**
+• ⚔️ **{T[lang].get('weapons', lang)}**: Deal damage to opponents
+• 🛡️ **{T[lang].get('defense', lang)}**: Reduce incoming damage
+• 🚀 **{T[lang].get('boosts', lang)}**: Temporary enhancements
 • 💎 **Premium**: Exclusive TG Stars items
 
-🛍️ **{translations.get('shopping_guide', lang)}:**
+🛍️ **{T[lang].get('shopping_guide', lang)}:**
 1. Use `/shop` to browse items
 2. Check item stats before buying
 3. Use `/buy [item_name]` to purchase
 4. View your items with `/inventory`
 
-📦 **{translations.get('inventory_management', lang)}:**
+📦 **{T[lang].get('inventory_management', lang)}:**
 • Items stack when you buy multiples
 • Some items have usage limits
 • Premium items never expire
 • Weapons are consumed when used
 
-💡 **{translations.get('shopping_tips', lang)}:**
+💡 **{T[lang].get('shopping_tips', lang)}:**
 • Start with basic weapons like missiles
 • Invest in defense items for protection
 • Save TG Stars for premium weapons
@@ -326,11 +332,11 @@ async def _show_items_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_mana
     
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(
-        types.InlineKeyboardButton(f"🛒 {translations.get('open_shop', lang)}", callback_data='quick:shop'),
-        types.InlineKeyboardButton(f"📦 {translations.get('view_inventory', lang)}", callback_data='quick:inventory')
+        types.InlineKeyboardButton(f"🛒 {T[lang].get('open_shop', lang)}", callback_data='quick:shop'),
+        types.InlineKeyboardButton(f"📦 {T[lang].get('view_inventory', lang)}", callback_data='quick:inventory')
     )
     keyboard.add(
-        types.InlineKeyboardButton(f"🔙 {translations.get('back_to_help', lang)}", callback_data='help:main')
+        types.InlineKeyboardButton(f"🔙 {T[lang].get('back_to_help', lang)}", callback_data='help:main')
     )
     
     await bot.edit_message_text(
@@ -383,7 +389,7 @@ async def _show_stats_help(call: types.CallbackQuery, bot: AsyncTeleBot, db_mana
         types.InlineKeyboardButton(f"🏆 {T[lang].get('view_leaderboard', {})}", callback_data='quick:leaderboard')
     )
     keyboard.add(
-        types.InlineKeyboardButton(f"🔙 {translations.get('back_to_help', lang)}", callback_data='help:main')
+        types.InlineKeyboardButton(f"🔙 {T[lang].get('back_to_help', lang)}", callback_data='help:main')
     )
     
     await bot.edit_message_text(
@@ -457,7 +463,7 @@ A: Weapons increase attack damage, while defense items reduce incoming damage or
         keyboard = types.InlineKeyboardMarkup()
         keyboard.add(
             types.InlineKeyboardButton(f"🆘 {T[lang].get('contact_support', {})}", url="https://t.me/bettercallninja"),
-            types.InlineKeyboardButton(f"🔙 {translations.get('back_to_help', lang)}", callback_data='help:main')
+            types.InlineKeyboardButton(f"🔙 {T[lang].get('back_to_help', lang)}", callback_data='help:main')
         )
 
         await bot.edit_message_text(

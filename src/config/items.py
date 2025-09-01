@@ -1069,8 +1069,12 @@ def get_item_price(item_id: str) -> int:
     return price
 
 def get_items_by_category(category: str) -> Dict[str, Dict[str, Any]]:
-    """Get all items in a specific category"""
-    return ItemManager.get_items_by_filter(category=category)
+    """Get all items of a specific category"""
+    result = {}
+    for item_id, item_data in ITEMS.items():
+        if item_data.get('category') == category:
+            result[item_id] = item_data
+    return result
 
 def get_items_by_payment_type(payment_type: PaymentType) -> Dict[str, Dict[str, Any]]:
     """Get all items for a specific payment type"""
@@ -1479,3 +1483,36 @@ __all__ = [
     "validate_item_id", "get_all_item_ids", "get_items_summary", "search_items",
     "get_recommended_items_for_level", "get_item_config"
 ]
+
+# Added functions to help with item categorization and filtering
+def get_all_categories() -> List[str]:
+    """Get all unique item categories"""
+    categories = set()
+    for item_data in ITEMS.values():
+        if 'category' in item_data:
+            categories.add(item_data['category'])
+    return list(categories)
+
+def get_category_count() -> Dict[str, int]:
+    """Get count of items in each category"""
+    category_counts = {}
+    for item_data in ITEMS.values():
+        category = item_data.get('category', 'other')
+        if category in category_counts:
+            category_counts[category] += 1
+        else:
+            category_counts[category] = 1
+    return category_counts
+
+# Make sure all items have a category
+for item_id, item_data in ITEMS.items():
+    if 'category' not in item_data:
+        # Assign default category based on item properties
+        if is_weapon(item_id):
+            ITEMS[item_id]['category'] = 'weapons'
+        elif is_defense_item(item_id):
+            ITEMS[item_id]['category'] = 'defense'
+        elif item_data.get('payment') == 'tg_stars':
+            ITEMS[item_id]['category'] = 'premium'
+        else:
+            ITEMS[item_id]['category'] = 'other'

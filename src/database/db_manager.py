@@ -101,11 +101,10 @@ async def initialize_pool() -> None:
     if pool is None:
         try:
             pool = AsyncConnectionPool(
-                min_size=DB_POOL_MIN_SIZE, 
-                max_size=DB_POOL_MAX_SIZE, 
                 conninfo=DATABASE_URL,
-                timeout=DB_COMMAND_TIMEOUT,
-                open=False  # Don't open in constructor to avoid deprecation warning
+                min_size=DB_POOL_MIN_SIZE, 
+                max_size=DB_POOL_MAX_SIZE,
+                open=False  # Don't open in constructor
             )
             # Open the pool properly using await
             await pool.open()
@@ -115,6 +114,27 @@ async def initialize_pool() -> None:
             logger.error(f"Failed to initialize database pool: {e}")
             logger.error(f"خطا در مقداردهی استخر پایگاه داده: {e}")
             raise DatabaseError(f"Database initialization failed: {e}")
+
+async def refresh_pool() -> None:
+    """تازه‌سازی استخر اتصالات - Refresh the database connection pool"""
+    global pool
+    try:
+        if pool:
+            logger.info("Refreshing database connection pool...")
+            logger.info("در حال تازه‌سازی استخر اتصالات پایگاه داده...")
+            # Close the existing pool
+            await pool.close()
+            # Create a new pool
+            pool = None
+            await initialize_pool()
+            logger.info("Database connection pool refreshed successfully")
+            logger.info("استخر اتصالات پایگاه داده با موفقیت تازه‌سازی شد")
+    except Exception as e:
+        logger.error(f"Failed to refresh database pool: {e}")
+        logger.error(f"خطا در تازه‌سازی استخر پایگاه داده: {e}")
+        # Try to initialize a new pool anyway
+        pool = None
+        await initialize_pool()
 
 class DBManager:
     """
@@ -126,12 +146,43 @@ class DBManager:
         self._pool = pool
         self._query_cache: Dict[str, Any] = {}
         self._cache_ttl = 300  # 5 minutes cache TTL
+        self._last_pool_refresh = time.time()
+        self._pool_refresh_interval = 3600  # Refresh pool every hour
         
+    async def _validate_connection(self, conn) -> bool:
+        """
+        اعتبارسنجی اتصال پایگاه داده
+        Validate database connection by executing a simple query
+        
+        Returns:
+            True if connection is valid, False otherwise
+        """
+        try:
+            # Execute a simple query to check if connection is valid
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT 1")
+                result = await cur.fetchone()
+                return result is not None and result[0] == 1
+        except Exception as e:
+            logger.warning(f"Connection validation failed: {e}")
+            return False
+            
     async def ensure_pool(self) -> None:
-        """اطمینان از وجود استخر اتصالات - Ensure connection pool exists"""
+        """اطمینان از وجود استخر اتصالات - Ensure connection pool exists and is healthy"""
+        # If no pool exists, initialize it
         if not self._pool:
             await initialize_pool()
             self._pool = pool
+            self._last_pool_refresh = time.time()
+            return
+            
+        # Check if we need to refresh the pool based on time
+        current_time = time.time()
+        if current_time - self._last_pool_refresh > self._pool_refresh_interval:
+            logger.info("Pool refresh interval reached, refreshing connection pool...")
+            await refresh_pool()
+            self._pool = pool
+            self._last_pool_refresh = current_time
     
     async def db(self, query: str, params: Optional[Tuple] = None, fetch: Optional[str] = None, 
                 retry_count: int = 0) -> Any:
@@ -151,7 +202,23 @@ class DBManager:
         await self.ensure_pool()
         
         try:
+            # Log query for debugging in case of issues
+            if retry_count > 0:
+                logger.debug(f"Retry attempt {retry_count} for query: {query}")
+                
             async with self._pool.connection() as conn:
+                # Validate connection before executing query
+                if not await self._validate_connection(conn):
+                    logger.warning("Connection validation failed, refreshing pool...")
+                    await refresh_pool()
+                    self._pool = pool
+                    self._last_pool_refresh = time.time()
+                    # Try again with a fresh connection
+                    if retry_count < DB_RETRY_ATTEMPTS:
+                        return await self.db(query, params, fetch, retry_count + 1)
+                    else:
+                        raise DatabaseError("Connection validation failed repeatedly")
+                
                 async with conn.cursor() as cur:
                     await cur.execute(query, params)
                     
@@ -177,16 +244,40 @@ class DBManager:
                     return None
                     
         except psycopg.OperationalError as e:
+            # Handle connection errors with retry logic
             if retry_count < DB_RETRY_ATTEMPTS:
                 logger.warning(f"Database connection error, retrying... ({retry_count + 1}/{DB_RETRY_ATTEMPTS})")
                 logger.warning(f"خطای اتصال پایگاه داده، تلاش مجدد... ({retry_count + 1}/{DB_RETRY_ATTEMPTS})")
-                await asyncio.sleep(1 * (retry_count + 1))  # Exponential backoff
+                
+                # Force pool refresh on connection errors
+                if "connection" in str(e).lower() or "timeout" in str(e).lower():
+                    logger.info("Connection error detected, refreshing pool before retry...")
+                    await refresh_pool()
+                    self._pool = pool
+                    self._last_pool_refresh = time.time()
+                
+                # Exponential backoff before retry
+                await asyncio.sleep(1 * (retry_count + 1))
                 return await self.db(query, params, fetch, retry_count + 1)
             else:
-                logger.error(f"Database connection failed after {DB_RETRY_ATTEMPTS} attempts")
-                logger.error(f"اتصال پایگاه داده پس از {DB_RETRY_ATTEMPTS} تلاش ناموفق بود")
+                logger.error(f"Database connection failed after {DB_RETRY_ATTEMPTS} attempts: {e}")
+                logger.error(f"اتصال پایگاه داده پس از {DB_RETRY_ATTEMPTS} تلاش ناموفق بود: {e}")
                 raise DatabaseError(f"Database connection failed: {e}")
+                
+        except psycopg.InterfaceError as e:
+            # Handle interface errors (like closed connection)
+            logger.warning(f"Database interface error: {e}, refreshing pool and retrying...")
+            await refresh_pool()
+            self._pool = pool
+            self._last_pool_refresh = time.time()
+            
+            if retry_count < DB_RETRY_ATTEMPTS:
+                return await self.db(query, params, fetch, retry_count + 1)
+            else:
+                raise DatabaseError(f"Database interface error persisted: {e}")
+                
         except Exception as e:
+            # Log detailed information about other errors
             logger.error(f"Database error: {str(e)}")
             logger.error(f"Query: {query}")
             logger.error(f"Params: {params}")
@@ -206,18 +297,69 @@ class DBManager:
         """
         await self.ensure_pool()
         
-        try:
-            async with self._pool.connection() as conn:
-                async with conn.transaction():
-                    for query, params in queries:
-                        await conn.execute(query, params)
-            logger.info(f"Transaction completed successfully with {len(queries)} queries")
-            logger.info(f"تراکنش با موفقیت با {len(queries)} کوئری کامل شد")
-            return True
-        except Exception as e:
-            logger.error(f"Transaction failed: {e}")
-            logger.error(f"تراکنش ناموفق بود: {e}")
-            raise TransactionError(f"Transaction failed: {e}")
+        retry_count = 0
+        max_retries = DB_RETRY_ATTEMPTS
+        
+        while retry_count <= max_retries:
+            try:
+                async with self._pool.connection() as conn:
+                    # Validate connection before starting transaction
+                    if not await self._validate_connection(conn):
+                        logger.warning("Connection validation failed before transaction, refreshing pool...")
+                        await refresh_pool()
+                        self._pool = pool
+                        self._last_pool_refresh = time.time()
+                        retry_count += 1
+                        continue
+                        
+                    async with conn.transaction():
+                        for query, params in queries:
+                            await conn.execute(query, params)
+                            
+                logger.info(f"Transaction completed successfully with {len(queries)} queries")
+                logger.info(f"تراکنش با موفقیت با {len(queries)} کوئری کامل شد")
+                return True
+                
+            except psycopg.OperationalError as e:
+                # Handle connection errors
+                logger.warning(f"Transaction connection error (attempt {retry_count+1}/{max_retries+1}): {e}")
+                
+                # Force pool refresh on connection errors
+                if "connection" in str(e).lower() or "timeout" in str(e).lower():
+                    logger.info("Connection error detected in transaction, refreshing pool...")
+                    await refresh_pool()
+                    self._pool = pool
+                    self._last_pool_refresh = time.time()
+                
+                if retry_count < max_retries:
+                    retry_count += 1
+                    # Exponential backoff
+                    await asyncio.sleep(1 * retry_count)
+                    continue
+                else:
+                    logger.error(f"Transaction failed after {max_retries+1} attempts: {e}")
+                    logger.error(f"تراکنش پس از {max_retries+1} تلاش ناموفق بود: {e}")
+                    raise TransactionError(f"Transaction failed: {e}")
+            
+            except psycopg.InterfaceError as e:
+                # Handle interface errors
+                logger.warning(f"Transaction interface error: {e}, refreshing pool and retrying...")
+                await refresh_pool()
+                self._pool = pool
+                self._last_pool_refresh = time.time()
+                
+                if retry_count < max_retries:
+                    retry_count += 1
+                    continue
+                else:
+                    raise TransactionError(f"Transaction interface error persisted: {e}")
+                    
+            except Exception as e:
+                # Log details for other errors
+                logger.error(f"Transaction failed: {e}")
+                logger.error(f"تراکنش ناموفق بود: {e}")
+                logger.error(f"Queries: {queries}")
+                raise TransactionError(f"Transaction failed: {e}")
 
     # =============================================================================
     # مدیریت کاربران - User Management
@@ -374,13 +516,14 @@ class DBManager:
             return False
     
     async def get_user_level(self, chat_id: int, user_id: int) -> int:
-        """دریافت سطح کاربر - Get user level"""
+        """Get user level with fallback to 1"""
         try:
-            result = await self.db(
-                "SELECT level FROM players WHERE chat_id = %s AND user_id = %s",
-                (chat_id, user_id), fetch="one"
+            level_data = await self.db(
+                "SELECT level FROM players WHERE chat_id=%s AND user_id=%s",
+                (chat_id, user_id),
+                fetch="one_dict"
             )
-            return result[0] if result else 1
+            return level_data['level'] if level_data else 1
         except Exception as e:
             logger.error(f"Error getting user level: {e}")
             return 1
@@ -758,49 +901,277 @@ class DBManager:
     # مدیریت کولدان - Cooldown Management
     # =============================================================================
     
-    async def set_cooldown(self, chat_id: int, user_id: int, action: str, 
-                          duration: int, data: Optional[str] = None) -> bool:
-        """تنظیم کولدان - Set cooldown for an action"""
+    async def check_cooldown(self, chat_id: int, user_id: int, cooldown_type: str) -> int:
+        """
+        بررسی وضعیت کولدان برای یک اقدام خاص
+        Check if a cooldown is active and return remaining time in seconds
+        Returns 0 if no cooldown is active
+        """
         try:
-            until_time = int(time.time()) + duration
-            await self.db("""
-                INSERT INTO cooldowns (chat_id, user_id, action, until, data)
-                VALUES (%s, %s, %s, %s, %s)
-                ON CONFLICT (chat_id, user_id, action) 
-                DO UPDATE SET until = EXCLUDED.until, data = EXCLUDED.data
-            """, (chat_id, user_id, action, until_time, data))
+            current_time = int(time.time())
+            cooldown_data = await self.db(
+                "SELECT expires_at FROM cooldowns WHERE chat_id=%s AND user_id=%s AND cooldown_type=%s AND expires_at > %s",
+                (chat_id, user_id, cooldown_type, current_time),
+                fetch="one_dict"
+            )
             
-            logger.info(f"Cooldown set for user {user_id}: {action} for {duration} seconds")
-            logger.info(f"کولدان برای کاربر {user_id} تنظیم شد: {action} برای {duration} ثانیه")
+            if cooldown_data and cooldown_data.get("expires_at"):
+                # Return remaining seconds
+                return cooldown_data["expires_at"] - current_time
+            return 0
+        except Exception as e:
+            logger.error(f"Error checking cooldown: {e}")
+            logger.error(f"خطا در بررسی کولدان: {e}")
+            return 0
+    
+    async def set_cooldown(self, chat_id: int, user_id: int, cooldown_type: str, duration: int) -> bool:
+        """
+        تنظیم کولدان برای یک اقدام خاص
+        Set a cooldown timer for a specific action
+        Returns True if successful, False otherwise
+        """
+        try:
+            current_time = int(time.time())
+            expires_at = current_time + duration
+            
+            # First remove any existing cooldown of this type
+            await self.db(
+                "DELETE FROM cooldowns WHERE chat_id=%s AND user_id=%s AND cooldown_type=%s",
+                (chat_id, user_id, cooldown_type)
+            )
+            
+            # Then add the new cooldown
+            await self.db(
+                "INSERT INTO cooldowns (chat_id, user_id, cooldown_type, expires_at, created_at) VALUES (%s, %s, %s, %s, %s)",
+                (chat_id, user_id, cooldown_type, expires_at, current_time)
+            )
+            
+            logger.debug(f"Cooldown set for user {user_id} in chat {chat_id}: {cooldown_type} for {duration}s")
             return True
+        except Exception as e:
+            logger.error(f"Error setting cooldown: {e}")
+            return False
+            
+    async def cleanup_expired_cooldowns(self) -> int:
+        """
+        پاکسازی کولدان‌های منقضی شده
+        Clean up expired cooldowns from the database
+        
+        Returns:
+            Number of removed cooldowns
+        """
+        try:
+            current_time = int(time.time())
+            result = await self.db(
+                "DELETE FROM cooldowns WHERE expires_at < %s RETURNING id",
+                (current_time,),
+                fetch="all"
+            )
+            removed_count = len(result) if result else 0
+            logger.info(f"Cleaned up {removed_count} expired cooldowns")
+            return removed_count
+        except Exception as e:
+            logger.error(f"Error cleaning up expired cooldowns: {e}")
+            return 0
+            
+    async def repair_cooldowns_table(self) -> bool:
+        """
+        تعمیر جدول کولدان‌ها و حل مشکلات احتمالی
+        Repair cooldowns table and fix potential schema issues
+        
+        Returns:
+            True if repair was successful, False otherwise
+        """
+        try:
+            # 1. Validate the table structure
+            await self.db("""
+                DO $$
+                BEGIN
+                    -- Ensure cooldown_type column exists and is properly typed
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name='cooldowns' AND column_name='cooldown_type') THEN
+                        ALTER TABLE cooldowns ADD COLUMN cooldown_type TEXT NOT NULL DEFAULT 'attack';
+                    END IF;
+                    
+                    -- Ensure data JSONB column exists
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                                  WHERE table_name='cooldowns' AND column_name='data') THEN
+                        ALTER TABLE cooldowns ADD COLUMN data JSONB DEFAULT '{}';
+                    END IF;
+                    
+                    -- Ensure proper constraint exists
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints
+                                  WHERE table_name='cooldowns' AND constraint_name='future_expiry') THEN
+                        ALTER TABLE cooldowns ADD CONSTRAINT future_expiry CHECK (expires_at > created_at);
+                    END IF;
+                    
+                    -- Add unique constraint if it doesn't exist
+                    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints
+                                  WHERE table_name='cooldowns' AND constraint_name='cooldowns_chat_user_type_key') THEN
+                        ALTER TABLE cooldowns ADD CONSTRAINT cooldowns_chat_user_type_key 
+                        UNIQUE (chat_id, user_id, cooldown_type);
+                    END IF;
+                END
+                $$;
+            """)
+            
+            # 2. Cleanup any invalid entries (negative durations, etc)
+            await self.db(
+                "DELETE FROM cooldowns WHERE expires_at <= created_at",
+                fetch="count"
+            )
+            
+            # 3. Convert any old attack_cooldown entries if they exist
+            try:
+                # Check if the old attack_cooldown table exists
+                old_table_exists = await self.db("""
+                    SELECT EXISTS (
+                        SELECT FROM information_schema.tables 
+                        WHERE table_name = 'attack_cooldown'
+                    )
+                """, fetch="one")
+                
+                if old_table_exists and old_table_exists[0]:
+                    logger.info("Found old attack_cooldown table, migrating data...")
+                    
+                    # Migrate data from old table to new cooldowns table
+                    await self.db("""
+                        INSERT INTO cooldowns (chat_id, user_id, cooldown_type, expires_at, created_at)
+                        SELECT chat_id, user_id, 'attack', expires_at, created_at 
+                        FROM attack_cooldown
+                        ON CONFLICT (chat_id, user_id, cooldown_type) DO UPDATE
+                        SET expires_at = EXCLUDED.expires_at,
+                            created_at = EXCLUDED.created_at
+                    """)
+                    
+                    # Optionally rename the old table instead of dropping it
+                    await self.db("ALTER TABLE IF EXISTS attack_cooldown RENAME TO attack_cooldown_legacy")
+                    
+                    logger.info("Migration from attack_cooldown to cooldowns completed")
+            except Exception as migration_error:
+                logger.warning(f"Error during attack_cooldown migration: {migration_error}")
+            
+            # 4. Report success
+            logger.info("Cooldowns table repair completed successfully")
+            return True
+        except Exception as e:
+            logger.error(f"Error repairing cooldowns table: {e}")
+            return False
+            
+    async def handle_attack_cooldown(self, chat_id: int, user_id: int) -> Optional[int]:
+        """
+        بررسی و مدیریت کولدان حمله
+        Check if user is in attack cooldown and return remaining time
+        
+        Returns:
+            Remaining seconds if cooldown active, None if no cooldown or error
+        """
+        try:
+            # Check for attack cooldown
+            remaining = await self.check_cooldown(chat_id, user_id, "attack")
+            if remaining > 0:
+                return remaining
+                
+            return None
+        except Exception as e:
+            logger.error(f"Error handling attack cooldown: {e}")
+            return None
+    
+    async def set_attack_cooldown(self, chat_id: int, user_id: int, duration: int = 300) -> bool:
+        """
+        تنظیم کولدان حمله برای کاربر
+        Set attack cooldown for a user
+        
+        Args:
+            chat_id: Chat ID
+            user_id: User ID
+            duration: Cooldown duration in seconds (default: 5 minutes)
+            
+        Returns:
+            True if cooldown was set, False otherwise
+        """
+        try:
+            return await self.set_cooldown(chat_id, user_id, "attack", duration)
+        except Exception as e:
+            logger.error(f"Error setting attack cooldown: {e}")
+            return False
+            
+            logger.info(f"Set cooldown for user {user_id}, type {cooldown_type}, duration {duration}s")
+            logger.info(f"کولدان برای کاربر {user_id}، نوع {cooldown_type}، مدت {duration} ثانیه تنظیم شد")
+            return True
+        except Exception as e:
+            logger.error(f"Error setting cooldown: {e}")
+            logger.error(f"خطا در تنظیم کولدان: {e}")
+            return False
+    
+    async def clear_cooldown(self, chat_id: int, user_id: int, cooldown_type: str) -> bool:
+        """
+        پاکسازی کولدان برای یک اقدام خاص
+        Clear a cooldown for a specific action
+        Returns True if successful, False otherwise
+        """
+        try:
+            await self.db(
+                "DELETE FROM cooldowns WHERE chat_id=%s AND user_id=%s AND cooldown_type=%s",
+                (chat_id, user_id, cooldown_type)
+            )
+            
+            logger.info(f"Cleared cooldown for user {user_id}, type {cooldown_type}")
+            logger.info(f"کولدان برای کاربر {user_id}، نوع {cooldown_type} پاک شد")
+            return True
+        except Exception as e:
+            logger.error(f"Error clearing cooldown: {e}")
+            logger.error(f"خطا در پاکسازی کولدان: {e}")
+            return False
+    
+    async def get_all_cooldowns(self, chat_id: int, user_id: int) -> Dict[str, int]:
+        """
+        دریافت تمامی کولدان‌های فعال کاربر
+        Get all active cooldowns for a user
+        Returns a dictionary with cooldown_type as key and remaining seconds as value
+        """
+        try:
+            current_time = int(time.time())
+            cooldowns = await self.db(
+                "SELECT cooldown_type, expires_at FROM cooldowns WHERE chat_id=%s AND user_id=%s AND expires_at > %s",
+                (chat_id, user_id, current_time),
+                fetch="all_dicts"
+            )
+            
+            return {cd["cooldown_type"]: cd["expires_at"] - current_time for cd in cooldowns} if cooldowns else {}
+        except Exception as e:
+            logger.error(f"Error getting all cooldowns: {e}")
+            logger.error(f"خطا در دریافت تمامی کولدان‌ها: {e}")
+            return {}
+    
+    # Legacy cooldown functions - preserved for backward compatibility
+    async def set_cooldown_legacy(self, chat_id: int, user_id: int, action: str, 
+                          duration: int, data: Optional[str] = None) -> bool:
+        """تنظیم کولدان - Set cooldown for an action (Legacy)"""
+        try:
+            # Redirect to new implementation
+            logger.warning("Using legacy set_cooldown with action parameter. Please update to use cooldown_type parameter.")
+            return await self.set_cooldown(chat_id, user_id, action, duration)
         except Exception as e:
             logger.error(f"Error setting cooldown: {e}")
             return False
     
     async def get_cooldown(self, chat_id: int, user_id: int, action: str) -> Optional[int]:
-        """دریافت زمان باقیمانده کولدان - Get remaining cooldown time"""
+        """دریافت زمان باقیمانده کولدان - Get remaining cooldown time (Legacy)"""
         try:
-            result = await self.db(
-                "SELECT until FROM cooldowns WHERE chat_id = %s AND user_id = %s AND action = %s",
-                (chat_id, user_id, action), fetch="one"
-            )
-            
-            if result:
-                remaining = result[0] - int(time.time())
-                return max(0, remaining)
-            return 0
+            # Redirect to new implementation
+            logger.warning("Using legacy get_cooldown. Please update to check_cooldown.")
+            return await self.check_cooldown(chat_id, user_id, action)
         except Exception as e:
             logger.error(f"Error getting cooldown: {e}")
             return 0
     
-    async def clear_cooldown(self, chat_id: int, user_id: int, action: str) -> bool:
-        """پاک کردن کولدان - Clear cooldown"""
+    async def clear_cooldown_legacy(self, chat_id: int, user_id: int, action: str) -> bool:
+        """پاک کردن کولدان - Clear cooldown (Legacy)"""
         try:
-            await self.db(
-                "DELETE FROM cooldowns WHERE chat_id = %s AND user_id = %s AND action = %s",
-                (chat_id, user_id, action)
-            )
-            return True
+            # Redirect to new implementation
+            logger.warning("Using legacy clear_cooldown with action parameter. Please update to use cooldown_type parameter.")
+            return await self.clear_cooldown(chat_id, user_id, action)
         except Exception as e:
             logger.error(f"Error clearing cooldown: {e}")
             return False
@@ -810,7 +1181,7 @@ class DBManager:
         try:
             current_time = int(time.time())
             result = await self.db(
-                "DELETE FROM cooldowns WHERE until < %s",
+                "DELETE FROM cooldowns WHERE expires_at < %s",
                 (current_time,)
             )
             logger.info(f"Cleaned up expired cooldowns")
@@ -819,6 +1190,230 @@ class DBManager:
         except Exception as e:
             logger.error(f"Error cleaning up cooldowns: {e}")
             return False
+            
+    async def repair_cooldowns_table(self) -> int:
+        """
+        تعمیر جدول کولدان‌ها
+        Repair cooldowns table if there are any inconsistencies between column names
+        """
+        try:
+            logger.info("Repairing cooldowns table...")
+            
+            # 1. First check if we need to migrate legacy cooldowns
+            try:
+                # Check if the action column exists (old schema)
+                await self.db("SELECT action FROM cooldowns LIMIT 1")
+                # If we get here, action column exists, we need to migrate
+                logger.info("Legacy cooldown table detected with 'action' column, migrating data...")
+                
+                # Get all legacy cooldowns
+                legacy_cooldowns = await self.db(
+                    "SELECT chat_id, user_id, action, expires_at, created_at, data FROM cooldowns",
+                    fetch="all_dicts"
+                )
+                
+                # Create a temporary table for the migration
+                await self.db("""
+                    CREATE TEMP TABLE cooldowns_new(
+                        id SERIAL PRIMARY KEY,
+                        chat_id BIGINT NOT NULL,
+                        user_id BIGINT NOT NULL,
+                        cooldown_type TEXT NOT NULL,
+                        expires_at BIGINT NOT NULL,
+                        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()),
+                        data JSONB DEFAULT '{}',
+                        UNIQUE(chat_id, user_id, cooldown_type)
+                    )
+                """)
+                
+                # Insert legacy data into the new table with correct column names
+                for cd in legacy_cooldowns:
+                    await self.db(
+                        "INSERT INTO cooldowns_new (chat_id, user_id, cooldown_type, expires_at, created_at, data) VALUES (%s, %s, %s, %s, %s, %s)",
+                        (cd["chat_id"], cd["user_id"], cd["action"], cd["expires_at"], cd["created_at"], cd.get("data", "{}"))
+                    )
+                
+                # Drop the old table and rename the new one
+                await self.db("DROP TABLE cooldowns")
+                await self.db("ALTER TABLE cooldowns_new RENAME TO cooldowns")
+                
+                # Re-create the correct indexes
+                await self.db("""
+                    ALTER TABLE cooldowns ADD CONSTRAINT future_expiry CHECK (expires_at > created_at)
+                """)
+                
+                logger.info(f"Successfully migrated {len(legacy_cooldowns)} legacy cooldowns")
+                return len(legacy_cooldowns)
+                
+            except Exception as e:
+                # If the action column doesn't exist, we might already have the new schema
+                if "column \"action\" does not exist" in str(e):
+                    logger.info("Cooldowns table already has the correct schema")
+                else:
+                    logger.error(f"Error checking legacy cooldowns: {e}")
+            
+            # 2. Clean up any duplicate entries
+            duplicates_removed = await self.db("""
+                DELETE FROM cooldowns 
+                WHERE id IN (
+                    SELECT id FROM (
+                        SELECT id, ROW_NUMBER() OVER (PARTITION BY chat_id, user_id, cooldown_type ORDER BY expires_at DESC) as row_num
+                        FROM cooldowns
+                    ) as duplicates 
+                    WHERE row_num > 1
+                )
+            """)
+            
+            # 3. Remove any expired cooldowns
+            current_time = int(time.time())
+            expired_removed = await self.db(
+                "DELETE FROM cooldowns WHERE expires_at < %s",
+                (current_time,)
+            )
+            
+            # 4. Re-create indexes if needed
+            try:
+                await self.db("DROP INDEX IF EXISTS idx_cooldowns_user")
+                await self.db("CREATE INDEX idx_cooldowns_user ON cooldowns(chat_id, user_id)")
+                
+                await self.db("DROP INDEX IF EXISTS idx_cooldowns_expiry")
+                await self.db("CREATE INDEX idx_cooldowns_expiry ON cooldowns(expires_at)")
+            except Exception as e:
+                logger.error(f"Error recreating indexes: {e}")
+            
+            logger.info("Cooldowns table repair completed")
+            return 1
+            
+        except Exception as e:
+            logger.error(f"Error repairing cooldowns table: {e}")
+            return 0
+
+    async def update_players_table_schema(self) -> bool:
+        """Update players table to include missing columns needed by commands"""
+        try:
+            # Add missing columns if they don't exist
+            missing_columns = [
+                ("max_hp", "INT DEFAULT 100"),
+                ("last_attack", "BIGINT"),
+                ("last_attack_time", "BIGINT"),
+                ("experience", "INT DEFAULT 0"),
+                ("join_date", "BIGINT DEFAULT EXTRACT(EPOCH FROM NOW())"),
+                ("attacks_made", "INT DEFAULT 0"),
+                ("attacks_received", "INT DEFAULT 0"),
+                ("victories", "INT DEFAULT 0"),
+                ("defeats", "INT DEFAULT 0"),
+                ("shields_used", "INT DEFAULT 0"),
+                ("items_bought", "INT DEFAULT 0"),
+                ("activity_points", "INT DEFAULT 0")
+            ]
+            
+            for column_name, column_def in missing_columns:
+                try:
+                    await self.db(f"ALTER TABLE players ADD COLUMN IF NOT EXISTS {column_name} {column_def}")
+                    logger.info(f"Added column {column_name} to players table")
+                except Exception as e:
+                    if "already exists" in str(e).lower():
+                        logger.info(f"Column {column_name} already exists")
+                    else:
+                        logger.error(f"Error adding column {column_name}: {e}")
+            
+            # Update max_hp for existing users who might have it as NULL
+            await self.db("UPDATE players SET max_hp = 100 WHERE max_hp IS NULL")
+            
+            # Update join_date for existing users who might have it as NULL
+            await self.db("UPDATE players SET join_date = created_at WHERE join_date IS NULL")
+            
+            # Update HP constraint to use max_hp
+            try:
+                await self.db("ALTER TABLE players DROP CONSTRAINT IF EXISTS positive_hp")
+                await self.db("ALTER TABLE players ADD CONSTRAINT positive_hp CHECK (hp >= 0 AND hp <= COALESCE(max_hp, 100))")
+            except Exception as e:
+                logger.warning(f"Could not update HP constraint: {e}")
+            
+            logger.info("Players table schema updated successfully")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error updating players table schema: {e}")
+            return False
+
+    async def get_attack_history(self, chat_id: int, user_id: int, limit: int = 50) -> List[Dict[str, Any]]:
+        """Get attack history for a user"""
+        try:
+            attacks = await self.db("""
+                SELECT attacker_id, victim_id, damage, weapon, attack_time, is_critical, defense_reduced
+                FROM attacks 
+                WHERE chat_id = %s AND (attacker_id = %s OR victim_id = %s)
+                ORDER BY attack_time DESC 
+                LIMIT %s
+            """, (chat_id, user_id, user_id, limit), fetch="all_dicts")
+            
+            return attacks or []
+        except Exception as e:
+            logger.error(f"Error getting attack history: {e}")
+            return []
+
+    async def get_purchase_history(self, chat_id: int, user_id: int, limit: int = 50) -> List[Dict[str, Any]]:
+        """Get purchase history for a user"""
+        try:
+            purchases = await self.db("""
+                SELECT item, price, payment_type, purchase_time, quantity
+                FROM purchases 
+                WHERE chat_id = %s AND user_id = %s
+                ORDER BY purchase_time DESC 
+                LIMIT %s
+            """, (chat_id, user_id, limit), fetch="all_dicts")
+            
+            return purchases or []
+        except Exception as e:
+            logger.error(f"Error getting purchase history: {e}")
+            return []
+
+    async def get_user_combat_stats(self, chat_id: int, user_id: int) -> Dict[str, Any]:
+        """Get detailed combat statistics for a user"""
+        try:
+            # Get attack statistics
+            attack_stats = await self.db("""
+                SELECT 
+                    COUNT(*) as total_attacks,
+                    SUM(damage) as total_damage_dealt,
+                    AVG(damage) as avg_damage_dealt,
+                    MAX(damage) as max_damage_dealt,
+                    COUNT(CASE WHEN is_critical THEN 1 END) as critical_hits
+                FROM attacks 
+                WHERE chat_id = %s AND attacker_id = %s
+            """, (chat_id, user_id), fetch="one_dict")
+            
+            # Get defense statistics
+            defense_stats = await self.db("""
+                SELECT 
+                    COUNT(*) as times_attacked,
+                    SUM(damage) as total_damage_taken,
+                    AVG(damage) as avg_damage_taken,
+                    MAX(damage) as max_damage_taken,
+                    COUNT(CASE WHEN defense_reduced THEN 1 END) as successful_defenses
+                FROM attacks 
+                WHERE chat_id = %s AND victim_id = %s
+            """, (chat_id, user_id), fetch="one_dict")
+            
+            # Get weapon preferences
+            weapon_stats = await self.db("""
+                SELECT weapon, COUNT(*) as usage_count
+                FROM attacks 
+                WHERE chat_id = %s AND attacker_id = %s 
+                GROUP BY weapon 
+                ORDER BY usage_count DESC 
+                LIMIT 5
+            """, (chat_id, user_id), fetch="all_dicts")
+            
+            return {
+                "attack_stats": attack_stats or {},
+                "defense_stats": defense_stats or {},
+                "weapon_preferences": weapon_stats or []
+            }
+        except Exception as e:
+            logger.error(f"Error getting user combat stats: {e}")
+            return {"attack_stats": {}, "defense_stats": {}, "weapon_preferences": []}
 
     # =============================================================================
     # مدیریت دفاع فعال - Active Defense Management
@@ -1318,6 +1913,7 @@ async def setup_database() -> None:
                 last_active BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()),
                 tg_stars INT DEFAULT 0,
                 hp INT DEFAULT 100,
+                max_hp INT DEFAULT 100,
                 level INT DEFAULT 1,
                 created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()),
                 total_attacks INT DEFAULT 0,
@@ -1326,7 +1922,7 @@ async def setup_database() -> None:
                 damage_taken INT DEFAULT 0,
                 preferred_weapon TEXT,
                 settings JSONB DEFAULT '{}',
-                -- Additional columns for helpers.py compatibility
+                -- Additional columns for commands compatibility
                 experience INT DEFAULT 0,
                 join_date BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()),
                 attacks_made INT DEFAULT 0,
@@ -1336,8 +1932,11 @@ async def setup_database() -> None:
                 shields_used INT DEFAULT 0,
                 items_bought INT DEFAULT 0,
                 activity_points INT DEFAULT 0,
+                last_attack BIGINT,
+                last_attack_time BIGINT,
                 PRIMARY KEY(chat_id, user_id),
-                CONSTRAINT positive_hp CHECK (hp >= 0 AND hp <= 100),
+                CONSTRAINT positive_hp CHECK (hp >= 0 AND hp <= max_hp),
+                CONSTRAINT positive_max_hp CHECK (max_hp >= 50 AND max_hp <= 200),
                 CONSTRAINT positive_level CHECK (level >= 1),
                 CONSTRAINT positive_tg_stars CHECK (tg_stars >= 0),
                 CONSTRAINT positive_experience CHECK (experience >= 0),
@@ -1349,14 +1948,15 @@ async def setup_database() -> None:
         # Create enhanced cooldowns table
         await db_manager.db("""
             CREATE TABLE IF NOT EXISTS cooldowns(
-                chat_id BIGINT,
-                user_id BIGINT,
-                action TEXT,
-                until BIGINT,
-                data TEXT,
+                id SERIAL PRIMARY KEY,
+                chat_id BIGINT NOT NULL,
+                user_id BIGINT NOT NULL,
+                cooldown_type TEXT NOT NULL,
+                expires_at BIGINT NOT NULL,
                 created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()),
-                PRIMARY KEY(chat_id, user_id, action),
-                CONSTRAINT future_until CHECK (until > created_at)
+                data JSONB DEFAULT '{}',
+                UNIQUE(chat_id, user_id, cooldown_type),
+                CONSTRAINT future_expiry CHECK (expires_at > created_at)
             )
         """)
         logger.info("Cooldowns table created/verified - جدول کولدان‌ها ایجاد/تایید شد")
@@ -1445,6 +2045,23 @@ async def setup_database() -> None:
         """)
         logger.info("Active defenses table created/verified - جدول دفاع‌های فعال ایجاد/تایید شد")
         
+        # Create active_boosts table for temporary item effects
+        await db_manager.db("""
+            CREATE TABLE IF NOT EXISTS active_boosts(
+                id SERIAL PRIMARY KEY,
+                chat_id BIGINT NOT NULL,
+                user_id BIGINT NOT NULL,
+                boost_type TEXT NOT NULL,
+                boost_value DOUBLE PRECISION NOT NULL DEFAULT 1.0,
+                expires_at BIGINT NOT NULL,
+                activated_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()),
+                UNIQUE(chat_id, user_id, boost_type),
+                CONSTRAINT future_expiry_boost CHECK (expires_at > activated_at),
+                CONSTRAINT positive_boost CHECK (boost_value > 0)
+            )
+        """)
+        logger.info("Active boosts table created/verified - جدول تقویت‌های فعال ایجاد/تایید شد")
+        
         # Create interactions table for logging user interactions
         await db_manager.db("""
             CREATE TABLE IF NOT EXISTS interactions(
@@ -1482,8 +2099,11 @@ async def setup_database() -> None:
             "CREATE INDEX IF NOT EXISTS idx_attacks_victim ON attacks(chat_id, victim_id)",
             "CREATE INDEX IF NOT EXISTS idx_purchases_time ON purchases(chat_id, purchase_time DESC)",
             "CREATE INDEX IF NOT EXISTS idx_inventories_user ON inventories(chat_id, user_id)",
-            "CREATE INDEX IF NOT EXISTS idx_cooldowns_until ON cooldowns(chat_id, user_id, until)",
+            "CREATE INDEX IF NOT EXISTS idx_cooldowns_expires ON cooldowns(chat_id, user_id, expires_at)",
+            "CREATE INDEX IF NOT EXISTS idx_cooldowns_type ON cooldowns(chat_id, user_id, cooldown_type)",
             "CREATE INDEX IF NOT EXISTS idx_defenses_expires ON active_defenses(chat_id, expires_at)",
+            "CREATE INDEX IF NOT EXISTS idx_boosts_expires ON active_boosts(chat_id, user_id, expires_at)",
+            "CREATE INDEX IF NOT EXISTS idx_boosts_type ON active_boosts(chat_id, user_id, boost_type)",
             "CREATE INDEX IF NOT EXISTS idx_achievements_user ON player_achievements(chat_id, user_id)",
             "CREATE INDEX IF NOT EXISTS idx_interactions_user ON interactions(chat_id, user_id, timestamp DESC)"
         ]
@@ -1492,6 +2112,22 @@ async def setup_database() -> None:
             await db_manager.db(index_query)
         
         logger.info("Database indexes created/verified - ایندکس‌های پایگاه داده ایجاد/تایید شدند")
+        
+        # Fix cooldowns table issues - repair table structure and consolidate any mixed data
+        try:
+            logger.info("Repairing cooldowns table structure...")
+            await db_manager.repair_cooldowns_table()
+            logger.info("Cooldowns table structure repaired")
+        except Exception as e:
+            logger.error(f"Error repairing cooldowns table: {e}")
+        
+        # Update players table schema to include missing columns
+        try:
+            logger.info("Updating players table schema...")
+            await db_manager.update_players_table_schema()
+            logger.info("Players table schema updated")
+        except Exception as e:
+            logger.error(f"Error updating players table schema: {e}")
         
         # Add triggers for automatic updates (PostgreSQL specific)
         await db_manager.db("""
@@ -1579,6 +2215,8 @@ __all__ = [
     'TransactionError',
     'setup_database',
     'initialize_pool',
+    'refresh_pool',
     'validate_database_config',
-    'db'  # Legacy support
+    'db',  # Legacy support
+    'pool'  # Global connection pool
 ]
