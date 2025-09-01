@@ -1467,6 +1467,33 @@ def load_translations() -> None:
         "view_leaderboard": "جدول امتیازات",
         "faq_title": "سوالات متداول",
         "contact_support": "راهنمایی بیشتر",
+        
+        # Missing translation keys
+        "daily_averages": "میانگین‌های روزانه",
+        "daily_breakdown": "تفکیک روزانه",
+        "stars_terms": "شرایط و ضوابط ستاره‌ها",
+        "trends_loaded": "روندها بارگذاری شد",
+        "direct_attack_instructions": "دستورالعمل حمله مستقیم",
+        "weapon_selection_confirmed": "انتخاب سلاح تایید شد",
+        "attacks": "حملات",
+        "status_loaded": "وضعیت بارگذاری شد",
+        "weapon_selected": "سلاح انتخاب شد",
+        "refresh_balance": "به‌روزرسانی موجودی",
+        "stars_support": "پشتیبانی ستاره‌ها",
+        "trend_analysis": "تحلیل روند",
+        "no_weapon_selected": "هیچ سلاحی انتخاب نشده",
+        "active_defense_info": "اطلاعات دفاع فعال",
+        "weapons_loaded": "تسلیحات بارگذاری شد",
+        "shop_defense_items": "آیتم‌های دفاعی فروشگاه",
+        "stars_faq": "سوالات متداول ستاره‌ها",
+        "close_stars_menu": "بستن منوی ستاره‌ها",
+        "stars_help": "راهنمای ستاره‌ها",
+        "current_weapon_message": "پیام سلاح فعلی",
+        "activate_defense_header": "سربرگ فعال‌سازی دفاع",
+        "no_defense_items": "آیتم دفاعی موجود نیست",
+        "reply_to_attack": "پاسخ به حمله",
+        "coming_soon": "به زودی",
+        "select_defense_activation": "انتخاب فعال‌سازی دفاع"
     }
     
     logger.info("Translations loaded successfully for both English and Persian")
