@@ -1858,10 +1858,28 @@ class DBManager:
             logger.error(f"Error getting database stats: {e}")
             return {}
 
-    async def log_message_interaction(self, chat_id: int, user_id: int, message_type: str, data: Dict[str, Any] = None) -> bool:
+    async def log_message_interaction(self, chat_id: int = None, user_id: int = None, message_type: str = None, 
+                                    data: Dict[str, Any] = None, intention: str = None, sentiment: str = None, 
+                                    confidence_score: float = None, response_generated: bool = None, 
+                                    timestamp: int = None) -> bool:
         """ثبت تعامل پیام کاربر - Log user message interaction"""
         try:
-            current_time = int(time.time())
+            # Handle both old and new calling patterns
+            if data is None:
+                data = {}
+            
+            # Add new parameters to data if provided
+            if intention is not None:
+                data['intention'] = intention
+            if sentiment is not None:
+                data['sentiment'] = sentiment
+            if confidence_score is not None:
+                data['confidence_score'] = confidence_score
+            if response_generated is not None:
+                data['response_generated'] = response_generated
+            
+            current_time = timestamp if timestamp else int(time.time())
+            
             await self.db("""
                 INSERT INTO interactions (chat_id, user_id, interaction_type, interaction_data, timestamp)
                 VALUES (%s, %s, %s, %s, %s)
@@ -1871,6 +1889,47 @@ class DBManager:
             return True
         except Exception as e:
             logger.error(f"Error logging message interaction: {e}")
+            return False
+
+    async def log_new_user_join(self, chat_id: int, user_id: int, user_lang: str = 'en') -> bool:
+        """ثبت عضویت کاربر جدید - Log new user join"""
+        try:
+            current_time = int(time.time())
+            
+            # Create event data
+            event_data = {
+                "language": user_lang,
+                "join_timestamp": current_time
+            }
+            
+            # Log to interactions table if it exists
+            await self.db("""
+                INSERT INTO interactions (chat_id, user_id, interaction_type, interaction_data, timestamp)
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT DO NOTHING
+            """, (chat_id, user_id, "new_user_join", json.dumps(event_data), current_time))
+            
+            logger.info(f"Logged new user join: {user_id} in chat {chat_id}")
+            return True
+        except Exception as e:
+            logger.error(f"Error logging new user join: {e}")
+            return False
+
+    async def log_user_event(self, user_id: int, chat_id: int, event_type: str, event_data: Dict[str, Any] = None) -> bool:
+        """ثبت رویداد کاربر - Log user event"""
+        try:
+            current_time = int(time.time())
+            
+            # Log to interactions table
+            await self.db("""
+                INSERT INTO interactions (chat_id, user_id, interaction_type, interaction_data, timestamp)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (chat_id, user_id, event_type, json.dumps(event_data) if event_data else None, current_time))
+            
+            logger.info(f"Logged user event: {event_type} for user {user_id} in chat {chat_id}")
+            return True
+        except Exception as e:
+            logger.error(f"Error logging user event: {e}")
             return False
 
 

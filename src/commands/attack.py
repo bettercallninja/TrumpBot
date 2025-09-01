@@ -25,8 +25,13 @@ def escape_markdown(text: str) -> str:
     """Escape special characters for Telegram markdown"""
     if not text:
         return ""
-    # Escape markdown special characters
-    return re.sub(r'([*_\[\]()~`>#+\-=|{}.!])', r'\\\1', str(text))
+    # More comprehensive escape for markdown special characters
+    text = str(text)
+    # Escape characters that can break markdown parsing
+    escape_chars = ['*', '_', '`', '[', ']', '(', ')', '~', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!', '\\']
+    for char in escape_chars:
+        text = text.replace(char, f'\\{char}')
+    return text
 
 class AttackManager:
     """Manages attack mechanics and damage calculations"""
@@ -493,7 +498,7 @@ async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: 
         
         # Generate attack report with improved formatting
         weapon_emoji = get_item_emoji(weapon)
-        weapon_name = get_item_display_name(weapon, lang)
+        weapon_name = escape_markdown(get_item_display_name(weapon, lang))
         weapon_stats = get_item_stats(weapon)
         
         # Create comprehensive attack report with better formatting
@@ -512,7 +517,7 @@ async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: 
             # Damage section
             msg += f"\n💥 **آسیب**:\n"
             if has_defense and defense_type:
-                defense_name = T[lang].get('defense_items', {}).get(defense_type, defense_type)
+                defense_name = escape_markdown(T[lang].get('defense_items', {}).get(defense_type, defense_type))
                 msg += f"• آسیب اولیه: `{damage}`\n"
                 msg += f"• 🛡️ دفاع با {defense_name}: `-{defense_reduced}`\n"
                 msg += f"• **آسیب نهایی**: `{final_damage}`\n"
@@ -555,7 +560,7 @@ async def execute_attack(message: types.Message, bot: AsyncTeleBot, db_manager: 
             # Damage section
             msg += f"\n💥 **Damage**:\n"
             if has_defense and defense_type:
-                defense_name = T[lang].get('defense_items', {}).get(defense_type, defense_type)
+                defense_name = escape_markdown(T[lang].get('defense_items', {}).get(defense_type, defense_type))
                 msg += f"• Initial damage: `{damage}`\n"
                 msg += f"• 🛡️ {defense_name} defense: `-{defense_reduced}`\n"
                 msg += f"• **Final damage**: `{final_damage}`\n"
