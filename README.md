@@ -5,7 +5,7 @@
 
 
 <p align="center">
-  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.13-blue?logo=python"></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.11-blue?logo=python"></a>
   <a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/Postgres-12+-blue?logo=postgresql"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green"></a>
   <img src="https://img.shields.io/github/stars/bettercallninja/TrumpBot?style=social">
