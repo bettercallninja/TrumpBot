@@ -118,29 +118,6 @@ python main.py > bot.log 2>&1 &
 
 ---
 
-## 🛣 Roadmap
-
-### ✅ v1.0
-- Core combat + inventory
-- Bilingual support
-- Basic shields
-
-### 🎉 v2.0 (current)
-- `/attack` without reply
-- Quick `/shield`
-- Linked inventory & status
-- Enhanced stats system
-- Updated help
-
-### 📌 v3.0 (planned)
-- 🏆 Leaderboards & achievements
-- 🤖 AI-driven combat strategies
-- 📊 Web dashboard & analytics
-- 🐳 Docker support
-- 🌍 More languages
-
----
-
 ## 🔒 Security & Performance
 
 - Parameterized SQL → **safe from injection**
