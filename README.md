@@ -1,240 +1,163 @@
-# TrumpBot - Advanced Telegram Battle Bot
+# 🦅 TrumpBot - Advanced Telegram Battle Bot
 
-A sophisticated Telegram bot for group-based PvP missile combat with modern Python architecture, comprehensive error handling, and bilingual support.
+> ⚡ A modern Telegram bot for group-based PvP missile combat
+> 🚀 Built with async Python, PostgreSQL, and bilingual (FA/EN) support
 
-## 🚀 Features
+<p align="center">
+  <img src="assets/demo.gif" alt="TrumpBot Demo" width="600"/>
+</p>
 
-### Core Gameplay
-- **PvP Combat System**: Reply-based attacks with sophisticated damage calculations
-- **Weapon Arsenal**: Multiple weapon types with varying damage and effects
-- **Defense Systems**: Shields and intercept systems with configurable effectiveness
-- **Level-based Mechanics**: Dynamic damage based on player levels and experience
-- **Real-time Status**: HP tracking, active defenses, and cooldown management
+<p align="center">
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.11-blue?logo=python"></a>
+  <a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/Postgres-12+-blue?logo=postgresql"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green"></a>
+  <img src="https://img.shields.io/github/stars/bettercallninja/TrumpBot?style=social">
+</p>
 
-### Premium Features
-- **Telegram Stars Integration**: Premium items purchasable with TG Stars
-- **Medal Economy**: Activity-based reward system with balanced progression
-- **Inventory Management**: Comprehensive item storage and usage tracking
-- **Daily Bonuses**: Regular rewards to maintain engagement
+---
 
-### Technical Excellence
-- **Bilingual Support**: Complete FA/EN localization with user preferences
-- **Async Architecture**: Full async/await implementation for optimal performance
-- **Connection Pooling**: PostgreSQL with psycopg-pool for efficient database operations
-- **Type Safety**: Comprehensive type hints throughout the codebase
-- **Error Handling**: Robust exception handling with logging and user feedback
-- **Modular Design**: Clean separation of concerns with organized modules
+## ✨ Features
 
-### Recent Enhancements
-- **Improved Weapon Selection**: Select weapons with `/attack` command without reply
-- **Enhanced Defense System**: New `/shield` command for quick shield activation
-- **Cross-Linked Features**: Inventory and Status screens now link to each other
-- **Enhanced Stats System**: Fixed stats buttons with new weapon stats and trends views
-- **Comprehensive Help**: Updated help system with clear instructions for all features
+### 🎮 Core Gameplay
+- **PvP Combat System**: Reply-based attacks with advanced damage calculations
+- **Weapons Arsenal**: Multiple types with unique damage & effects
+- **Defense Systems**: Shields and interceptors with cooldowns
+- **Level-based Progression**: Dynamic XP, levels, and scaling
+- **Real-time Status**: HP tracking, defenses, and cooldown management
 
-## 🏗️ Architecture
+### 💎 Premium Features
+- **Telegram Stars Shop**: Buy premium items with TG Stars
+- **Medal Economy**: Earn rewards via gameplay & activity
+- **Inventory System**: Store & use items with logging
+- **Daily Bonuses**: Keep engagement alive
 
-### Modern Code Structure
-```
+### ⚙️ Technical Excellence
+- **Async-first**: Full async/await implementation
+- **Connection Pooling**: `psycopg-pool` for PostgreSQL
+- **Bilingual**: English + فارسی with per-user settings
+- **Type Hints**: Static safety across the codebase
+- **Error Handling**: Robust exception management & user feedback
+- **Modular Design**: Commands, DB, utils, handlers separated
+
+---
+
+## 🏗 Architecture
+
+<details>
+<summary>View Code Structure</summary>
+
+```tree
 TrumpBot/
-├── main.py                 # Application entry point
-├── src/                    # Main package
-│   ├── app.py             # Application bootstrap with error handling
-│   ├── commands/          # Command handlers (modular design)
-│   │   ├── attack.py      # Combat system with AttackManager class
-│   │   ├── general.py     # Basic commands with enhanced error handling
-│   │   ├── status.py      # Status management with StatusManager class
-│   │   └── ...
-│   ├── config/            # Configuration management
-│   │   ├── bot_config.py  # Centralized BotConfig class
-│   │   └── items.py       # Item system with enums and utilities
-│   ├── database/          # Database layer
-│   │   └── db_manager.py  # Modern DBManager with connection pooling
-│   ├── handlers/          # Event handlers
-│   ├── utils/             # Utilities and helpers
-│   │   ├── helpers.py     # Refactored with manager classes
-│   │   └── translations.py # Enhanced with type hints
-│   └── __init__.py
-├── pyproject.toml         # Modern Python project configuration
-└── README.md             # This file
+ ├── main.py
+ ├── src/
+ │   ├── app.py
+ │   ├── commands/       # attack, general, status, ...
+ │   ├── config/         # BotConfig, items
+ │   ├── database/       # DBManager with pooling
+ │   ├── handlers/       # event handlers
+ │   ├── utils/          # helpers, translations
+ │   └── __init__.py
+ ├── pyproject.toml
+ └── README.md
 ```
+</details>
 
-### Key Architectural Improvements
-- **Class-based Configuration**: `BotConfig` class replacing scattered constants
-- **Manager Pattern**: Specialized managers for different game systems
-- **Connection Pooling**: Async PostgreSQL pool for optimal database performance
-- **Factory Pattern**: `create_bot()` function for clean bot instantiation
-- **Dependency Injection**: Clean separation between business logic and dependencies
+- Manager pattern for clean game logic
+- Dependency injection for flexibility
+- Factory pattern for bot creation
+- Full type-hints & structured logging
 
-## 🛠️ Installation & Setup
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- **Python 3.8+** with async/await support
-- **PostgreSQL 12+** for reliable data persistence
-- **Telegram Bot Token** from @BotFather
+- Python **3.8+**
+- PostgreSQL **12+**
+- Telegram Bot Token from [@BotFather](https://t.me/BotFather)
 
-### Environment Setup
+### Installation
+```bash
+git clone <repository-url>
+cd TrumpBot
+pip install -r requirements.txt
+```
 
-1. **Clone and Install Dependencies**:
-   ```bash
-   git clone <repository-url>
-   cd TrumpBot
-   pip install -r requirements.txt
-   ```
+### Configuration
+Create `.env` file:
+```env
+BOT_TOKEN=your_bot_token
+DATABASE_URL=postgresql://user:pass@localhost:5432/trumpbot
+UNLIMITED_MISSILES=false
+LOG_LEVEL=INFO
+```
 
-2. **Environment Configuration**:
-   Create a `.env` file with:
-   ```env
-   BOT_TOKEN=your_telegram_bot_token_here
-   DATABASE_URL=postgresql://username:password@localhost:5432/trumpbot
-   
-   # Optional configurations
-   UNLIMITED_MISSILES=false
-   LOG_LEVEL=INFO
-   ```
-
-3. **Database Setup**:
-   ```bash
-   # Create database
-   createdb trumpbot
-   
-   # Tables will be auto-created on first run
-   ```
-
-### Running the Bot
-
-**Development Mode**:
+### Run
 ```bash
 python main.py
 ```
 
-**Production Mode** (with logging):
+For production:
 ```bash
 python main.py > bot.log 2>&1 &
 ```
 
-## 🎮 Game Commands
+---
 
-### Basic Commands
-- `/start` - Welcome message and main menu
-- `/help` - Comprehensive help system
-- `/language` - Switch between English/Persian
-- `/status` - Current player status and defenses
-- `/shield` - Quickly activate a shield
-- `/stats` - View detailed player statistics
+## 🎮 Commands
 
-### Combat System
-- `/attack [user] [weapon]` - Attack another player
-- Reply to a message + `/attack` - Quick attack with current weapon
-- Use `/attack` without reply to select your weapon first
-- Weapon types: `moab`, `f22`, `nuclear`, `mega_nuke`, `stealth_bomber`
+| Command      | Action                          |
+|--------------|---------------------------------|
+| `/start`     | Welcome & main menu             |
+| `/help`      | Show full help                  |
+| `/language`  | Switch EN/FA                    |
+| `/status`    | Show player HP & defenses       |
+| `/shield`    | Quick shield activation         |
+| `/attack`    | Attack (reply or weapon select) |
+| `/shop`      | Buy items                       |
+| `/inventory` | Show & manage items             |
+| `/stars`     | Premium shop (TG Stars)         |
+| `/stats`     | Combat statistics               |
 
-### Defense System
-- `/shield` - Quick command to activate your shield
-- `/status` - View and activate your defense systems
-- Defense types: `shield` (blocks attacks), `intercept` (reduces hit chance)
+---
 
-### Economy & Inventory
-- `/shop` - Browse and purchase items
-- `/inventory` or `/inv` - View and manage owned items
-- `/stars` - Telegram Stars premium shop
-- `/top` - Leaderboard system
-- `/stats` - View your combat statistics
+## 🛣 Roadmap
 
-## 🔧 Advanced Configuration
+### ✅ v1.0
+- Core combat + inventory
+- Bilingual support
+- Basic shields
 
-### Bot Configuration Class
-```python
-from src.config.bot_config import BotConfig
+### 🎉 v2.0 (current)
+- `/attack` without reply
+- Quick `/shield`
+- Linked inventory & status
+- Enhanced stats system
+- Updated help
 
-config = BotConfig
-# Access to all game constants:
-# - DAMAGE_MULTIPLIERS
-# - DEFENSE_EFFECTIVENESS  
-# - ATTACK_COOLDOWN
-# - UNLIMITED_MISSILES
-```
+### 📌 v3.0 (planned)
+- 🏆 Leaderboards & achievements
+- 🤖 AI-driven combat strategies
+- 📊 Web dashboard & analytics
+- 🐳 Docker support
+- 🌍 More languages
 
-### Database Manager
-```python
-from src.database.db_manager import DBManager
-
-db = DBManager()
-# Modern async operations with connection pooling
-result = await db.db("SELECT * FROM players WHERE user_id=%s", (user_id,), fetch="one_dict")
-```
-
-### Custom Item System
-```python
-from src.config.items import ITEMS, ItemType, PaymentType
-
-# Define new items with full type safety
-# Support for different payment methods and categories
-```
+---
 
 ## 🔒 Security & Performance
 
-### Database Security
-- **Parameterized Queries**: Full protection against SQL injection
-- **Connection Pooling**: Efficient resource management
-- **Error Isolation**: Database errors don't crash the application
+- Parameterized SQL → **safe from injection**
+- Connection pooling → **efficient DB usage**
+- Rate-limiting → **fair gameplay**
+- Graceful degradation → **bot never crashes**
 
-### Rate Limiting & Cooldowns
-- **Attack Cooldown**: Configurable delay between attacks
-- **Defense Timers**: Time-based defense expiration
-- **Activity Tracking**: Automatic activity point calculation
+---
 
-### Error Handling
-- **Graceful Degradation**: Errors don't interrupt bot operation
-- **User Feedback**: Meaningful error messages in user's language
-- **Comprehensive Logging**: Detailed logs for debugging and monitoring
+## 🛡 Deployment
 
-## 🌐 Internationalization
+<details>
+<summary>Dockerfile</summary>
 
-### Language Support
-- **English (en)**: Complete translation set
-- **Persian/Farsi (fa)**: Full localization including RTL considerations
-- **Per-user Settings**: Individual language preferences stored in database
-
-### Adding New Languages
-1. Add translations to `src/utils/translations.py`
-2. Update language selection handlers
-3. Test with both LTR and RTL text layouts
-
-## 🚀 Performance Optimizations
-
-### Database Optimizations
-- **Connection Pooling**: Reuse connections for better performance
-- **Efficient Queries**: Optimized SQL with proper indexing
-- **Batch Operations**: Reduced database round-trips
-
-### Memory Management
-- **Async Patterns**: Non-blocking operations throughout
-- **Resource Cleanup**: Proper connection and resource management
-- **Type Hints**: Better memory usage with static analysis
-
-## 🔍 Monitoring & Debugging
-
-### Logging System
-- **Structured Logging**: Consistent log format with timestamps
-- **Error Tracking**: Comprehensive exception logging
-- **Performance Metrics**: Database query timing and performance data
-
-### Health Checks
-- **Database Connection**: Automatic connection health verification
-- **Bot Status**: Regular polling status monitoring
-- **Error Recovery**: Automatic reconnection on failures
-
-## 🛡️ Deployment
-
-### Production Checklist
-- [ ] Environment variables properly configured
-- [ ] Database backup strategy in place
-- [ ] Log rotation configured
-- [ ] Monitor bot performance metrics
-- [ ] Set up error alerting
-
-### Docker Deployment (Optional)
 ```dockerfile
 FROM python:3.11-slim
 WORKDIR /app
@@ -243,36 +166,24 @@ RUN pip install -r requirements.txt
 COPY . .
 CMD ["python", "main.py"]
 ```
-
-## 🤝 Contributing
-
-### Code Style
-- **Type Hints**: Required for all functions and classes
-- **Docstrings**: Comprehensive documentation for all public methods
-- **Error Handling**: Proper exception handling with user feedback
-- **Testing**: Add tests for new features
-
-### Development Workflow
-1. Fork the repository
-2. Create feature branch with descriptive name
-3. Implement changes with proper error handling
-4. Add/update tests and documentation
-5. Submit pull request with detailed description
-
-## 📞 Support
-- **t.me/@bettercallninja**
-
-### Common Issues
-- **Import Errors**: Ensure all `__init__.py` files exist
-- **Database Connection**: Verify DATABASE_URL format and credentials
-- **Permission Issues**: Check bot admin permissions in target groups
-
-### Getting Help
-- Check logs for detailed error information
-- Verify environment variable configuration
-- Test database connectivity independently
-- Review Telegram Bot API documentation
+</details>
 
 ---
 
-**TrumpBot** - Modern Telegram gaming bot with enterprise-grade architecture and comprehensive feature set.
+## 🤝 Contributing
+
+1. Fork repo & create branch
+2. Add feature with type hints + docs
+3. Open PR with description
+
+---
+
+## 📞 Support
+
+Telegram: [@bettercallninja](https://t.me/bettercallninja)
+
+---
+
+## 📜 License
+
+MIT © [bettercallninja](https://github.com/bettercallninja)
