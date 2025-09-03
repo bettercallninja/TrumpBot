@@ -31,7 +31,7 @@
 ### ⚙️ Technical Excellence
 - **Async-first**: Full async/await implementation
 - **Connection Pooling**: `psycopg-pool` for PostgreSQL
-- **Bilingual**: English + فارسی with per-user settings
+- **Bilingual**: English + Persian with per-user settings
 - **Type Hints**: Static safety across the codebase
 - **Error Handling**: Robust exception management & user feedback
 - **Modular Design**: Commands, DB, utils, handlers separated
